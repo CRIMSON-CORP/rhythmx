@@ -1,6 +1,7 @@
 import Icon from "@/components/icon";
 import TermsPolicyText from "../TermsPolicyText";
 import Input from "../Input";
+import { Button } from "@/components/ui/button";
 
 function page() {
   return (
@@ -72,9 +73,7 @@ function page() {
           </div>
           <p>I agree to RhythmX marketing communications</p>
         </label>
-        <button className="bg-black outline outline-black p-4 rounded-10 text-white w-full">
-          Continue
-        </button>
+        <Button>Continue</Button>
       </form>
       <TermsPolicyText />
     </div>

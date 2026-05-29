@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Input from "../Input";
 import TermsPolicyText from "../TermsPolicyText";
 
@@ -20,9 +21,7 @@ async function Page({ searchParams }: { searchParams: Promise<{ email: string }>
           placeholder="Enter your email address"
         />
         <Input name="otp" label="OTP" type="number" placeholder="Enter OTP here" />
-        <button className="bg-black outline outline-black p-4 rounded-10 text-white w-full">
-          Verify
-        </button>
+        <Button>Verify</Button>
       </form>
       <TermsPolicyText />
     </div>

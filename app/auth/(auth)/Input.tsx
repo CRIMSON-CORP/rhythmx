@@ -1,5 +1,7 @@
 "use client";
 import Icon from "@/components/icon";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import useToggle from "@/hooks/useToggle";
 import { InputHTMLAttributes } from "react";
 
@@ -14,23 +16,25 @@ function Input({ type = "text", name, label, ...props }: InputProps) {
   const [isOpen, toggle] = useToggle(false);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={name}>{label}</label>
-      <div className="bg-white outline outline-[#D9D9D9] p-4 rounded-10 flex items-center gap-2">
-        <input
+    <Field>
+      <FieldLabel htmlFor={name}>{label}</FieldLabel>
+      <InputGroup className="bg-white outline outline-[#D9D9D9] p-4 rounded-10 flex items-center gap-2">
+        <InputGroupInput
           id={name}
-          type={type === "password" && isOpen ? "text" : type}
           name={name}
-          {...props}
+          type={type === "password" && isOpen ? "text" : type}
           className="w-full outline-none placeholder:text-black/50"
+          {...props}
         />
         {type === "password" ? (
           <button type="button" onClick={toggle}>
-            {isOpen ? <Icon name="eye-slash" size={16} /> : <Icon name="eye" size={16} />}
+            <InputGroupAddon align="inline-end">
+              {isOpen ? <Icon name="eye-slash" size={16} /> : <Icon name="eye" size={16} />}
+            </InputGroupAddon>
           </button>
         ) : null}
-      </div>
-    </div>
+      </InputGroup>
+    </Field>
   );
 }
 

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import Input from "../Input";
 import TermsPolicyText from "../TermsPolicyText";
 
@@ -58,9 +59,7 @@ function Page() {
       </div>
       <form action="" className="space-y-6">
         <Input type="email" name="email" label="Email" placeholder="Enter your email address" />
-        <button className="bg-black outline outline-black p-4 rounded-10 text-white w-full">
-          Create Account
-        </button>
+        <Button>Create Account</Button>
       </form>
       <TermsPolicyText />
     </div>
