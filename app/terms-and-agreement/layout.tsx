@@ -7,7 +7,7 @@ function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="grow max-w-3xl w-full h-full mx-auto flex flex-col items-center gap-16 py-16 overflow-auto">
+    <div className="grow max-w-3xl px-5 w-full h-full mx-auto flex flex-col items-center gap-16 py-16 overflow-auto">
       <Icon name="logo" width={33} height={51} className="text-brand-orange" />
       <header className="flex flex-col items-center text-center gap-1">
         <h1 className="font-medium text-[32px] leading-tight">Terms of Agreement</h1>

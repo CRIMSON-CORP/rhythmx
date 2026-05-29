@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 type SizeProps = {
   size: number;
   width?: never;
@@ -18,7 +20,12 @@ type IconProps = {
 
 export default function Icon({ name, size, width, height, className, viewBox }: IconProps) {
   return (
-    <svg width={size || width} height={size || height} viewBox={viewBox} className={className}>
+    <svg
+      width={size || width}
+      height={size || height}
+      viewBox={viewBox}
+      className={cn("flex-none", className)}
+    >
       <use href={`/icons.svg#${name}`} />
     </svg>
   );
