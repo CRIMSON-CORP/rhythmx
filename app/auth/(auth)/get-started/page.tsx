@@ -1,11 +1,14 @@
+import Input from "../Input";
+import TermsPolicyText from "../TermsPolicyText";
+
 function Page() {
   return (
-    <div className="flex flex-col max-w-107.5 m-auto gap-8 py-24">
+    <div className="flex flex-col max-w-107.5 m-auto gap-8">
       <div className="space-y-1 text-2xl font-semibold max-w-85.25">
         <h1>Hey, you could be the next BIG thing</h1>
         <p className="text-black/50">Get started</p>
       </div>
-      <div className="flex flex-col gap-3 font-medium *:bg-white *:outline *:outline-[#D9D9D9] *:flex *:items-center  *:justify-center *:gap-2.5 *:p-4 *:rounded-[10px]">
+      <div className="flex flex-col gap-3 font-medium *:bg-white *:outline *:outline-[#D9D9D9] *:flex *:items-center  *:justify-center *:gap-2.5 *:p-4 *:rounded-10">
         <button>
           <svg
             width="24"
@@ -54,25 +57,12 @@ function Page() {
         </button>
       </div>
       <form action="" className="space-y-6">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="Enter your email address"
-            className="bg-white outline outline-[#D9D9D9] p-4 rounded-[10px]"
-          />
-        </div>
-        <button className="bg-black outline outline-black p-4 rounded-[10px] text-white w-full">
+        <Input type="email" name="email" label="Email" placeholder="Enter your email address" />
+        <button className="bg-black outline outline-black p-4 rounded-10 text-white w-full">
           Create Account
         </button>
       </form>
-      <p className="text-xs text-black/50">
-        Your name and photo are displayed to users who invite you to RhythmX using your email. By
-        continuing, you acknowledge that you understand and agree to the Terms & Conditions and
-        Privacy Policy
-      </p>
+      <TermsPolicyText />
     </div>
   );
 }

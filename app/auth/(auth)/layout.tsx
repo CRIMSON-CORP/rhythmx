@@ -13,7 +13,7 @@ export default function AuthLayout({
         height={51}
         className="absolute top-14 left-1/2 -translate-x-1/2"
       />
-      <main className="min-h-full flex flex-col grow px-5">{children}</main>
+      <main className="min-h-full flex flex-col grow px-5 py-32">{children}</main>
     </>
   );
 }
