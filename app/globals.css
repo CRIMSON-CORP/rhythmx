@@ -6,6 +6,7 @@
 
 @theme inline {
   --color-brand-orange: #ff4907;
+  --color-brand-blue: #0066ff;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -40,13 +41,14 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-page-background: var(--page-background);
   --color-default: var(--default);
   --color-default-default: var(--default-default);
   --color-default-secondary: var(--default-secondary);
   --color-border-default-secondary: var(--border-default-secondary);
   --color-default-tertiary: var(--default-tertiary);
   --color-neutral-default: var(--neutral-default);
-  --color-blue: #0066ff;
+  --color-danger-default: #ec221f;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -55,9 +57,12 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --radius-10: 10px;
+  --radius-20: 20px;
+  --radius-40: 40px;
 }
 
 :root {
+  --page-background: #f9fafc;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
