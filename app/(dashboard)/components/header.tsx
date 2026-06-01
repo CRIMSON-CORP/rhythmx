@@ -157,10 +157,10 @@ function Header() {
           <button>
             <Icon name="search" size={24} />
           </button>
-          <button className="relative">
+          <Link href="/notifications" className="relative">
             <Icon name="inbox" size={24} />
             <span className="absolute size-2.5 bg-danger-default rounded-full top-0 right-0 block" />
-          </button>
+          </Link>
           <Link
             href="/wallet"
             className="flex items-center gap-3 bg-brand-orange/10 rounded-full px-2.5 py-2 pl-4"
