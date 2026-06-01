@@ -233,9 +233,59 @@ function Header() {
               </PopoverContent>
             </Popover>
           </div>
-          <Link href="/" className="p-2 bg-brand-orange rounded-full">
-            <Icon name="plus" size={20} className="text-white" />
-          </Link>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="p-2 bg-brand-orange rounded-full">
+                <Icon name="plus" size={20} className="text-white" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="p-0 outline-none shadow-2xl ring-0 gap-0 min-w-89"
+            >
+              <header className="px-6 py-5 border-b border-b-brand-orange/10">
+                <span className="text-sm font-medium">What will you like to release?</span>
+              </header>
+              <div className="p-6 flex flex-col gap-4">
+                <div className="flex flex-col gap-6">
+                  <Link href="/releases" className="flex items-center gap-3">
+                    <span className="p-1.5 bg-brand-blue/10 rounded-full">
+                      <Icon name="music" size={20} className="text-brand-blue" />
+                    </span>
+                    <div className="flex flex-col grow">
+                      <span className="font-medium text-sm">Single</span>
+                      <span className="text-xs text-default-tertiary">
+                        Add a single to your discography
+                      </span>
+                    </div>
+                    <Icon name="chevron-right" size={20} className="text-default-tertiary" />
+                  </Link>
+                  <Link href="/releases" className="flex items-center gap-3">
+                    <span className="p-1.5 bg-brand-blue/10 rounded-full">
+                      <Icon name="disc" size={20} className="text-brand-blue" />
+                    </span>
+                    <div className="flex flex-col grow">
+                      <span className="font-medium text-sm">Album</span>
+                      <span className="text-xs text-default-tertiary">
+                        Add an album to your discography
+                      </span>
+                    </div>
+                    <Icon name="chevron-right" size={20} className="text-default-tertiary" />
+                  </Link>
+                </div>
+                <p className="text-[11px]">
+                  You&apos;re starting a pay per release distribution.{" "}
+                  <Link href="/pricing" className="text-brand-orange underline">
+                    View Pricing Here.
+                  </Link>
+                </p>
+                <footer className="text-brand-blue flex items-stretch justify-end gap-3.5">
+                  <Icon name="globe" size={24} />
+                  <Icon name="question" size={24} />
+                </footer>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </header>
     </div>

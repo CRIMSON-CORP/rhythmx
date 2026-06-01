@@ -25,6 +25,9 @@
 	<symbol id="chevron-down" fill="none" viewBox="0 0 16 16">
 		<path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
 	</symbol>
+	<symbol id="chevron-right" viewBox="0 0 20 20" fill="none">
+		<path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+	</symbol>
 	<symbol id="record-label" fill="none" viewBox="0 0 32 32">
 		<path d="M16.0001 4.00001C14.1285 3.99749 12.3149 4.64906 10.8728 5.84205C9.43078 7.03504 8.45094 8.69445 8.10274 10.5333C7.98807 11.1547 7.92941 11.4653 8.14541 11.8733C8.36007 12.2827 8.66541 12.4187 9.27474 12.6907C11.1147 13.5093 13.4534 14 16.0001 14C18.5467 14 20.8867 13.5093 22.7254 12.6907C23.3347 12.4187 23.6401 12.2827 23.8547 11.8733C24.0707 11.4653 24.0121 11.1533 23.8974 10.5333C23.5492 8.69445 22.5694 7.03504 21.1273 5.84205C19.6852 4.64906 17.8716 3.99749 16.0001 4.00001Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
 		<path d="M22.6665 7.3335C26.6518 8.38416 29.3332 10.3468 29.3332 12.5935C29.3332 15.9482 23.3638 18.6668 15.9998 18.6668C8.63584 18.6668 2.6665 15.9468 2.6665 12.5935C2.6665 10.3468 5.34784 8.38416 9.33317 7.3335M15.9998 24.0002V28.0002M22.6665 22.6668L23.9998 28.0002M9.33317 22.6668L7.99984 28.0002" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -110,5 +113,8 @@
 	</symbol>
 	<symbol id="play" viewBox="0 0 16 16" fill="none">
 		<path d="M3.33334 2L12.6667 8L3.33334 14V2Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+	</symbol>
+	<symbol id="music" viewBox="0 0 20 20" fill="none">
+		<path d="M7.5 15V4.16667L17.5 2.5V13.3333M7.5 15C7.5 16.3807 6.38071 17.5 5 17.5C3.61929 17.5 2.5 16.3807 2.5 15C2.5 13.6193 3.61929 12.5 5 12.5C6.38071 12.5 7.5 13.6193 7.5 15ZM17.5 13.3333C17.5 14.714 16.3807 15.8333 15 15.8333C13.6193 15.8333 12.5 14.714 12.5 13.3333C12.5 11.9526 13.6193 10.8333 15 10.8333C16.3807 10.8333 17.5 11.9526 17.5 13.3333Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
 	</symbol>
 </svg>

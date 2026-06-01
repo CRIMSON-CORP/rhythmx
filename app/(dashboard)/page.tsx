@@ -10,7 +10,9 @@ import MyRelease from "./components/my-release";
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="container py-10 text-default-tertiary">Loading dashboard...</div>}>
+    <Suspense
+      fallback={<div className="container py-10 text-default-tertiary">Loading dashboard...</div>}
+    >
       <div className="flex flex-col gap-6">
         <div className="container flex flex-wrap items-center justify-between gap-6">
           <Greeting />
@@ -32,4 +34,3 @@ export default function Home() {
     </Suspense>
   );
 }
-
