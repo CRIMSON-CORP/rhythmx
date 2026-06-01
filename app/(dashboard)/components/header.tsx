@@ -1,4 +1,3 @@
-"use client";
 import Icon from "@/components/icon";
 import {
   Command,
@@ -11,100 +10,17 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-
-const mainOptions = [
-  {
-    href: "/",
-    title: "Home",
-    icon: "home",
-    command: "⇧I",
-  },
-  {
-    href: "/discography",
-    title: "Discography",
-    icon: "disc",
-    command: "⇧C",
-  },
-  {
-    href: "/artist",
-    title: "Artist",
-    icon: "star",
-    command: "⇧A",
-  },
-  {
-    href: "/trend-analytics",
-    title: "Trends & Analytics",
-    icon: "bar-chart",
-    command: "⇧T",
-  },
-  {
-    href: "/earning",
-    title: "Earning",
-    icon: "dollar",
-    command: "⇧E",
-  },
-  {
-    href: "/wallet",
-    title: "Wallet",
-    icon: "inbox",
-    command: "⇧W",
-  },
-  {
-    href: "/subscription",
-    title: "Subscription",
-    icon: "zap",
-    command: "⇧S",
-  },
-];
-
-const managementOptions = [
-  {
-    href: "/team ",
-    title: "Team",
-    icon: "users",
-    command: "",
-  },
-  {
-    href: "/roles-permission ",
-    title: "Roles & Permission",
-    icon: "command",
-    command: "",
-  },
-];
-
-const profileOptions = [
-  {
-    href: "/invite ",
-    title: "Invite",
-    icon: "user-plus",
-    command: "⇧I",
-  },
-  {
-    href: "/view-as-artist",
-    title: "View As Artist",
-    icon: "command",
-    command: "⇧I",
-  },
-  {
-    href: "/view-as-record-label ",
-    title: "View As Record Label",
-    icon: "command",
-    command: "⇧I",
-  },
-  {
-    href: "/view-as-royalty",
-    title: "View As Royalty",
-    icon: "command",
-    command: "⇧I",
-  },
-  {
-    href: "/settings",
-    title: "Settings",
-    icon: "settings",
-    command: "⇧S",
-  },
-];
+import { mainOptions, managementOptions, profileOptions } from "@/data/nav-links";
+import PageTitle from "./page-title";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { VisuallyHidden } from "radix-ui";
+import Search from "./search";
 
 function Header() {
   return (
@@ -113,11 +29,9 @@ function Header() {
         <div className="flex items-center gap-8">
           <Icon name="logo" width={25} height={38} className="text-brand-orange" />
           <Popover>
-            <PopoverTrigger asChild>
-              <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
-                <Icon name="side-bar" size={20} />
-                <Icon name="chevron-down" size={16} className="text-default-tertiary" />
-              </button>
+            <PopoverTrigger className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
+              <Icon name="side-bar" size={20} />
+              <Icon name="chevron-down" size={16} className="text-default-tertiary" />
             </PopoverTrigger>
             <PopoverContent
               align="start"
@@ -154,9 +68,19 @@ function Header() {
           <PageTitle />
         </div>
         <div className="flex items-center gap-8 text-default font-medium">
-          <button>
-            <Icon name="search" size={24} />
-          </button>
+          <Dialog>
+            <DialogTrigger>
+              <Icon name="search" size={24} />
+            </DialogTrigger>
+            <DialogContent className="overflow-hidden isolate gap-0" showCloseButton={false}>
+              <VisuallyHidden.Root>
+                <DialogTitle>Search Popup</DialogTitle>
+                <DialogDescription>Search Popup</DialogDescription>
+              </VisuallyHidden.Root>
+              <div className="absolute w-full top-0 right-0 h-26 bg-linear-to-r from-[#9747FF] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
+              <Search />
+            </DialogContent>
+          </Dialog>
           <Link href="/notifications" className="relative">
             <Icon name="inbox" size={24} />
             <span className="absolute size-2.5 bg-danger-default rounded-full top-0 right-0 block" />
@@ -182,10 +106,8 @@ function Header() {
               <span>Captain RL</span>
             </div>
             <Popover>
-              <PopoverTrigger asChild>
-                <button className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
-                  <Icon name="elipses-h" size={20} />
-                </button>
+              <PopoverTrigger className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
+                <Icon name="elipses-h" size={20} />
               </PopoverTrigger>
               <PopoverContent
                 align="end"
@@ -234,10 +156,8 @@ function Header() {
             </Popover>
           </div>
           <Popover>
-            <PopoverTrigger asChild>
-              <button className="p-2 bg-brand-orange rounded-full">
-                <Icon name="plus" size={20} className="text-white" />
-              </button>
+            <PopoverTrigger className="p-2 bg-brand-orange rounded-full">
+              <Icon name="plus" size={20} className="text-white" />
             </PopoverTrigger>
             <PopoverContent
               align="end"
@@ -293,21 +213,3 @@ function Header() {
 }
 
 export default Header;
-
-function PageTitle() {
-  const pathname = usePathname();
-  const currentPath = [...mainOptions, ...managementOptions].find(
-    (option) => option.href === pathname,
-  );
-
-  if (!currentPath) {
-    return null;
-  }
-
-  return (
-    <>
-      <Icon name={currentPath.icon} size={20} className="text-default-tertiary" />
-      <span className="text-sm font-medium">{currentPath.title}</span>
-    </>
-  );
-}
