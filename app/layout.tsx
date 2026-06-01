@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-sans" });
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  variable: "--font-heading",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,8 +21,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full", "antialiased", "font-sans", inter.variable)}>
-      <body className="min-h-full h-full flex flex-col">{children}</body>
+    <html
+      lang="en"
+      className={cn("h-full", "antialiased", "font-sans", inter.variable, bricolage.variable)}
+    >
+      <body className="min-h-full flex flex-col pb-20">{children}</body>
     </html>
   );
 }

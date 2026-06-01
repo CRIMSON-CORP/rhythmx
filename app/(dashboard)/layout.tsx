@@ -7,7 +7,7 @@ function DashbaordLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="p4 md:p-10 bg-page-background h-full">
+    <div className="bg-page-background h-full flex flex-col gap-6">
       <Header />
       <main>{children}</main>
     </div>

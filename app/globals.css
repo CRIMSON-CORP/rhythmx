@@ -2,16 +2,36 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility container {
+  max-width: 1770px;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+
+@utility container-full-bleed {
+  padding-inline: max(16px, calc((100vw - 1770px) / 2 + 16px));
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-brand-orange: #ff4907;
   --color-brand-blue: #0066ff;
+  --color-brand-purple: #9747ff;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-heading);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,6 +69,7 @@
   --color-default-tertiary: var(--default-tertiary);
   --color-neutral-default: var(--neutral-default);
   --color-danger-default: #ec221f;
+  --color-positive-tertiary: #14ae5c;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -58,6 +79,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
   --radius-10: 10px;
   --radius-20: 20px;
+  --radius-30: 30px;
   --radius-40: 40px;
 }
 
