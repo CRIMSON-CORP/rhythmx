@@ -2,6 +2,7 @@
 
 import Icon from "@/components/icon";
 import { mainOptions, managementOptions } from "@/data/nav-links";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function PageTitle() {
@@ -14,9 +15,19 @@ export default function PageTitle() {
     return null;
   }
 
+  const isHome = pathname === "/";
+
   return (
     <>
-      <Icon name={currentPath.icon} size={20} className="text-default-tertiary" />
+      <div className="@max-sm:hidden">
+        {isHome ? (
+          <Icon name={currentPath.icon} size={20} className="text-default-tertiary" />
+        ) : (
+          <Link href="/">
+            <Icon name={currentPath.icon} size={20} className="text-default" />
+          </Link>
+        )}
+      </div>
       <span className="text-sm font-medium">{currentPath.title}</span>
     </>
   );

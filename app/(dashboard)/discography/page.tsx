@@ -1,0 +1,210 @@
+import Icon from "@/components/icon";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { VisuallyHidden } from "radix-ui";
+import Releases from "./releases";
+import Link from "next/link";
+import ReleaseCards from "@/components/realease-cards";
+import { releases } from "@/data/releases";
+import ReleaseCard from "@/components/release-card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const DUMMY_RELEASES: ReleaseResult[] = [
+  {
+    id: "1",
+    title: "Standing B4 Him",
+    type: "Single",
+    platforms: "Apple Music. Spotify. Deezer",
+    image: "/images/release-1.png",
+  },
+  {
+    id: "2",
+    title: "Dancing in the Rain",
+    type: "Duet",
+    platforms: "Amazon Music. YouTube Music. Tidal",
+    image: "/images/release-2.png",
+  },
+  {
+    id: "3",
+    title: "Lost in the Echo",
+    type: "Cover",
+    platforms: "SoundCloud. Pandora. iHeartRadio",
+    image: "/images/release-3.png",
+  },
+];
+
+function DisocgraphyPage() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="container flex flex-wrap items-center justify-between gap-6">
+        <h1 className="font-heading text-[32px] leading-tight font-semibold flex items-center gap-2.5 text-default">
+          <span>Discography</span>
+          <div className="bg-white flex items-center gap-2.5 px-5 py-4 rounded-full font-sans font-medium max-sm:hidden">
+            <span className="text-sm text-border-default-secondary">Total Release</span>
+            <span className="text-base">10203</span>
+          </div>
+        </h1>
+        <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
+          <Dialog>
+            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
+              <Icon name="check-circle" size={16} />
+              <span>Approved Release (3)</span>
+            </DialogTrigger>
+            <DialogContent
+              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
+              showCloseButton={false}
+            >
+              <VisuallyHidden.Root>
+                <DialogTitle>Approved releases Popup</DialogTitle>
+                <DialogDescription>Approved Releases Popup</DialogDescription>
+              </VisuallyHidden.Root>
+              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#14AE5C] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
+              <Releases title="Approved Release" releases={DUMMY_RELEASES} />
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
+              <Icon name="check-circle" size={16} />
+              <span>Pending Release (3)</span>
+            </DialogTrigger>
+            <DialogContent
+              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
+              showCloseButton={false}
+            >
+              <VisuallyHidden.Root>
+                <DialogTitle>Pending releases Popup</DialogTitle>
+                <DialogDescription>Pending Releases Popup</DialogDescription>
+              </VisuallyHidden.Root>
+              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
+              <Releases title="Pending Release" releases={DUMMY_RELEASES} type="pending" />
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
+              <Icon name="check-circle" size={16} />
+              <span>Rejected Release (3)</span>
+            </DialogTrigger>
+            <DialogContent
+              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
+              showCloseButton={false}
+            >
+              <VisuallyHidden.Root>
+                <DialogTitle>Rejected releases Popup</DialogTitle>
+                <DialogDescription>Rejected Releases Popup</DialogDescription>
+              </VisuallyHidden.Root>
+              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#EC221F] -z-10 opacity-25 blur-3xl"></div>
+              <Releases title="Rejected Release" releases={DUMMY_RELEASES} type="rejected" />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+      <section className="flex flex-col gap-8">
+        <header className="container flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3.5 text-default-tertiary">
+            <Icon name="disc" size={24} />
+            <h2 className="font-medium">Top Releases</h2>
+          </div>
+          <Link href="/" className="flex items-center gap-1 text-xs">
+            <span>See Trends & Analytics</span>
+            <Icon name="arrow-up-right" size={16} />
+          </Link>
+        </header>
+        <ReleaseCards scrollable>
+          {releases.map((release) => (
+            <ReleaseCard
+              key={release.id}
+              id={release.id}
+              name={release.name}
+              href={release.href}
+              imageSrc={release.imageSrc}
+              sources={release.sources}
+              engagements={release.engagements}
+              title={release.title}
+              type={release.type}
+            />
+          ))}
+        </ReleaseCards>
+      </section>
+      <section className="flex flex-col gap-8">
+        <header className="container flex items-center justify-between flex-wrap gap-3">
+          <h2 className="font-medium whitespace-nowrap">All Releases</h2>
+          <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
+            <div className="flex items-center p-4 gap-x-2">
+              <Icon name="search" size={16} />
+              <input
+                type="search"
+                placeholder="Search releases"
+                className="bg-transparent outline-none"
+              />
+            </div>
+            <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
+              <Icon name="arrow-up" size={16} />
+              <span>All</span>
+            </button>
+            <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
+              <Icon name="disc" size={16} />
+              <span>Album</span>
+            </button>
+            <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
+              <Icon name="music" size={16} />
+              <span>Single</span>
+            </button>
+            <Select defaultValue="recent">
+              <SelectTrigger className="bg-white rounded-full flex px-4 py-3 items-center">
+                <span>Sort:</span>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" align="start" className="outline-0! p-2">
+                <SelectItem value="recent">Recent</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="popular">Popular</SelectItem>
+                <SelectItem value="unpopular">Unpopular</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select defaultValue="any">
+              <SelectTrigger className="bg-white rounded-full flex px-4 py-3 items-center">
+                <span>Artist:</span>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" align="start" className="outline-0! p-2">
+                <SelectItem value="any">Any</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="yearly">Yearly</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </header>
+        <ReleaseCards>
+          {releases.map((release) => (
+            <ReleaseCard
+              key={release.id}
+              id={release.id}
+              name={release.name}
+              href={release.href}
+              imageSrc={release.imageSrc}
+              sources={release.sources}
+              engagements={release.engagements}
+              title={release.title}
+              type={release.type}
+            />
+          ))}
+        </ReleaseCards>
+      </section>
+    </div>
+  );
+}
+
+export default DisocgraphyPage;

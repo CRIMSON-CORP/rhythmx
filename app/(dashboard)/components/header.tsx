@@ -7,7 +7,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/components/ui/popover";
 import Image from "next/image";
 import Link from "next/link";
 import { mainOptions, managementOptions, profileOptions } from "@/data/nav-links";
@@ -24,9 +24,9 @@ import Search from "./search";
 
 function Header() {
   return (
-    <div className="max-w-442.5 w-full mx-auto px-4 pt-10">
+    <div className="@container max-w-442.5 w-full mx-auto px-4 pt-10">
       <header className="bg-white px-8 py-6 rounded-full flex items-center justify-between">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center @max-md:gap-2 gap-4 lg:gap-8">
           <Icon name="logo" width={25} height={38} className="text-brand-orange" />
           <Popover>
             <PopoverTrigger className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
@@ -42,28 +42,32 @@ function Header() {
                   <CommandGroup className="p-0">
                     {mainOptions.map((option) => (
                       <CommandItem key={option.href} className="p-0 cursor-pointer">
-                        <Link
-                          href={option.href.trim()}
-                          className="flex items-center gap-2 px-4 py-3 w-full h-full"
-                        >
-                          <Icon name={option.icon} size={20} className="text-brand-orange" />
-                          <span>{option.title}</span>
-                          <CommandShortcut>{option.command}</CommandShortcut>
-                        </Link>
+                        <PopoverClose asChild>
+                          <Link
+                            href={option.href.trim()}
+                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
+                          >
+                            <Icon name={option.icon} size={20} className="text-brand-orange" />
+                            <span>{option.title}</span>
+                            <CommandShortcut>{option.command}</CommandShortcut>
+                          </Link>
+                        </PopoverClose>
                       </CommandItem>
                     ))}
                   </CommandGroup>
                   <CommandGroup className="p-0" heading="Management">
                     {managementOptions.map((option) => (
                       <CommandItem key={option.href} className="p-0 cursor-pointer">
-                        <Link
-                          href={option.href.trim()}
-                          className="flex items-center gap-2 px-4 py-3 w-full h-full"
-                        >
-                          <Icon name={option.icon} size={20} className="text-brand-orange" />
-                          <span>{option.title}</span>
-                          <CommandShortcut>{option.command}</CommandShortcut>
-                        </Link>
+                        <PopoverClose asChild>
+                          <Link
+                            href={option.href.trim()}
+                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
+                          >
+                            <Icon name={option.icon} size={20} className="text-brand-orange" />
+                            <span>{option.title}</span>
+                            <CommandShortcut>{option.command}</CommandShortcut>
+                          </Link>
+                        </PopoverClose>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -77,9 +81,9 @@ function Header() {
           </Popover>
           <PageTitle />
         </div>
-        <div className="flex items-center gap-8 text-default font-medium">
+        <div className="flex items-center gap-4 lg:gap-8 text-default font-medium">
           <Dialog>
-            <DialogTrigger>
+            <DialogTrigger className="@max-4xl:hidden">
               <Icon name="search" size={24} />
             </DialogTrigger>
             <DialogContent className="overflow-hidden isolate gap-0" showCloseButton={false}>
@@ -91,87 +95,85 @@ function Header() {
               <Search />
             </DialogContent>
           </Dialog>
-          <Link href="/notifications" className="relative">
+          <Link href="/notifications" className="relative @max-2xl:hidden">
             <Icon name="inbox" size={24} />
             <span className="absolute size-2.5 bg-danger-default rounded-full top-0 right-0 block" />
           </Link>
           <Link
             href="/wallet"
-            className="flex items-center gap-3 bg-brand-orange/10 rounded-full px-2.5 py-2 pl-4"
+            className="flex items-center gap-3 bg-brand-orange/10 rounded-full px-2.5 py-2 pl-4 @max-4xl:hidden"
           >
             <span>$394,000.00</span>
             <span className="block p-1.5">
               <Icon name="zap" size={20} className="text-brand-orange" />
             </span>
           </Link>
-          <div className="bg-page-background px-2.5 py-2 rounded-40 flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Image
-                src="/images/avatar.png"
-                width={32}
-                height={32}
-                alt="Captain RL"
-                className="bg-[#C7FFB3] rounded-lg"
-              />
-              <span>Captain RL</span>
-            </div>
-            <Popover>
-              <PopoverTrigger className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
-                <Icon name="elipses-h" size={20} />
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="p-2 rounded-20 outline-none shadow-2xl ring-0 gap-0 min-w-75.25"
-              >
-                <Command className="p-0">
-                  <div className="flex items-center gap-4 p-4">
-                    <Image
-                      src="/images/avatar.png"
-                      width={32}
-                      height={32}
-                      alt="Captain RL"
-                      className="bg-[#C7FFB3] rounded-lg"
-                    />
-                    <div className="flex flex-col leading-tight">
-                      <span className="font-semibold">Captain RL</span>
-                      <span className="text-border-default-secondary text-sm">Admin</span>
-                    </div>
-                  </div>
-                  <CommandSeparator className="my-1" />
-                  <CommandList className="max-h-none font-medium">
-                    <CommandGroup className="p-0">
-                      {profileOptions.map((option) => (
-                        <CommandItem key={option.href} className="p-0 cursor-pointer">
-                          <Link
-                            href={option.href.trim()}
-                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
-                          >
-                            <Icon name={option.icon} size={20} />
-                            <span>{option.title}</span>
-                            <CommandShortcut>{option.command}</CommandShortcut>
-                          </Link>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                    <CommandSeparator className="my-1" />
-                    <CommandGroup className="p-0">
-                      <CommandItem key="privacy-policy" className="px-4 py-3 cursor-pointer">
-                        <span>Privacy Policy</span>
-                      </CommandItem>
-                      <CommandItem key="terms-of-use" className="px-4 py-3 cursor-pointer">
-                        <span>Terms of Use</span>
-                      </CommandItem>
-                      <CommandItem key="logout" className="px-4 py-3 cursor-pointer">
-                        <span>Logout</span>
-                      </CommandItem>
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
           <Popover>
-            <PopoverTrigger className="p-2 bg-brand-orange rounded-full">
+            <PopoverTrigger className="bg-page-background px-2.5 py-2 rounded-40 flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/images/avatar.png"
+                  width={32}
+                  height={32}
+                  alt="Captain RL"
+                  className="bg-[#C7FFB3] rounded-lg"
+                />
+                <span className="@max-3xl:hidden">Captain RL</span>
+              </div>
+              <Icon name="elipses-h" size={20} className="@max-lg:hidden" />
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="p-2 rounded-20 outline-none shadow-2xl ring-0 gap-0 min-w-75.25"
+            >
+              <Command className="p-0">
+                <div className="flex items-center gap-4 p-4">
+                  <Image
+                    src="/images/avatar.png"
+                    width={32}
+                    height={32}
+                    alt="Captain RL"
+                    className="bg-[#C7FFB3] rounded-lg"
+                  />
+                  <div className="flex flex-col leading-tight">
+                    <span className="font-semibold">Captain RL</span>
+                    <span className="text-border-default-secondary text-sm">Admin</span>
+                  </div>
+                </div>
+                <CommandSeparator className="my-1" />
+                <CommandList className="max-h-none font-medium">
+                  <CommandGroup className="p-0">
+                    {profileOptions.map((option) => (
+                      <CommandItem key={option.href} className="p-0 cursor-pointer">
+                        <Link
+                          href={option.href.trim()}
+                          className="flex items-center gap-2 px-4 py-3 w-full h-full"
+                        >
+                          <Icon name={option.icon} size={20} />
+                          <span>{option.title}</span>
+                          <CommandShortcut>{option.command}</CommandShortcut>
+                        </Link>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  <CommandSeparator className="my-1" />
+                  <CommandGroup className="p-0">
+                    <CommandItem key="privacy-policy" className="px-4 py-3 cursor-pointer">
+                      <span>Privacy Policy</span>
+                    </CommandItem>
+                    <CommandItem key="terms-of-use" className="px-4 py-3 cursor-pointer">
+                      <span>Terms of Use</span>
+                    </CommandItem>
+                    <CommandItem key="logout" className="px-4 py-3 cursor-pointer">
+                      <span>Logout</span>
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger className="p-2 bg-brand-orange rounded-full @max-xl:hidden">
               <Icon name="plus" size={20} className="text-white" />
             </PopoverTrigger>
             <PopoverContent

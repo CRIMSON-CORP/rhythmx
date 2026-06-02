@@ -31,3 +31,11 @@ interface AccountFormProps {
   fundingDate: string;
   licenseNumber: string;
 }
+
+type ReleaseResult = {
+  id: string;
+  title: string;
+  type: string;
+  platforms: string;
+  image: string;
+};

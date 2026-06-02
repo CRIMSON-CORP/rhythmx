@@ -7,7 +7,7 @@ function ReleaseCard({ imageSrc, title, engagements, type, name, sources }: Rele
   const hasMoreSources = sources.length > 2;
   return (
     <div className="w-full aspect-square rounded-30 overflow-hidden relative flex flex-col justify-between gap-5 text-white isolate snap-center">
-      <Image src={imageSrc} alt={title} fill className="-z-10 object-cover" />
+      <Image src={imageSrc} alt={title} fill className="-z-10 object-cover" loading="lazy" />
       <header className="flex justify-end p-4">
         <div className="flex items-center gap-0.5 px-2.5 py-1 rounded-full bg-[#F2F2F7]/10 backdrop-blur-lg">
           <Icon name={type === "album" ? "play" : "eye"} size={16} />

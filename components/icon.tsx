@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 type SizeProps = {
-  size?: number;
+  size: number;
   width?: never;
   height?: never;
 };
