@@ -19,3 +19,15 @@ type ReleaseCardProps = {
   name: string;
   sources: string[];
 };
+
+interface AccountFormProps {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  countryCode: string;
+  labelName: string;
+  labelAbout: string;
+  fundingDate: string;
+  licenseNumber: string;
+}

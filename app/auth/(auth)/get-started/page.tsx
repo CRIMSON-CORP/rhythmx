@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import Input from "../Input";
+import Input from "../../../../components/Input";
 import TermsPolicyText from "../TermsPolicyText";
 
 function Page() {

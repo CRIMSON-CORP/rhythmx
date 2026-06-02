@@ -6,7 +6,7 @@ import useOnBoardingStore, {
 import type { AccountType as LabelName } from "@/store/onboarding-store";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
-import Input from "@/app/auth/(auth)/Input";
+import Input from "@/components/Input";
 import {
   Select,
   SelectContent,

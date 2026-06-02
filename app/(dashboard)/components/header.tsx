@@ -41,19 +41,29 @@ function Header() {
                 <CommandList className="max-h-none font-medium">
                   <CommandGroup className="p-0">
                     {mainOptions.map((option) => (
-                      <CommandItem key={option.href} className="px-4 py-3 cursor-pointer">
-                        <Icon name={option.icon} size={20} className="text-brand-orange" />
-                        <span>{option.title}</span>
-                        <CommandShortcut>{option.command}</CommandShortcut>
+                      <CommandItem key={option.href} className="p-0 cursor-pointer">
+                        <Link
+                          href={option.href.trim()}
+                          className="flex items-center gap-2 px-4 py-3 w-full h-full"
+                        >
+                          <Icon name={option.icon} size={20} className="text-brand-orange" />
+                          <span>{option.title}</span>
+                          <CommandShortcut>{option.command}</CommandShortcut>
+                        </Link>
                       </CommandItem>
                     ))}
                   </CommandGroup>
                   <CommandGroup className="p-0" heading="Management">
                     {managementOptions.map((option) => (
-                      <CommandItem key={option.href} className="px-4 py-3 cursor-pointer">
-                        <Icon name={option.icon} size={20} className="text-brand-orange" />
-                        <span>{option.title}</span>
-                        <CommandShortcut>{option.command}</CommandShortcut>
+                      <CommandItem key={option.href} className="p-0 cursor-pointer">
+                        <Link
+                          href={option.href.trim()}
+                          className="flex items-center gap-2 px-4 py-3 w-full h-full"
+                        >
+                          <Icon name={option.icon} size={20} className="text-brand-orange" />
+                          <span>{option.title}</span>
+                          <CommandShortcut>{option.command}</CommandShortcut>
+                        </Link>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -131,10 +141,15 @@ function Header() {
                   <CommandList className="max-h-none font-medium">
                     <CommandGroup className="p-0">
                       {profileOptions.map((option) => (
-                        <CommandItem key={option.href} className="px-4 py-3 cursor-pointer">
-                          <Icon name={option.icon} size={20} />
-                          <span>{option.title}</span>
-                          <CommandShortcut>{option.command}</CommandShortcut>
+                        <CommandItem key={option.href} className="p-0 cursor-pointer">
+                          <Link
+                            href={option.href.trim()}
+                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
+                          >
+                            <Icon name={option.icon} size={20} />
+                            <span>{option.title}</span>
+                            <CommandShortcut>{option.command}</CommandShortcut>
+                          </Link>
                         </CommandItem>
                       ))}
                     </CommandGroup>

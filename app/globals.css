@@ -27,6 +27,8 @@
   --color-brand-orange: #ff4907;
   --color-brand-blue: #0066ff;
   --color-brand-purple: #9747ff;
+  --color-grey: #8e8e93;
+  --color-light-blue: #eaf5ff;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -70,6 +72,7 @@
   --color-neutral-default: var(--neutral-default);
   --color-danger-default: #ec221f;
   --color-positive-tertiary: #14ae5c;
+  --color-positive-secondary: #02542d;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);

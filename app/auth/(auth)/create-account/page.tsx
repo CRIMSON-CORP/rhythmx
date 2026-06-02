@@ -1,6 +1,6 @@
 import Icon from "@/components/icon";
 import TermsPolicyText from "../TermsPolicyText";
-import Input from "../Input";
+import Input from "../../../../components/Input";
 import { Button } from "@/components/ui/button";
 
 function page() {
