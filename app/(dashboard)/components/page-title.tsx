@@ -7,9 +7,15 @@ import { usePathname } from "next/navigation";
 
 export default function PageTitle() {
   const pathname = usePathname();
-  const currentPath = [...mainOptions, ...managementOptions].find(
-    (option) => option.href === pathname,
-  );
+  const currentPath = [...mainOptions, ...managementOptions]
+    .filter((option) => option.href.trim() !== "")
+    .find((option) => {
+      const href = option.href.trim();
+      if (href === "/") {
+        return pathname === "/";
+      }
+      return pathname === href || pathname.startsWith(href + "/");
+    });
 
   if (!currentPath) {
     return null;

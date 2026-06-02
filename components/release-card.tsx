@@ -1,12 +1,16 @@
 import Image from "next/image";
 import Icon from "./icon";
 import { formatCount } from "@/lib/count-formatter";
+import Link from "next/link";
 
-function ReleaseCard({ imageSrc, title, engagements, type, name, sources }: ReleaseCardProps) {
+function ReleaseCard({ id, imageSrc, title, engagements, type, name, sources }: ReleaseCardProps) {
   const shownSources = sources.slice(0, 2);
   const hasMoreSources = sources.length > 2;
   return (
-    <div className="w-full aspect-square rounded-30 overflow-hidden relative flex flex-col justify-between gap-5 text-white isolate snap-center">
+    <Link
+      href={`/discography/${id}`}
+      className="w-full aspect-square rounded-30 overflow-hidden relative flex flex-col justify-between gap-5 text-white isolate snap-center"
+    >
       <Image src={imageSrc} alt={title} fill className="-z-10 object-cover" loading="lazy" />
       <header className="flex justify-end p-4">
         <div className="flex items-center gap-0.5 px-2.5 py-1 rounded-full bg-[#F2F2F7]/10 backdrop-blur-lg">
@@ -51,7 +55,7 @@ function ReleaseCard({ imageSrc, title, engagements, type, name, sources }: Rele
           </div>
         </footer>
       )}
-    </div>
+    </Link>
   );
 }
 
