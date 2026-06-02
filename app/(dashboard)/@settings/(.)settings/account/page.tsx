@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Icon from "@/components/icon";
 import Form from "./form";
+import Link from "next/link";
 
 export default async function AccountForm() {
   const initialData: AccountFormProps = {
@@ -45,15 +46,18 @@ export default async function AccountForm() {
       <Form {...initialData} />
       {/* Update Password Action Card */}
       <footer className="px-6 py-4 mt-2 bg-page-background">
-        <button className="w-full bg-white flex gap-3 p-3 rounded-20 text-left">
+        <Link
+          href="/settings/security-privacy"
+          className="w-full bg-white text-default hover:bg-default hover:text-white transition-colors duration-300 flex gap-3 p-3 rounded-20 text-left"
+        >
           <Icon name="lock" size={20} />
           <div className="flex flex-col">
-            <span className="font-medium text-default leading-tight">Update Password</span>
+            <span className="font-medium leading-tight">Update Password</span>
             <span className="text-xs font-medium text-default-tertiary leading-tight">
               Secure your account if you feel your password has been compromised
             </span>
           </div>
-        </button>
+        </Link>
       </footer>
     </div>
   );
