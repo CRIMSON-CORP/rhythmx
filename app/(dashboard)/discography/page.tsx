@@ -136,7 +136,7 @@ function DisocgraphyPage() {
           ))}
         </ReleaseCards>
       </section>
-      <section className="flex flex-col gap-8">
+      <section className="flex flex-col gap-8 pt-8 pb-4">
         <header className="container flex items-center justify-between flex-wrap gap-3">
           <h2 className="font-medium whitespace-nowrap">All Releases</h2>
           <div className="flex items-center gap-2 sm:gap-6 flex-wrap">

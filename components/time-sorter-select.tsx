@@ -19,7 +19,7 @@ function TimeSorterSelect() {
       <SelectTrigger className="w-fit px-4 py-2 bg-white rounded-full ring-0! shadow-none border-none gap-2">
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
-      <SelectContent position="popper" align="end" className="rounded-20! outline-0! ring-0 p-2">
+      <SelectContent position="popper" align="end" className="rounded-20! outline-0! ring-0">
         <SelectItem value="daily">Daily</SelectItem>
         <SelectItem value="weekly">Weekly</SelectItem>
         <SelectItem value="monthly">Monthly</SelectItem>

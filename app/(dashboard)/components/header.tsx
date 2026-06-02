@@ -22,7 +22,7 @@ import {
 import { VisuallyHidden } from "radix-ui";
 import Search from "./search";
 
-function Header() {
+async function Header() {
   return (
     <div className="@container max-w-442.5 w-full mx-auto px-4 pt-10">
       <header className="bg-white px-8 py-6 rounded-full flex items-center justify-between">
@@ -41,7 +41,7 @@ function Header() {
                 <CommandList className="max-h-none font-medium">
                   <CommandGroup className="p-0">
                     {mainOptions.map((option) => (
-                      <CommandItem key={option.href} className="p-0 cursor-pointer">
+                      <CommandItem className="p-0 cursor-pointer" key={option.href}>
                         <PopoverClose asChild>
                           <Link
                             href={option.href.trim()}
@@ -185,7 +185,7 @@ function Header() {
               </header>
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex flex-col gap-6">
-                  <Link href="/releases" className="flex items-center gap-3">
+                  <Link href="/discography/single/new" className="flex items-center gap-3">
                     <span className="p-1.5 bg-brand-blue/10 rounded-full">
                       <Icon name="music" size={20} className="text-brand-blue" />
                     </span>
