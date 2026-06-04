@@ -495,9 +495,7 @@ function ReleaseSummary() {
                     <Icon name="music" className="text-brand-purple" size={18} />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-semibold text-sm text-default truncate">
-                      {titleText}
-                    </span>
+                    <span className="font-semibold text-sm text-default truncate">{titleText}</span>
                     <span className="text-xs text-border-default-secondary mt-0.5">
                       {subtitleText}
                     </span>
@@ -533,7 +531,7 @@ function ReleaseSummary() {
               return (
                 <div
                   key={id}
-                  className="bg-white rounded-[20px] p-6 h-[90px] w-full max-w-[172px] flex items-center justify-center shrink-0 border border-default-default/5 shadow-xs animate-in fade-in-0 duration-300"
+                  className="bg-white rounded-20 p-6 h-22.5 w-full max-w-43 flex items-center justify-center shrink-0 border border-default-default/5 shadow-xs animate-in fade-in-0 duration-300"
                 >
                   {logo ? (
                     <Image
