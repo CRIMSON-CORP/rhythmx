@@ -31,9 +31,9 @@ function Releases({
           <Icon name="cancel" size={24} className="text-default" />
         </DialogClose>
       </header>
-      <div className="px-6 pb-10.5">
-        <header className="flex gap-4 items-center">
-          <div className="flex items-center grow gap-2.5 px-4 py-3 bg-white/20 rounded-full">
+      <div className="px-3 md:px-6 pb-10.5 overflow-auto">
+        <header className="flex gap-1.5 md:gap-4 flex-wrap items-center">
+          <div className="flex items-center grow w-full gap-2.5 px-4 py-3 bg-white/20 rounded-full">
             <Icon name="search" size={16} className="text-default-tertiary" />
             <input
               placeholder="Search anything"
@@ -43,7 +43,7 @@ function Releases({
             />
           </div>
           <Select defaultValue="all">
-            <SelectTrigger className="bg-white/30 rounded-full flex px-4 py-3 items-center">
+            <SelectTrigger className="bg-white/30 rounded-full flex px-4 py-3 items-center text-xs md:text-base">
               <span className="text-default-tertiary">Filter:</span>
               <SelectValue />
             </SelectTrigger>
@@ -56,7 +56,7 @@ function Releases({
             </SelectContent>
           </Select>
           <Select defaultValue="any">
-            <SelectTrigger className="bg-white/30 rounded-full flex px-4 py-3 items-center">
+            <SelectTrigger className="bg-white/30 rounded-full flex px-4 py-3 items-center text-xs md:text-base">
               <span className="text-default-tertiary">Artists:</span>
               <SelectValue />
             </SelectTrigger>
@@ -69,7 +69,7 @@ function Releases({
             </SelectContent>
           </Select>
           <Select defaultValue="recent">
-            <SelectTrigger className="bg-white/30 rounded-full flex px-4 py-3 items-center">
+            <SelectTrigger className="bg-white/30 rounded-full flex px-4 py-3 items-center text-xs md:text-base">
               <span className="text-default-tertiary">Sort:</span>
               <SelectValue />
             </SelectTrigger>
@@ -81,21 +81,23 @@ function Releases({
             </SelectContent>
           </Select>
         </header>
-        <div className="p-4 flex flex-col gap-5">
+        <div className="p-4 flex flex-col gap-5 overflow-auto">
           {releases.map((release) => (
-            <div key={release.id} className="flex items-center gap-4 group">
+            <div key={release.id} className="flex items-center gap-4 group overflow-auto">
               <Image
                 src={release.image}
                 alt={release.title}
                 width={50}
                 height={50}
-                className="rounded-full size-14 object-cover"
+                className="rounded-full size-14 object-cover shrink-0"
               />
-              <div className="flex flex-col grow">
-                <span className="font-medium text-lg">{release.title}</span>
-                <div className="flex items-center gap-2 text-sm mt-0.5">
+              <div className="flex flex-col grow overflow-auto">
+                <span className="font-medium text-lg truncate">{release.title}</span>
+                <div className="flex items-center gap-2 text-sm mt-0.5 overflow-x-auto">
                   <span className="text-default-tertiary font-medium text-xs">{release.type}</span>
-                  <span className="text-border-default-secondary text-xs">{release.platforms}</span>
+                  <span className="text-border-default-secondary text-xs truncate">
+                    {release.platforms}
+                  </span>
                 </div>
               </div>
               {type === "approved" ? (
@@ -106,7 +108,7 @@ function Releases({
                   Pending
                 </div>
               ) : (
-                <div className="p-2.5 bg-white/30 rounded-20 text-xs text-brand-blue">
+                <div className="w-fit whitespace-nowrap p-2.5 bg-white/30 rounded-20 text-xs text-brand-blue">
                   Update & Submit
                 </div>
               )}

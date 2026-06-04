@@ -78,7 +78,9 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
             >
               <Icon name="arrow-left" size={27} />
             </Link>
-            <h1 className="font-heading text-5xl leading-tight font-semibold">Release Details</h1>
+            <h1 className="font-heading text-3xl md:text-5xl font-semibold leading-[0.7]">
+              Release Details
+            </h1>
           </div>
           <div className="bg-white flex items-center gap-2.5 px-5 py-4 rounded-full font-medium">
             <span className="text-sm text-border-default-secondary">All Platform plays</span>
@@ -147,7 +149,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
               {DUMMY_TRACKS.map((track) => (
                 <li
                   key={track.index}
-                  className="flex items-center justify-between gap-4 px-5 py-3 rounded-20 hover:bg-page-background transition-colors group"
+                  className="flex flex-wrap items-center justify-between gap-4 px-5 py-3 rounded-20 hover:bg-page-background transition-colors group"
                 >
                   <span className="size-10 font-medium text-border-default-secondary text-center bg-page-background rounded-full flex items-center justify-center flex-none">
                     {track.index}

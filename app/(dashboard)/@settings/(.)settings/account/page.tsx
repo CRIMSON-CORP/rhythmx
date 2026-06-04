@@ -18,7 +18,7 @@ export default async function AccountForm() {
   return (
     <div className="flex flex-col">
       {/* Profile Details Header */}
-      <div className="flex items-center gap-5 border-b border-b-default-default px-6 py-7.5">
+      <div className="flex items-center gap-5 border-b border-b-default-default px-4 py-5 md:px-6 md:py-7.5">
         <div className="relative size-19.25 overflow-hidden rounded-full">
           <Image
             src="/images/avatar.png"
@@ -45,7 +45,7 @@ export default async function AccountForm() {
       {/* Input Fields */}
       <Form {...initialData} />
       {/* Update Password Action Card */}
-      <footer className="px-6 py-4 mt-2 bg-page-background">
+      <footer className="px-4 py-4 md:px-6 mt-2 bg-page-background">
         <Link
           href="/settings/security-privacy"
           className="w-full bg-white text-default hover:bg-default hover:text-white transition-colors duration-300 flex gap-3 p-3 rounded-20 text-left"

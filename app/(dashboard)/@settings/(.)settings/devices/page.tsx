@@ -39,7 +39,7 @@ export default function DevicesSettingsPage() {
   return (
     <div className="flex flex-col gap-6 h-full overflow-auto">
       {/* Log out all devices */}
-      <div className="px-8 pt-4">
+      <div className="px-3 md:px-8 pt-4">
         <div className="bg-white p-4 rounded-2xl flex items-center justify-between gap-3">
           <div className="flex flex-col gap-3">
             <h4 className="font-medium">Log out of all devices</h4>
@@ -54,7 +54,7 @@ export default function DevicesSettingsPage() {
       </div>
 
       {/* Devices Section */}
-      <div className="flex flex-col gap-4 px-8 pb-8 overflow-auto">
+      <div className="flex flex-col gap-4 px-3 md:px-8 pb-8 overflow-auto">
         <div className="flex items-center justify-between">
           <h3 className="font-medium">Devices</h3>
 
@@ -93,7 +93,7 @@ export default function DevicesSettingsPage() {
                     <td className="py-4.5 px-6 text-right">
                       <button
                         type="button"
-                        className="px-4 py-1.5 border border-black/15 rounded-full text-xs font-semibold hover:bg-black/5 transition-all cursor-pointer"
+                        className="whitespace-nowrap px-4 py-1.5 border border-black/15 rounded-full text-xs font-semibold hover:bg-black/5 transition-all cursor-pointer"
                       >
                         Log out
                       </button>

@@ -58,7 +58,7 @@ function EarningHistory() {
   const shown = earningAvatars.slice(0, 3);
   const hidden = earningAvatars.length - shown.length;
   return (
-    <div className="bg-white rounded-30 flex flex-col basis-84.5">
+    <div className="bg-white rounded-30 flex flex-col w-full md:basis-84.5">
       <header className="flex items-center justify-between gap-1 text-default-tertiary px-4 py-5">
         <h2 className="font-medium leading-tight">Earning History</h2>
         <div>

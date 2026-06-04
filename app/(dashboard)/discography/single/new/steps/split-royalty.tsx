@@ -218,7 +218,7 @@ function SplitRoyalty() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 p-8 bg-white rounded-30">
-          <p className="font-medium text-default text-sm">
+          <p className="font-medium text-default text-center text-sm">
             Do review your release details before clicking “continue”
           </p>
           <Button

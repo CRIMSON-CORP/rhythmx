@@ -32,7 +32,7 @@ function Earnings() {
         <Icon name="funnel" size={24} />
       </header>
       <div className="flex @max-md:flex-col-reverse grow gap-6 items-end px-6 pb-6">
-        <div className="flex @max-md:self-stretch items-end justify-between grow h-full max-h-27 gap-1.5">
+        <div className="flex @max-md:self-stretch items-end justify-between grow h-full min-h-27 gap-1.5">
           {data.map((amount, index) => (
             <div key={index} className="h-full flex items-end grow group">
               <div

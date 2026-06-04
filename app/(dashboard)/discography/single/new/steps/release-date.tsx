@@ -17,8 +17,18 @@ import useNewReleaseStore from "@/store/new-release-store";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
-export function XpressDialog({ xpressRelease }: { xpressRelease: boolean }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function XpressDialog({
+  xpressRelease,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: {
+  xpressRelease: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [localOpen, setLocalOpen] = useState(false);
+  const isOpen = controlledOpen !== undefined ? controlledOpen : localOpen;
+  const setIsOpen = controlledOnOpenChange !== undefined ? controlledOnOpenChange : setLocalOpen;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -93,6 +103,7 @@ export function XpressDialog({ xpressRelease }: { xpressRelease: boolean }) {
 
 function ReleaseDate() {
   const { form, setForm, next } = useNewReleaseStore();
+  const [isXpressDialogOpen, setIsXpressDialogOpen] = useState(false);
 
   const artworkUrl = useMemo(() => {
     if (!form.artwork) return "/images/release-2.png";
@@ -190,26 +201,35 @@ function ReleaseDate() {
             </div>
           </div>
           {/* Xpress Release Switch */}
-          <div className="p-6 flex items-center justify-between border-t border-t-default-default">
+          <div className="p-6 flex items-center flex-wrap gap-4 justify-between border-t border-t-default-default">
             <div className="flex items-center justify-between">
               <span className="font-medium text-default">Xpress Release</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-default font-medium flex items-center">
                 Use fast release
-                <XpressDialog xpressRelease={xpressRelease} />
+                <XpressDialog
+                  xpressRelease={xpressRelease}
+                  open={isXpressDialogOpen}
+                  onOpenChange={setIsXpressDialogOpen}
+                />
               </span>
               <Switch
                 checked={xpressRelease}
-                onCheckedChange={(checked) => setForm({ xpress_release: checked })}
+                onCheckedChange={(checked) => {
+                  setForm({ xpress_release: checked });
+                  if (checked) {
+                    setIsXpressDialogOpen(true);
+                  }
+                }}
               />
             </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="flex text-center items-center justify-end gap-4 p-8 bg-white rounded-30">
-          <p className="font-medium text-default text-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 p-8 bg-white rounded-30">
+          <p className="font-medium text-default text-center text-sm">
             Do review your release details before clicking “continue”
           </p>
           <Button

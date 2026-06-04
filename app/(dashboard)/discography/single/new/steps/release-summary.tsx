@@ -16,6 +16,7 @@ import { useMemo, useState } from "react";
 import { goeyToast } from "goey-toast";
 import { XpressDialog } from "./release-date";
 import { useRouter } from "next/navigation";
+import { distributionPlatforms, socialMediaPlatforms } from "@/data/platforms";
 
 const SpotifyLogo = ({ className }: { className?: string }) => (
   <svg
@@ -108,6 +109,7 @@ function ReleaseSummary() {
   const router = useRouter();
   const { form, setForm, setStep } = useNewReleaseStore();
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
+  const [isXpressDialogOpen, setIsXpressDialogOpen] = useState(false);
 
   const mainArtistName = form.main_artists?.[0]?.name || "Main Artist";
 
@@ -124,6 +126,13 @@ function ReleaseSummary() {
     const time = form.release_time || "09:41 AM";
     return time.replace(/^0/, "").replace(/\s+/g, "");
   }, [form.release_time]);
+
+  const getPlatformLogo = (id: string) => {
+    const p =
+      distributionPlatforms.find((item) => item.id === id) ||
+      socialMediaPlatforms.find((item) => item.id === id);
+    return p?.logo || null;
+  };
 
   const handleSubmit = () => {
     setIsSubmitDialogOpen(true);
@@ -449,31 +458,36 @@ function ReleaseSummary() {
         </div>
       </div>
 
-      {/* 4. Release Tracks Card */}
-      <div className="bg-white rounded-30 p-8 flex flex-col gap-6">
-        <div className="flex items-center justify-between border-b border-default-default/10 pb-4">
-          <h3 className="text-xl font-medium font-heading text-default">Release Tracks</h3>
+      {/* 4. Release Tracks Section */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between px-2">
+          <span className="text-sm font-semibold text-[#767680]">Release Tracks</span>
           <button
             onClick={() => setStep(2)}
-            className="text-brand-orange hover:underline font-medium text-xs flex items-center gap-1 cursor-pointer"
+            className="text-brand-orange hover:underline font-semibold text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
             <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
           </button>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="bg-white rounded-[24px] p-6 flex flex-col">
           {(form.tracks || []).length === 0 ? (
             <span className="text-xs text-border-default-secondary italic p-4 text-center">
               No tracks uploaded yet.
             </span>
           ) : (
-            form.tracks.map((track, index) => (
-              <div
-                key={track.id}
-                className="flex items-center justify-between bg-page-background/50 rounded-20 p-4"
-              >
-                <div className="flex items-center gap-3 min-w-0">
+            form.tracks.map((track, index) => {
+              const filename = track.track_file?.name || track.track_title;
+              const hasExt = filename.includes(".");
+              const titleText = filename;
+              const subtitleText = hasExt ? "Uploaded" : "Mp3";
+
+              return (
+                <div
+                  key={track.id}
+                  className="flex items-center gap-4 border-b border-default-default/10 last:border-b-0 pb-4 last:pb-0 pt-4 first:pt-0"
+                >
                   <div className="size-8 rounded-full bg-page-background flex items-center justify-center text-xs font-semibold text-default shrink-0">
                     {index + 1}
                   </div>
@@ -481,80 +495,62 @@ function ReleaseSummary() {
                     <Icon name="music" className="text-brand-purple" size={18} />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-medium text-sm text-default truncate">
-                      {track.track_title}
+                    <span className="font-semibold text-sm text-default truncate">
+                      {titleText}
                     </span>
-                    <span className="text-xs text-border-default-secondary mt-0.5 truncate">
-                      {track.track_file?.name || `${track.track_title}.mp3`}
+                    <span className="text-xs text-border-default-secondary mt-0.5">
+                      {subtitleText}
                     </span>
                   </div>
                 </div>
-                <span className="text-xs text-[#009951] font-semibold bg-[#EBFFEE] rounded-full px-3 py-1 shrink-0">
-                  Uploaded
-                </span>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
 
-      {/* 5. Release Platforms Card */}
-      <div className="bg-white rounded-30 p-8 flex flex-col gap-6">
-        <div className="flex items-center justify-between border-b border-default-default/10 pb-4">
-          <h3 className="text-xl font-medium font-heading text-default">Release Platforms</h3>
+      {/* 5. Release Platform Section */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between px-2">
+          <span className="text-sm font-semibold text-[#767680]">Release Platform</span>
           <button
             onClick={() => setStep(3)}
-            className="text-brand-orange hover:underline font-medium text-xs flex items-center gap-1 cursor-pointer"
+            className="text-brand-orange hover:underline font-semibold text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
             <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-4">
-          {(form.platforms || []).length === 0 ? (
-            <span className="text-xs text-border-default-secondary italic p-4">
-              No platforms selected.
-            </span>
-          ) : (
-            form.platforms.map((platform) => (
-              <div
-                key={platform}
-                className="bg-page-background/50 rounded-20 px-6 py-4 flex items-center gap-3 shrink-0"
-              >
-                {platform.toLowerCase() === "spotify" ? (
-                  <>
-                    <SpotifyLogo className="size-6" />
-                    <span className="text-sm font-semibold text-default">Spotify</span>
-                  </>
-                ) : platform.toLowerCase() === "apple" ? (
-                  <>
-                    <span className="size-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
-                      A
-                    </span>
-                    <span className="text-sm font-semibold text-default">Apple Music</span>
-                  </>
-                ) : platform.toLowerCase() === "tidal" ? (
-                  <>
-                    <span className="size-6 bg-black rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
-                      T
-                    </span>
-                    <span className="text-sm font-semibold text-default">Tidal</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="size-6 bg-brand-purple/20 rounded-full flex items-center justify-center text-brand-purple text-xs font-bold shrink-0">
-                      P
-                    </span>
-                    <span className="text-sm font-semibold text-default capitalize">
-                      {platform}
-                    </span>
-                  </>
-                )}
-              </div>
-            ))
-          )}
-        </div>
+        {(form.platforms || []).length === 0 ? (
+          <div className="bg-white rounded-[24px] p-6 text-center text-xs text-border-default-secondary italic">
+            No platforms selected.
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-4">
+            {form.platforms.map((id) => {
+              const logo = getPlatformLogo(id);
+              return (
+                <div
+                  key={id}
+                  className="bg-white rounded-[20px] p-6 h-[90px] w-full max-w-[172px] flex items-center justify-center shrink-0 border border-default-default/5 shadow-xs animate-in fade-in-0 duration-300"
+                >
+                  {logo ? (
+                    <Image
+                      src={logo}
+                      alt={id}
+                      width={100}
+                      height={25}
+                      className="object-contain max-h-8"
+                    />
+                  ) : (
+                    <span className="text-sm font-semibold text-default capitalize">{id}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* 6. Split Pay Card */}
@@ -656,11 +652,20 @@ function ReleaseSummary() {
           <div className="flex items-center justify-between">
             <div className="flex items-center text-xs font-semibold text-[#767680]">
               <span>Use Express release</span>
-              <XpressDialog xpressRelease={form.xpress_release ?? false} />
+              <XpressDialog
+                xpressRelease={form.xpress_release ?? false}
+                open={isXpressDialogOpen}
+                onOpenChange={setIsXpressDialogOpen}
+              />
             </div>
             <Switch
               checked={form.xpress_release ?? false}
-              onCheckedChange={(checked) => setForm({ xpress_release: checked })}
+              onCheckedChange={(checked) => {
+                setForm({ xpress_release: checked });
+                if (checked) {
+                  setIsXpressDialogOpen(true);
+                }
+              }}
             />
           </div>
         </div>

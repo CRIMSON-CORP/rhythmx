@@ -125,7 +125,7 @@ export default async function BillingPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Cards Section */}
-      <div className="flex flex-col gap-3 px-6 pb-4">
+      <div className="flex flex-col gap-3 px-3 md:px-6 pb-4">
         <h3 className="font-medium">Cards</h3>
         <div className="bg-white p-4 rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -144,7 +144,7 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      <div className="px-8 py-4 flex flex-col gap-3 flex-1 overflow-auto">
+      <div className="px-3 md:px-8 py-4 flex flex-col gap-3 flex-1 overflow-auto">
         {/* Billing History Section Header */}
         <div className="flex items-center justify-between">
           <h3 className="font-medium">Billing History</h3>

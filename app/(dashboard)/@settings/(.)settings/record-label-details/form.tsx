@@ -9,7 +9,7 @@ function Form(initialData: AccountFormProps) {
   const [fundingDate, setFundingDate] = useState(initialData?.fundingDate || "1994-05-12");
   const [licenceNumber, setLicenceNumber] = useState(initialData?.licenseNumber || undefined);
   return (
-    <form className="flex flex-col gap-4 p-6 bg-white" onSubmit={(e) => e.preventDefault()}>
+    <form className="flex flex-col gap-4 p-4 md:p-6 bg-white" onSubmit={(e) => e.preventDefault()}>
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-default-tertiary">Label Name</label>
         <input

@@ -2,7 +2,7 @@ import { Switch } from "@/components/ui/switch";
 
 export default function SecurityPrivacyPage() {
   return (
-    <div className="flex flex-col gap-4 px-8 pt-4 pb-8">
+    <div className="flex flex-col gap-4 px-3 md:px-8 pt-4 pb-8">
       {/* 2-step verification */}
       <div className="bg-white p-4.5 rounded-2xl flex items-center justify-between">
         <div className="flex flex-col gap-1 pr-6">

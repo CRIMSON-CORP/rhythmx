@@ -48,7 +48,7 @@ export default function ManagePlanPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Active Plan */}
-      <div className="flex flex-col gap-4 px-8 pb-4">
+      <div className="flex flex-col gap-4 px-3 md:px-8 pb-4">
         <h3 className="font-medium">Active Plan</h3>
         <div className="bg-white p-4 rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ export default function ManagePlanPage() {
         </div>
       </div>
 
-      <div className="px-8 pb-4 flex flex-col gap-3">
+      <div className="px-3 md:px-8 pb-4 flex flex-col gap-3">
         {/* Grid Header */}
         <div className="flex items-center justify-between">
           <h3 className="font-medium">All Plans</h3>

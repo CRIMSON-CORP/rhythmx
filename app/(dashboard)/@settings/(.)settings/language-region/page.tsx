@@ -16,7 +16,7 @@ export default function LanguageSettingsPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Current Language */}
-      <div className="px-8 pt-4">
+      <div className="px-3 md:px-8 pt-4">
         <div className="bg-white p-4 rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="size-10.5 rounded-full bg-brand-blue flex items-center justify-center text-white shrink-0">
@@ -37,7 +37,7 @@ export default function LanguageSettingsPage() {
       </div>
 
       {/* Region Settings */}
-      <div className="flex flex-col gap-4 px-8 pb-8">
+      <div className="flex flex-col gap-4 px-3 md:px-8 pb-8">
         <h3 className="font-medium">Region</h3>
 
         {/* Current Region Card */}

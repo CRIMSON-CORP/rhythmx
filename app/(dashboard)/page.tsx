@@ -16,7 +16,7 @@ export default function Home() {
       <div className="flex flex-col gap-6">
         <div className="container flex flex-wrap items-center justify-between gap-6">
           <Greeting />
-          <div className="flex items-center gap-6 md:gap-8">
+          <div className="flex flex-wrap grow justify-end items-center gap-6 md:gap-8">
             <TimeSorterSelect />
             <MusicCard />
           </div>

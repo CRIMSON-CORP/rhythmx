@@ -9,7 +9,7 @@ function Form(initialData: AccountFormProps) {
   const [email, setEmail] = useState(initialData?.email || "littletemi@gmail.com");
   const [phone, setPhone] = useState(initialData?.phone || undefined);
   return (
-    <form className="flex flex-col gap-4 p-6 bg-white" onSubmit={(e) => e.preventDefault()}>
+    <form className="flex flex-col gap-4 p-4 md:p-6 bg-white" onSubmit={(e) => e.preventDefault()}>
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-default-tertiary">First Name</label>
         <input

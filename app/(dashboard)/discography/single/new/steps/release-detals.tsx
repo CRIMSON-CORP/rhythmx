@@ -348,7 +348,7 @@ function ReleaseDetalsPage() {
 
         {/* Form Footer / Action bar */}
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
-          <p className="font-medium text-default">
+          <p className="font-medium text-default text-center">
             Please review your release details before clicking &quot;continue&quot;
           </p>
           <Button

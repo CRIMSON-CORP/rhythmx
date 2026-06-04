@@ -17,7 +17,7 @@ export default async function AccountForm() {
   return (
     <div className="flex flex-col">
       {/* Profile Details Header */}
-      <div className="flex items-center gap-5 border-b border-b-default-default px-6 py-7.5">
+      <div className="flex items-center gap-5 border-b border-b-default-default px-4 py-5 md:px-6 md:py-7.5">
         <div className="relative size-19.25 overflow-hidden rounded-full">
           <Image
             src="/images/avatar.png"

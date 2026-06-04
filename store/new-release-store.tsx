@@ -98,7 +98,7 @@ export const newReleaseStoreTitles = [
 ];
 
 const useNewReleaseStore = create<NewReleaseStoreProps>((set) => ({
-  currentStep: 6,
+  currentStep: 2,
   form: {
     release_title: "",
     release_description: "",

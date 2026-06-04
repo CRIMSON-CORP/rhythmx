@@ -17,7 +17,7 @@ export default async function WithdrawalForm() {
       };
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-2xl">
+    <div className="flex flex-col gap-6 p-4 md:p-6 max-w-2xl">
       <p className="text-sm text-grey font-medium leading-relaxed">
         This is where funds you received or made on RhythemX will be sent to when you initiate a
         withdrawal. Funds are sent instantly.
