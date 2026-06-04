@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./components/header";
+import GooeyToaster from "./GooeyToaster";
 
 function DashbaordLayout({
   children,
@@ -11,11 +12,12 @@ function DashbaordLayout({
   settings: React.ReactNode;
 }>) {
   return (
-    <div className="bg-page-background h-full flex flex-col gap-6">
+    <div className="bg-page-background grow flex flex-col gap-6">
       <Header />
-      <main>{children}</main>
+      <main className="grow">{children}</main>
       {notifications}
       {settings}
+      <GooeyToaster />
     </div>
   );
 }

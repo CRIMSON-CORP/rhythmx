@@ -27,6 +27,7 @@
   --color-brand-orange: #ff4907;
   --color-brand-blue: #0066ff;
   --color-brand-purple: #9747ff;
+  --color-brand-purple-2: #6500e9;
   --color-grey: #8e8e93;
   --color-light-blue: #eaf5ff;
   --color-background: var(--background);
@@ -176,4 +177,8 @@
   button {
     @apply cursor-pointer;
   }
+}
+
+.gooey-timestamp {
+  display: none;
 }

@@ -4,19 +4,14 @@ import useNewReleaseStore, { newReleaseStoreTitles } from "@/store/new-release-s
 function NewSinglePage() {
   const currentStep = useNewReleaseStore((state) => state.currentStep);
   return (
-    <div>
+    <div className="grow">
       {newReleaseStoreTitles.map((item, index) => {
-        const Component = item.Componenet;
-        if (!Component) return null;
-        return (
-          <div key={index} hidden={currentStep !== index}>
-            <Component />
-          </div>
-        );
+        const Component = item.Component;
+        if (!Component || currentStep !== index) return null;
+        return <Component key={index} />;
       })}
     </div>
   );
 }
 
 export default NewSinglePage;
-

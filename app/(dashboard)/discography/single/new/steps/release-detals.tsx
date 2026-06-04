@@ -13,51 +13,71 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
+import { releaseGenre } from "@/data/release-genre";
+import { releaseLanguage } from "@/data/release-language-dropdown";
+import { cn } from "@/lib/utils";
+import { goeyToast } from "goey-toast";
 
 function ReleaseDetalsPage() {
   const { form, setForm, next } = useNewReleaseStore();
   const [isDragging, setIsDragging] = useState(false);
-  const [, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(form.artwork_url || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragCounter = useRef(0);
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(true);
+    dragCounter.current++;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(false);
+    dragCounter.current--;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleUploadArtwork = (file: File) => {
+    goeyToast.success("Uploading Cover Artwork...", {
+      description: "Please wait while we upload your cover art",
+      duration: 1500,
+    });
+
+    setTimeout(() => {
+      const url = URL.createObjectURL(file);
+      setForm({ artwork: file, artwork_url: url });
+      setPreviewUrl(url);
+      goeyToast.success("Artwork Uploaded", {
+        description: "Cover artwork has been uploaded successfully",
+        duration: 1000,
+      });
+    }, 1500);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    dragCounter.current = 0;
     setIsDragging(false);
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
-      setForm({ artwork: files[0] });
+      handleUploadArtwork(files[0]);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setForm({ artwork: files[0] });
-      const url = URL.createObjectURL(files[0]);
-      setPreviewUrl(url);
+      handleUploadArtwork(files[0]);
     }
   };
 
@@ -65,9 +85,30 @@ function ReleaseDetalsPage() {
     setForm({ [key]: value });
   };
 
-  // Generate production copyright years (last 10 years and next 2 years)
+  const isFormValid = !!(
+    form.release_title?.trim() &&
+    form.primary_genre &&
+    form.version_title?.trim() &&
+    form.producers?.trim() &&
+    form.copyright_holder?.trim() &&
+    form.production_copyright_year &&
+    form.copyright_year &&
+    form.language &&
+    form.original_release_date &&
+    form.artwork
+  );
+
+  const handleContinue = () => {
+    if (isFormValid) {
+      next();
+    } else {
+      goeyToast.error("All Fields are required", {
+        description: "Please fill in all fields to continue",
+      });
+    }
+  };
+
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 15 }, (_, i) => (currentYear + 2 - i).toString());
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[0.55fr_0.45fr] gap-8 items-stretch">
@@ -123,13 +164,11 @@ function ReleaseDetalsPage() {
                   <SelectValue placeholder="Select a genre (Pop, Rock, Country etc.)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pop">Pop</SelectItem>
-                  <SelectItem value="rock">Rock</SelectItem>
-                  <SelectItem value="country">Country</SelectItem>
-                  <SelectItem value="afrobeats">Afrobeats</SelectItem>
-                  <SelectItem value="hiphop">Hip Hop / Rap</SelectItem>
-                  <SelectItem value="rnb">R&B</SelectItem>
-                  <SelectItem value="electronic">Electronic / Dance</SelectItem>
+                  {releaseGenre.map((g) => (
+                    <SelectItem key={g.value} value={g.value}>
+                      {g.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -145,13 +184,11 @@ function ReleaseDetalsPage() {
                   <SelectValue placeholder="Select a genre (Pop, Rock, Country etc.)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pop">Pop</SelectItem>
-                  <SelectItem value="rock">Rock</SelectItem>
-                  <SelectItem value="country">Country</SelectItem>
-                  <SelectItem value="afrobeats">Afrobeats</SelectItem>
-                  <SelectItem value="hiphop">Hip Hop / Rap</SelectItem>
-                  <SelectItem value="rnb">R&B</SelectItem>
-                  <SelectItem value="electronic">Electronic / Dance</SelectItem>
+                  {releaseGenre.map((g) => (
+                    <SelectItem key={g.value} value={g.value}>
+                      {g.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -210,41 +247,29 @@ function ReleaseDetalsPage() {
             {/* Production Copyright Year */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-default">Production Copyright Year</label>
-              <Select
+              <input
+                type="number"
+                min={1900}
+                max={currentYear + 2}
                 value={form.production_copyright_year}
-                onValueChange={(value) => handleInputChange("production_copyright_year", value)}
-              >
-                <SelectTrigger className="w-full h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange bg-transparent transition-colors">
-                  <SelectValue placeholder="Select Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((y) => (
-                    <SelectItem key={y} value={y}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(e) => handleInputChange("production_copyright_year", e.target.value)}
+                placeholder="Select Year"
+                className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-colors"
+              />
             </div>
 
             {/* Copyright Year */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-default">Copyright Year</label>
-              <Select
+              <input
+                type="number"
+                min={1900}
+                max={currentYear + 2}
                 value={form.copyright_year}
-                onValueChange={(value) => handleInputChange("copyright_year", value)}
-              >
-                <SelectTrigger className="w-full h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange bg-transparent transition-colors">
-                  <SelectValue placeholder="Select Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((y) => (
-                    <SelectItem key={y} value={y}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(e) => handleInputChange("copyright_year", e.target.value)}
+                placeholder="Select Year"
+                className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-colors"
+              />
             </div>
 
             {/* Language */}
@@ -258,12 +283,11 @@ function ReleaseDetalsPage() {
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="english">English</SelectItem>
-                  <SelectItem value="spanish">Spanish</SelectItem>
-                  <SelectItem value="french">French</SelectItem>
-                  <SelectItem value="german">German</SelectItem>
-                  <SelectItem value="yoruba">Yoruba</SelectItem>
-                  <SelectItem value="igbo">Igbo</SelectItem>
+                  {releaseLanguage.map((l) => (
+                    <SelectItem key={l.value} value={l.value}>
+                      {l.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -327,7 +351,12 @@ function ReleaseDetalsPage() {
           <p className="font-medium text-default">
             Please review your release details before clicking &quot;continue&quot;
           </p>
-          <Button variant="orange" onClick={next} className="w-fit">
+          <Button
+            variant="orange"
+            onClick={handleContinue}
+            disabled={!isFormValid}
+            className="w-fit"
+          >
             <span>Continue</span>
             <Icon name="arrow-right" size={16} />
           </Button>
@@ -358,58 +387,68 @@ function ReleaseDetalsPage() {
             </DialogTrigger>
             <DialogContent className="p-5 max-w-116.5 w-full">
               <DialogTitle>Artwork Policy</DialogTitle>
-              <DialogDescription>
-                <ol className="list-decimal pl-5 text-border-default-secondary font-medium">
-                  <li>Sexually explicit imagery.</li>
-                  <li>Streaming platforms only accept cover art files in JPG or PNG formats.</li>
-                  <li>Any text other than the release title and/or artist name.</li>
-                  <li>WebURLs social media handle or contact information</li>
-                  <li>
-                    Third-Party logos on trademarks without express written consent from the
-                    trademark
-                  </li>
-                </ol>
-              </DialogDescription>
+              <ol className="list-decimal pl-5 text-border-default-secondary font-medium">
+                <li>Sexually explicit imagery.</li>
+                <li>Streaming platforms only accept cover art files in JPG or PNG formats.</li>
+                <li>Any text other than the release title and/or artist name.</li>
+                <li>WebURLs social media handle or contact information</li>
+                <li>
+                  Third-Party logos on trademarks without express written consent from the trademark
+                </li>
+              </ol>
             </DialogContent>
           </Dialog>
         </div>
 
         <div className="grow flex flex-col gap-6 items-center justify-center p-5">
-          <div className="relative isolate flex justify-end items-end *:origin-[bottom_right] *:rounded-20 *:aspect-square *:object-cover *:outline-4  *:outline-white">
+          {previewUrl ? (
             <Image
-              width={167}
-              height={167}
-              src="/images/new-release-1.jpg"
+              width={230}
+              height={230}
+              src={previewUrl}
               alt="release artwork preview"
-              className="-rotate-12"
+              className="rounded-20"
             />
-            <Image
-              width={124}
-              height={124}
-              src="/images/new-release-2.jpg"
-              alt="release artwork preview"
-              className="absolute -z-10"
-            />
-            <Image
-              width={142}
-              height={142}
-              src="/images/new-release-3.jpg"
-              alt="release artwork preview"
-              className="absolute -z-20 rotate-12"
-            />
-          </div>
-          <p className="text-xl font-medium font-heading mt-10">Drag your Cover Artwork here</p>
+          ) : (
+            <div className="relative isolate flex justify-end items-end *:origin-[bottom_right] *:rounded-20 *:aspect-square *:object-cover *:outline-4  *:outline-white">
+              <Image
+                width={167}
+                height={167}
+                src="/images/new-release-1.jpg"
+                alt="release artwork preview"
+                className="-rotate-12"
+              />
+              <Image
+                width={124}
+                height={124}
+                src="/images/new-release-2.jpg"
+                alt="release artwork preview"
+                className="absolute -z-10"
+              />
+              <Image
+                width={142}
+                height={142}
+                src="/images/new-release-3.jpg"
+                alt="release artwork preview"
+                className="absolute -z-20 rotate-12"
+              />
+            </div>
+          )}
+          {previewUrl ? null : (
+            <p className="text-xl font-medium font-heading mt-10">Drag your Cover Artwork here</p>
+          )}
           <label
             htmlFor="artwork-input"
-            className={`w-fit p-4 rounded-full outline outline-black bg-white hover:bg-default/5 text-default font-semibold flex items-center gap-2 transition-colors ${
-              isDragging ? "bg-brand-orange text-white border-transparent" : ""
-            }`}
+            className={cn(
+              "w-fit p-4 rounded-full outline outline-black bg-white hover:bg-default/5 text-default font-semibold flex items-center gap-2 transition-colors",
+              isDragging && "bg-brand-orange text-white border-transparent",
+            )}
           >
             {isDragging ? (
               <span>Drop</span>
             ) : (
               <>
-                <span>Browse Files</span>
+                {previewUrl ? <span>Change Artwork</span> : <span>Browse Files</span>}
                 <Icon name="folder" size={16} />
               </>
             )}

@@ -27,7 +27,7 @@ function Header() {
             <Icon name="arrow-left" size={27} />
           </button>
           <div className="flex flex-col gap-3 md:gap-6">
-            <h1 className="font-heading text-3xl md:text-5xl font-semibold leading-none">
+            <h1 className="font-heading text-3xl md:text-5xl font-semibold leading-[0.7]">
               {newReleaseStoreTitles[currentStep].title}
             </h1>
             <p className="font-medium text-sm md:text-base text-border-default-secondary leading-none">
@@ -66,7 +66,7 @@ function StepTab({
 }) {
   const isActive = index === currentStep;
   const buttonRef = useRef<HTMLButtonElement>(null);
-
+  const setSetp = useNewReleaseStore((state) => state.setStep);
   useEffect(() => {
     if (isActive) {
       buttonRef.current?.scrollIntoView({
@@ -81,6 +81,7 @@ function StepTab({
     <button
       key={title}
       ref={buttonRef}
+      onClick={() => setSetp(index)}
       className={cn(
         "p-4 bg-white rounded-full flex items-center gap-2 whitespace-nowrap transition-colors duration-300 snap-center",
         isActive ? "bg-[#EAF5FF] text-brand-blue" : "",
