@@ -24,7 +24,7 @@ import Search from "./search";
 
 async function Header() {
   return (
-    <div className="@container max-w-442.5 w-full mx-auto px-4 pt-10">
+    <div className="@container container w-full mx-auto px-4 pt-10">
       <header className="bg-white px-8 py-6 rounded-full flex items-center justify-between">
         <div className="flex items-center @max-md:gap-2 gap-4 lg:gap-8">
           <Icon name="logo" width={25} height={38} className="text-brand-orange" />

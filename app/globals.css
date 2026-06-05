@@ -18,7 +18,7 @@
 }
 
 @utility container-full-bleed {
-  padding-inline: max(16px, calc((100vw - 1770px) / 2 + 16px));
+  padding-inline: max(16px, calc((100vw - 1770px) / 2 - 4px));
 }
 
 @custom-variant dark (&:is(.dark *));

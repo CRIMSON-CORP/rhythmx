@@ -12,8 +12,8 @@ export const mainOptions = [
     command: "⇧C",
   },
   {
-    href: "/artist",
-    title: "Artist",
+    href: "/artists",
+    title: "Artists",
     icon: "star",
     command: "⇧A",
   },
