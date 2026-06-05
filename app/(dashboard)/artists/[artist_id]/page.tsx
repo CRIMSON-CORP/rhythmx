@@ -168,7 +168,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               </div>
               <footer className="p-5 flex items-center justify-center gap-2.5 border-t border-t-default-default">
                 <p className="text-border-default-secondary text-sm">Total Earnings</p>
-                <h2 className="font-medium text-default">$12,303,394</h2>
+                <p className="font-medium text-default">$12,303,394</p>
               </footer>
             </div>
           </div>

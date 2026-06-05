@@ -12,13 +12,37 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 
+const DUMMY_RELEASES: ReleaseResult[] = [
+  {
+    id: "1",
+    title: "Standing B4 Him",
+    type: "Single",
+    platforms: "Apple Music. Spotify. Deezer",
+    image: "/images/release-1.png",
+  },
+  {
+    id: "2",
+    title: "Dancing in the Rain",
+    type: "Duet",
+    platforms: "Amazon Music. YouTube Music. Tidal",
+    image: "/images/release-2.png",
+  },
+  {
+    id: "3",
+    title: "Lost in the Echo",
+    type: "Cover",
+    platforms: "SoundCloud. Pandora. iHeartRadio",
+    image: "/images/release-3.png",
+  },
+];
+
 function Releases({
   title,
-  releases,
+  releases = DUMMY_RELEASES,
   type = "approved",
 }: {
   title: string;
-  releases: ReleaseResult[];
+  releases?: ReleaseResult[];
   type?: "approved" | "pending" | "rejected";
 }) {
   const [searchQuery, setSearchQuery] = useState("");

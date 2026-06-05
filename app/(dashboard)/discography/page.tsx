@@ -48,7 +48,7 @@ function DisocgraphyPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="container flex flex-wrap items-center justify-between gap-6">
-        <h1 className="font-heading text-[32px] leading-tight font-semibold flex items-center gap-2.5 text-default">
+        <h1 className="font-heading text-3xl md:text-5xl leading-tight font-semibold flex items-center gap-2.5 text-default">
           <span>Discography</span>
           <div className="bg-white flex items-center gap-2.5 px-5 py-4 rounded-full font-sans font-medium max-sm:hidden">
             <span className="text-sm text-border-default-secondary">Total Release</span>
@@ -115,7 +115,7 @@ function DisocgraphyPage() {
             <Icon name="disc" size={24} />
             <h2 className="font-medium">Top Releases</h2>
           </div>
-          <Link href="/" className="flex items-center gap-1 text-xs">
+          <Link href="/trends-analytics" className="flex items-center gap-1 text-xs">
             <span>See Trends & Analytics</span>
             <Icon name="arrow-up-right" size={16} />
           </Link>

@@ -18,7 +18,7 @@ export const mainOptions = [
     command: "⇧A",
   },
   {
-    href: "/trend-analytics",
+    href: "/trends-analytics",
     title: "Trends & Analytics",
     icon: "bar-chart",
     command: "⇧T",
