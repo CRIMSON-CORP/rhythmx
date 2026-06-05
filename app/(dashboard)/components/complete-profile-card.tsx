@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function CompletProfileCard() {
   return (
-    <div className="bg-brand-orange outline outline-default-default rounded-30 p-4 flex flex-col gap-6 max-w-57">
+    <div className="bg-brand-orange outline outline-default-default rounded-30 p-4 flex flex-col gap-6 w-full max-w-57">
       <header className="flex items-center justify-between">
         <Icon name="zap" size={32} className="text-white" />
         <button>

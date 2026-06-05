@@ -24,7 +24,7 @@ export const mainOptions = [
     command: "⇧T",
   },
   {
-    href: "/earning",
+    href: "/earnings",
     title: "Earning",
     icon: "dollar",
     command: "⇧E",
