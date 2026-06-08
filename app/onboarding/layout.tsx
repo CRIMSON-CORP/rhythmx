@@ -4,7 +4,7 @@ import Icon from "@/components/icon";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex-1 grid grid-cols-[0.45fr_0.55fr]">
+    <div className="flex-1 grid grid-cols-[0.45fr_0.55fr] bg-white">
       <div className="flex flex-col justify-between items-stretch w-full px-5 py-16">
         <Header />
         <div className="w-full grow flex flex-col justify-center max-w-xl mx-auto">

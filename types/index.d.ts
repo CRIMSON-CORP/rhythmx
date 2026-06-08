@@ -48,6 +48,13 @@ interface Artist {
   balance?: number;
 }
 
+interface Team {
+  id: string;
+  name: string;
+  role: string;
+  image: string;
+}
+
 interface Track {
   id: string;
   track_title: string;
