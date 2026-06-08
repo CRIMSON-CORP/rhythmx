@@ -14,7 +14,7 @@ function DashbaordLayout({
   return (
     <div className="bg-page-background grow flex flex-col gap-6">
       <Header />
-      <main className="grow">{children}</main>
+      <main className="grow flex flex-col">{children}</main>
       {notifications}
       {settings}
       <GooeyToaster />

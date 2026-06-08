@@ -26,7 +26,7 @@ function SkeletonRow() {
 function SkeletonList() {
   return (
     <ul className="grid grid-cols-subgrid col-start-1 col-end-4 gap-4 overflow-hidden">
-      {Array.from({ length: 10 }).map((_, idx) => (
+      {Array.from({ length: 5 }).map((_, idx) => (
         <SkeletonRow key={idx} />
       ))}
     </ul>
