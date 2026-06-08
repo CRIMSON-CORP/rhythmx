@@ -45,6 +45,7 @@ interface Artist {
   name: string;
   location: string;
   image: string;
+  balance?: number;
 }
 
 interface Track {
