@@ -80,3 +80,23 @@ interface Track {
   licensing_document?: boolean;
   royalty_splits?: { name: string; percentage: number }[];
 }
+
+interface Permission {
+  id: string;
+  name: string;
+  enabled: boolean;
+}
+
+interface PermissionGroup {
+  category: string;
+  permissions: Permission[];
+}
+
+interface Role {
+  id: string;
+  name: string;
+  description: string;
+  teamCount: number;
+  permissions: PermissionGroup[];
+}
+
