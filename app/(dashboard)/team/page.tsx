@@ -13,7 +13,7 @@ import TeamForm from "@/components/team-form";
 
 function DisocgraphyPage() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 h-full overflow-auto">
       <div className="container flex flex-wrap items-center justify-between gap-6">
         <h1 className="font-heading text-3xl md:text-5xl leading-tight font-semibold flex items-center gap-2.5 text-default">
           <span>Team</span>
@@ -32,7 +32,7 @@ function DisocgraphyPage() {
           </Dialog>
         </div>
       </div>
-      <section className="flex flex-col gap-8 pt-8 pb-4">
+      <section className="flex flex-col gap-8 pt-8 pb-4 h-full overflow-auto">
         <header className="container flex items-center justify-between flex-wrap gap-3">
           <h2 className="font-medium whitespace-nowrap">All Team</h2>
           <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
@@ -81,7 +81,7 @@ function DisocgraphyPage() {
             </div>
           </div>
         </header>
-        <div className="container">
+        <div className="container h-full overflow-auto">
           <div className="bg-white rounded-30 p-3 md:p-8 grid grid-cols-[repeat(auto-fill,minmax(min(168px,100%),1fr))] gap-8">
             {teams.map((artist) => (
               <Team

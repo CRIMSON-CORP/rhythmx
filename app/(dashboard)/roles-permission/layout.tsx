@@ -14,7 +14,7 @@ function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 h-full overflow-auto">
       <div className="container flex flex-wrap items-center justify-between gap-6">
         <h1 className="font-heading text-3xl md:text-5xl leading-tight font-semibold flex items-center gap-2.5 text-default">
           <span>Roles & Permission</span>
@@ -55,9 +55,7 @@ function Layout({
           </Link>
         </div>
       </div>
-      <div className="container">
-        {children}
-      </div>
+      <div className="container h-full overflow-auto">{children}</div>
     </div>
   );
 }

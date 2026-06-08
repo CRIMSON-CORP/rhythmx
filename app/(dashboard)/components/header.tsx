@@ -145,14 +145,16 @@ async function Header() {
                   <CommandGroup className="p-0">
                     {profileOptions.map((option) => (
                       <CommandItem key={option.href} className="p-0 cursor-pointer">
-                        <Link
-                          href={option.href.trim()}
-                          className="flex items-center gap-2 px-4 py-3 w-full h-full"
-                        >
-                          <Icon name={option.icon} size={20} />
-                          <span>{option.title}</span>
-                          <CommandShortcut>{option.command}</CommandShortcut>
-                        </Link>
+                        <PopoverClose asChild>
+                          <Link
+                            href={option.href.trim()}
+                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
+                          >
+                            <Icon name={option.icon} size={20} />
+                            <span>{option.title}</span>
+                            <CommandShortcut>{option.command}</CommandShortcut>
+                          </Link>
+                        </PopoverClose>
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -185,30 +187,34 @@ async function Header() {
               </header>
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex flex-col gap-6">
-                  <Link href="/discography/single/new" className="flex items-center gap-3">
-                    <span className="p-1.5 bg-brand-blue/10 rounded-full">
-                      <Icon name="music" size={20} className="text-brand-blue" />
-                    </span>
-                    <div className="flex flex-col grow">
-                      <span className="font-medium text-sm">Single</span>
-                      <span className="text-xs text-default-tertiary">
-                        Add a single to your discography
+                  <PopoverClose asChild>
+                    <Link href="/discography/single/new" className="flex items-center gap-3">
+                      <span className="p-1.5 bg-brand-blue/10 rounded-full">
+                        <Icon name="music" size={20} className="text-brand-blue" />
                       </span>
-                    </div>
-                    <Icon name="chevron-right" size={20} className="text-default-tertiary" />
-                  </Link>
-                  <Link href="/releases" className="flex items-center gap-3">
-                    <span className="p-1.5 bg-brand-blue/10 rounded-full">
-                      <Icon name="disc" size={20} className="text-brand-blue" />
-                    </span>
-                    <div className="flex flex-col grow">
-                      <span className="font-medium text-sm">Album</span>
-                      <span className="text-xs text-default-tertiary">
-                        Add an album to your discography
+                      <div className="flex flex-col grow">
+                        <span className="font-medium text-sm">Single</span>
+                        <span className="text-xs text-default-tertiary">
+                          Add a single to your discography
+                        </span>
+                      </div>
+                      <Icon name="chevron-right" size={20} className="text-default-tertiary" />
+                    </Link>
+                  </PopoverClose>
+                  <PopoverClose asChild>
+                    <Link href="/releases" className="flex items-center gap-3">
+                      <span className="p-1.5 bg-brand-blue/10 rounded-full">
+                        <Icon name="disc" size={20} className="text-brand-blue" />
                       </span>
-                    </div>
-                    <Icon name="chevron-right" size={20} className="text-default-tertiary" />
-                  </Link>
+                      <div className="flex flex-col grow">
+                        <span className="font-medium text-sm">Album</span>
+                        <span className="text-xs text-default-tertiary">
+                          Add an album to your discography
+                        </span>
+                      </div>
+                      <Icon name="chevron-right" size={20} className="text-default-tertiary" />
+                    </Link>
+                  </PopoverClose>
                 </div>
                 <p className="text-[11px]">
                   You&apos;re starting a pay per release distribution.{" "}

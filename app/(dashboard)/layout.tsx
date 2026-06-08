@@ -12,13 +12,15 @@ function DashbaordLayout({
   settings: React.ReactNode;
 }>) {
   return (
-    <div className="bg-page-background grow flex flex-col gap-6">
-      <Header />
-      <main className="grow flex flex-col">{children}</main>
+    <>
+      <div className="bg-page-background grow flex flex-col gap-6 h-svh overflow-auto">
+        <Header />
+        <main className="flex flex-col h-full overflow-auto">{children}</main>
+      </div>
+      <GooeyToaster />
       {notifications}
       {settings}
-      <GooeyToaster />
-    </div>
+    </>
   );
 }
 

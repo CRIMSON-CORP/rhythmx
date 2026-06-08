@@ -147,7 +147,7 @@ function EarningsPage() {
                 </div>
               </div>
             </div>
-            <div className="flex-[0.45] min-w-70 bg-brand-orange outline outline-default-default rounded-30 p-4 flex flex-col gap-6">
+            <div className="flex-[0.45] min-w-70 bg-brand-orange outline outline-default-default rounded-30 p-4 flex flex-col gap-6 basis-94.75">
               <header className="flex items-center justify-between">
                 <Icon name="zap" size={32} className="text-white" />
                 <button>

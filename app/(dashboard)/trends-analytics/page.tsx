@@ -15,7 +15,7 @@ import Image from "next/image";
 
 const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
 const dataMax = Math.max(...data);
-function DisocgraphyPage() {
+function TrendsAnalyticsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="container flex flex-wrap items-center justify-between gap-6">
@@ -311,4 +311,4 @@ function DisocgraphyPage() {
   );
 }
 
-export default DisocgraphyPage;
+export default TrendsAnalyticsPage;

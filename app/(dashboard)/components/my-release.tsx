@@ -12,7 +12,7 @@ function MyRelease() {
           <Icon name="disc" size={24} />
           <h2 className="font-medium">My Release</h2>
         </div>
-        <Link href="/" className="flex items-center gap-1">
+        <Link href="/discography" className="flex items-center gap-1">
           <span>See all releases</span>
           <Icon name="arrow-up-right" size={16} />
         </Link>

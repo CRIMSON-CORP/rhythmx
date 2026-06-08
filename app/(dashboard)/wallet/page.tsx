@@ -38,7 +38,7 @@ import {
 
 function WalletPage() {
   return (
-    <div className="flex flex-col gap-8 grow">
+    <div className="flex flex-col gap-8 grow min-h-0 overflow-auto">
       <div className="container flex flex-wrap items-center justify-between gap-6">
         <h1 className="font-heading text-3xl md:text-5xl leading-tight font-semibold flex items-center gap-2.5 text-default">
           <span>Wallet</span>
@@ -53,8 +53,8 @@ function WalletPage() {
           <ReportTransactionModal />
         </div>
       </div>
-      <div className="container flex gap-5 grow">
-        <div className="flex flex-col gap-6 overflow-x-auto grow">
+      <div className="container flex gap-5 grow min-h-0 overflow-auto">
+        <div className="flex flex-col gap-6 overflow-auto grow min-h-0">
           <header className="flex items-center justify-between gap-4 flex-wrap">
             <p className="text-lg font-medium">Transactions History</p>
             <div className="flex items-center max-md:gap-4 gap-8">
@@ -89,8 +89,8 @@ function WalletPage() {
               </DropdownMenu>
             </div>
           </header>
-          <div className="flex flex-col gap-4 grow justify-between overflow-x-auto">
-            <div className="bg-white rounded-30 grid grid-cols-[max-content_max-content_max-content_1fr_max-content_max-content_max-content] pt-4 overflow-x-auto whitespace-nowrap">
+          <div className="flex flex-col gap-4 grow min-h-0 justify-between h-full overflow-x-auto">
+            <div className="bg-white rounded-30 grid grid-rows-[max-content_1fr] grid-cols-[max-content_max-content_max-content_1fr_max-content_max-content_max-content] pt-4 min-h-0 overflow-auto whitespace-nowrap">
               <header className="grid grid-cols-subgrid col-start-1 col-end-8 font-medium text-default/50 *:px-6 *:py-3 w-full border-b border-default-default">
                 <p>Transaction ID</p>
                 <p>Trans Type</p>
@@ -100,7 +100,7 @@ function WalletPage() {
                 <p>Amount</p>
                 <p>Status</p>
               </header>
-              <ul className="grid grid-cols-subgrid col-start-1 col-end-8 w-full">
+              <ul className="grid grid-cols-subgrid col-start-1 col-end-8 h-full overflow-auto">
                 <li className="grid grid-cols-subgrid col-start-1 col-end-8 w-full py-6 border-b border-default-default *:px-6 *:py-3 items-center">
                   <TransactionDetails transaction_id="#RHY38849403" />
                   <p>Wall</p>
@@ -121,6 +121,60 @@ function WalletPage() {
                 </li>
                 <li className="grid grid-cols-subgrid col-start-1 col-end-8 w-full py-6 border-b border-default-default *:px-6 *:py-3 items-center">
                   <p>#RHY38849403</p>
+                  <p>Wall</p>
+                  <p>Credit</p>
+                  <p className="flex items-center gap-3">
+                    <Image
+                      src="/images/release-1.png"
+                      alt="Mabel"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                    <span className="text-default">Mabel</span>
+                  </p>
+                  <p>Jan 4, 2022</p>
+                  <p>$847.00</p>
+                  {STATUS_MAP["paid"]}
+                </li>
+                <li className="grid grid-cols-subgrid col-start-1 col-end-8 w-full py-6 border-b border-default-default *:px-6 *:py-3 items-center">
+                  <TransactionDetails transaction_id="#RHY38849403" />
+                  <p>Wall</p>
+                  <p>Credit</p>
+                  <p className="flex items-center gap-3">
+                    <Image
+                      src="/images/release-1.png"
+                      alt="Mabel"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                    <span className="text-default">Mabel</span>
+                  </p>
+                  <p>Jan 4, 2022</p>
+                  <p>$847.00</p>
+                  {STATUS_MAP["paid"]}
+                </li>
+                <li className="grid grid-cols-subgrid col-start-1 col-end-8 w-full py-6 border-b border-default-default *:px-6 *:py-3 items-center">
+                  <p>#RHY38849403</p>
+                  <p>Wall</p>
+                  <p>Credit</p>
+                  <p className="flex items-center gap-3">
+                    <Image
+                      src="/images/release-1.png"
+                      alt="Mabel"
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                    <span className="text-default">Mabel</span>
+                  </p>
+                  <p>Jan 4, 2022</p>
+                  <p>$847.00</p>
+                  {STATUS_MAP["paid"]}
+                </li>
+                <li className="grid grid-cols-subgrid col-start-1 col-end-8 w-full py-6 border-b border-default-default *:px-6 *:py-3 items-center">
+                  <TransactionDetails transaction_id="#RHY38849403" />
                   <p>Wall</p>
                   <p>Credit</p>
                   <p className="flex items-center gap-3">

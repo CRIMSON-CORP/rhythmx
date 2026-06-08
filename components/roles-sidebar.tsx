@@ -17,7 +17,7 @@ export default function RolesSidebar({ searchQuery = "", activeRoleId }: RolesSi
   );
 
   return (
-    <div className="bg-white rounded-30 p-4 md:p-6 flex flex-col gap-8">
+    <div className="bg-white rounded-30 p-4 md:p-6 flex flex-col gap-3 h-full overflow-auto min-h-112.5">
       <h2 className="font-medium text-xl">Roles</h2>
       <Suspense
         fallback={
@@ -34,7 +34,7 @@ export default function RolesSidebar({ searchQuery = "", activeRoleId }: RolesSi
       >
         <SidebarSearch defaultValue={searchQuery} />
       </Suspense>
-      <ul className="flex flex-col gap-3.5 max-h-[600px] overflow-y-auto pr-1">
+      <ul className="flex flex-col gap-3.5 max-h-150 overflow-y-auto pr-1">
         {filteredRoles.length > 0 ? (
           filteredRoles.map((role) => {
             const isActive = role.id === activeRoleId;
