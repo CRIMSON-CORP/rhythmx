@@ -1,8 +1,9 @@
 "use client";
+import { Suspense } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useRouter, useSearchParams } from "next/navigation";
 
-function TimeSorterSelect() {
+function TimeSorterSelectInner() {
   const { push } = useRouter();
   const searchParams = useSearchParams();
 
@@ -29,4 +30,10 @@ function TimeSorterSelect() {
   );
 }
 
-export default TimeSorterSelect;
+export default function TimeSorterSelect() {
+  return (
+    <Suspense fallback={<div className="w-28 h-10 bg-white rounded-full animate-pulse" />}>
+      <TimeSorterSelectInner />
+    </Suspense>
+  );
+}

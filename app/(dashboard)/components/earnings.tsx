@@ -1,10 +1,11 @@
 "use client";
+import { Suspense } from "react";
 import { ListFilter } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
 
-function Earnings() {
+function EarningsInner() {
   const searchParams = useSearchParams();
   const timeSort = searchParams.get("time-sort");
   let lastDays = "30 Days";
@@ -55,4 +56,10 @@ function Earnings() {
   );
 }
 
-export default Earnings;
+export default function Earnings() {
+  return (
+    <Suspense fallback={<div className="min-w-80 bg-white rounded-30 grow-2 h-[230px] animate-pulse" />}>
+      <EarningsInner />
+    </Suspense>
+  );
+}
