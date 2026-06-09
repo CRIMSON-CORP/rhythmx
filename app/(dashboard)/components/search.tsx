@@ -1,11 +1,11 @@
 "use client";
 import { Search as SearchIcon, X } from "lucide-react";
 
-import Icon from "@/components/icon";
 import { DialogClose } from "@/components/ui/dialog";
 import Image from "next/image";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { Funnel, X, Search as SearchIcon } from "lucide-react";
 
 type SearchResult = {
   id: string;
@@ -68,7 +68,7 @@ function Search() {
           />
         </div>
         <button>
-          <Icon name="funnel" size={24} className="text-brand-orange" />
+          <Funnel size={24} className="text-brand-orange" />
         </button>
         <DialogClose>
           <X size={24} className="text-default" />

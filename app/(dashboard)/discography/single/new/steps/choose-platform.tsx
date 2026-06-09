@@ -1,11 +1,10 @@
 "use client";
-import { Check, Search } from "lucide-react";
 
-import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { distributionPlatforms, socialMediaPlatforms } from "@/data/platforms";
 import { cn } from "@/lib/utils";
 import useNewReleaseStore from "@/store/new-release-store";
+import { ArrowRight, Check, Search } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -91,7 +90,7 @@ function ChoosePlatform() {
                   : "bg-transparent text-transparent hover:bg-page-background/50",
               )}
             >
-              <Check size={14} className="stroke-[2.5]" />
+              <Check size={14} />
             </div>
           </button>
         </div>
@@ -125,7 +124,7 @@ function ChoosePlatform() {
                           : "bg-transparent text-transparent hover:bg-page-background/50",
                       )}
                     >
-                      <Check size={14} className="stroke-[2.5]" />
+                      <Check size={14} />
                     </button>
                   </div>
                 ))
@@ -162,7 +161,7 @@ function ChoosePlatform() {
                           : "bg-transparent text-transparent hover:bg-page-background/50",
                       )}
                     >
-                      <Check size={14} className="stroke-[2.5]" />
+                      <Check size={14} />
                     </button>
                   </div>
                 ))
@@ -181,7 +180,7 @@ function ChoosePlatform() {
             className="w-fit"
           >
             <span>Continue</span>
-            <Icon name="arrow-right" size={16} />
+            <ArrowRight size={16} />
           </Button>
         </div>
       </div>
@@ -227,7 +226,7 @@ function ChoosePlatform() {
                     }}
                     className="size-5 absolute top-2.5 right-2.5 rounded-full bg-brand-blue outline outline-brand-blue text-white flex items-center justify-center transition-colors"
                   >
-                    <Check size={14} className="stroke-[2.5]" />
+                    <Check size={14} />
                   </button>
                 </div>
               );

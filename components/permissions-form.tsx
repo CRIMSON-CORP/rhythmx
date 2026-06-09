@@ -1,6 +1,7 @@
 "use client";
 import { Search, Trash2, X } from "lucide-react";
 
+import { X, Trash2, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/icon";

@@ -1,5 +1,5 @@
 "use client";
-import Icon from "../../../components/icon";
+import { Funnel } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
@@ -29,7 +29,7 @@ function Earnings() {
     <div className="@container min-w-80 bg-white rounded-30 grow-2 flex flex-col gap-6">
       <header className="flex items-center justify-between gap-1 text-default-tertiary px-4 py-5">
         <h2 className="font-medium leading-tight">Earnings</h2>
-        <Icon name="funnel" size={24} />
+        <Funnel size={24} />
       </header>
       <div className="flex @max-md:flex-col-reverse grow gap-6 items-end px-6 pb-6">
         <div className="flex @max-md:self-stretch items-end justify-between grow h-full min-h-27 gap-1.5">

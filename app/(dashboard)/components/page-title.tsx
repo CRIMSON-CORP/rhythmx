@@ -27,10 +27,18 @@ export default function PageTitle() {
     <>
       <div className="@max-sm:hidden">
         {isHome ? (
-          <Icon name={currentPath.icon} size={20} className="text-default-tertiary" />
+          typeof currentPath.icon === "string" ? (
+            <Icon name={currentPath.icon} size={20} className="text-default-tertiary" />
+          ) : (
+            <currentPath.icon size={20} className="text-default-tertiary" />
+          )
         ) : (
           <Link href="/">
-            <Icon name={currentPath.icon} size={20} className="text-default" />
+            {typeof currentPath.icon === "string" ? (
+              <Icon name={currentPath.icon} size={20} className="text-default" />
+            ) : (
+              <currentPath.icon size={20} className="text-default" />
+            )}
           </Link>
         )}
       </div>

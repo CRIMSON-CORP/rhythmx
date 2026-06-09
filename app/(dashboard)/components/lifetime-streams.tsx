@@ -1,8 +1,8 @@
 "use client";
 import { Activity } from "lucide-react";
 import Link from "next/link";
-import Icon from "../../../components/icon";
 import { useSearchParams } from "next/navigation";
+import { Activity } from "lucide-react";
 
 const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
 

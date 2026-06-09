@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import Image from "next/image";
 import Icon from "@/components/icon";
 import Form from "./form";
+import { Plus } from "lucide-react";
 
 export default async function AccountForm() {
   const initialData: AccountFormProps = {

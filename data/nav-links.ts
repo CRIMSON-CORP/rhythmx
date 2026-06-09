@@ -1,26 +1,39 @@
+import {
+  ChartNoAxesColumn,
+  Command,
+  Disc,
+  Home,
+  Inbox,
+  Settings,
+  Star,
+  UserPlus,
+  Users,
+  Zap,
+} from "lucide-react";
+
 export const mainOptions = [
   {
     href: "/",
     title: "Home",
-    icon: "home",
+    icon: Home,
     command: "⇧I",
   },
   {
     href: "/discography",
     title: "Discography",
-    icon: "disc",
+    icon: Disc,
     command: "⇧C",
   },
   {
     href: "/artists",
     title: "Artists",
-    icon: "star",
+    icon: Star,
     command: "⇧A",
   },
   {
     href: "/trends-analytics",
     title: "Trends & Analytics",
-    icon: "bar-chart",
+    icon: ChartNoAxesColumn,
     command: "⇧T",
   },
   {
@@ -32,13 +45,13 @@ export const mainOptions = [
   {
     href: "/wallet",
     title: "Wallet",
-    icon: "inbox",
+    icon: Inbox,
     command: "⇧W",
   },
   {
     href: "/subscription",
     title: "Subscription",
-    icon: "zap",
+    icon: Zap,
     command: "⇧S",
   },
 ];
@@ -47,13 +60,13 @@ export const managementOptions = [
   {
     href: "/team ",
     title: "Team",
-    icon: "users",
+    icon: Users,
     command: "",
   },
   {
     href: "/roles-permission ",
     title: "Roles & Permission",
-    icon: "command",
+    icon: Command,
     command: "",
   },
 ];
@@ -62,31 +75,31 @@ export const profileOptions = [
   {
     href: "/invite ",
     title: "Invite",
-    icon: "user-plus",
+    icon: UserPlus,
     command: "⇧I",
   },
   {
     href: "/view-as-artist",
     title: "View As Artist",
-    icon: "command",
+    icon: Command,
     command: "⇧I",
   },
   {
     href: "/view-as-record-label ",
     title: "View As Record Label",
-    icon: "command",
+    icon: Command,
     command: "⇧I",
   },
   {
     href: "/view-as-royalty",
     title: "View As Royalty",
-    icon: "command",
+    icon: Command,
     command: "⇧I",
   },
   {
     href: "/settings",
     title: "Settings",
-    icon: "settings",
+    icon: Settings,
     command: "⇧S",
   },
 ];

@@ -17,6 +17,7 @@ import WithdrawalBank from "./views/withdrawal-bank";
 import EnterOtpView from "./views/enter-otp";
 import TransferSuccess from "./views/transfer-success";
 import { VisuallyHidden } from "radix-ui";
+import { ArrowUpRight, X } from "lucide-react";
 
 const VIEW_MAP: Record<WithdrawalView, React.ComponentType> = {
   "select-artist": SelectArtistView,

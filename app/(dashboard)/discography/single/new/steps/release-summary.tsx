@@ -18,6 +18,7 @@ import { goeyToast } from "goey-toast";
 import { XpressDialog } from "./release-date";
 import { useRouter } from "next/navigation";
 import { distributionPlatforms, socialMediaPlatforms } from "@/data/platforms";
+import { ArrowRight, ArrowUpRight, CalendarRange, DollarSign, Music, X } from "lucide-react";
 
 const SpotifyLogo = ({ className }: { className?: string }) => (
   <svg
@@ -493,7 +494,7 @@ function ReleaseSummary() {
                     {index + 1}
                   </div>
                   <div className="size-9 rounded-full bg-brand-purple/12 flex items-center justify-center shrink-0">
-                    <Icon name="music" className="text-brand-purple" size={18} />
+                    <Music className="text-brand-purple" size={18} />
                   </div>
                   <div className="flex flex-col min-w-0">
                     <span className="font-semibold text-sm text-default truncate">{titleText}</span>
@@ -569,7 +570,7 @@ function ReleaseSummary() {
           {form.own_full_royalty ? (
             <div className="bg-page-background/50 rounded-20 p-4 flex items-center gap-3">
               <div className="size-9 rounded-full bg-brand-purple/12 flex items-center justify-center shrink-0">
-                <Icon name="dollar" className="text-brand-purple" size={18} />
+                <DollarSign className="text-brand-purple" size={18} />
               </div>
               <div className="flex flex-col">
                 <span className="font-semibold text-sm text-default">Own Full Royalty Enabled</span>
@@ -638,7 +639,7 @@ function ReleaseSummary() {
         <div className="bg-white rounded-[24px] p-6 flex flex-col gap-5">
           {/* Row 1: Calendar icon and Date-Time */}
           <div className="flex items-center gap-3">
-            <Icon name="calendar-2" size={20} className="text-default shrink-0" />
+            <CalendarRange size={20} className="text-default shrink-0" />
             <span className="font-semibold text-default text-base">
               {formattedReleaseDate} {formattedTime}
             </span>
@@ -678,7 +679,7 @@ function ReleaseSummary() {
         </p>
         <Button variant="orange" onClick={handleSubmit} className="w-fit cursor-pointer">
           <span>{form.xpress_release ? "Pay & Submit" : "Submit"}</span>
-          <Icon name="arrow-right" size={16} />
+          <ArrowRight size={16} />
         </Button>
       </div>
 

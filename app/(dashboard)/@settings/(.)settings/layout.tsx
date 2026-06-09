@@ -4,7 +4,18 @@ import * as React from "react";
 import { Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { Trash2, Search, X } from "lucide-react";
+import {
+  Trash2,
+  Search,
+  X,
+  User,
+  Star,
+  CreditCard,
+  Inbox,
+  Shield,
+  HardDrive,
+  Sidebar,
+} from "lucide-react";
 import Icon from "@/components/icon";
 
 interface SettingsDialogLayoutProps {
@@ -43,29 +54,29 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
     {
       title: "Account",
       items: [
-        { id: "account", label: "Account", icon: "user", href: "/settings/account" },
+        { id: "account", label: "Account", icon: User, href: "/settings/account" },
         {
           id: "record-label-details",
           label: "Record Label Bio",
-          icon: "star",
+          icon: Star,
           href: "/settings/record-label-details",
         },
         {
           id: "withdrawal-account",
           label: "Withdrawal Account",
-          icon: "credit-card",
+          icon: "dollar",
           href: "/settings/withdrawal-account",
         },
         {
           id: "notification-settings",
           label: "Notification Settings",
-          icon: "inbox",
+          icon: Inbox,
           href: "/settings/notification-settings",
         },
         {
           id: "plan-billing",
           label: "Plan & Billing",
-          icon: "credit-card",
+          icon: CreditCard,
           href: "/settings/plan-billing",
         },
         {
@@ -82,10 +93,10 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
         {
           id: "security-privacy",
           label: "Security & Privacy",
-          icon: "shield",
+          icon: Shield,
           href: "/settings/security-privacy",
         },
-        { id: "devices", label: "Devices", icon: "hard-drive", href: "/settings/devices" },
+        { id: "devices", label: "Devices", icon: HardDrive, href: "/settings/devices" },
       ],
     },
   ];
@@ -188,7 +199,11 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
                                 : "text-default hover:bg-black/5 hover:text-default"
                             }`}
                           >
-                            <Icon size={20} name={item.icon} />
+                            {typeof item.icon === "string" ? (
+                              <Icon size={20} name={item.icon} />
+                            ) : (
+                              <item.icon size={20} />
+                            )}
                             <span>{item.label}</span>
                           </Link>
                         );
@@ -217,7 +232,7 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
                   onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                   className="md:hidden p-2 rounded-full hover:bg-black/5 text-default cursor-pointer shrink-0"
                 >
-                  <Icon name="side-bar" size={20} />
+                  <Sidebar size={20} />
                 </button>
                 <h2 className="font-medium text-lg md:text-xl">{getTitle()}</h2>
               </div>

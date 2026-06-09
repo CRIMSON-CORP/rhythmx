@@ -1,7 +1,6 @@
 "use client";
 import { X } from "lucide-react";
 
-import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
@@ -17,6 +16,7 @@ import {
 import useNewReleaseStore from "@/store/new-release-store";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, X } from "lucide-react";
 
 export function XpressDialog({
   xpressRelease,
@@ -240,7 +240,7 @@ function ReleaseDate() {
             className="w-fit"
           >
             <span>Continue</span>
-            <Icon name="arrow-right" size={16} />
+            <ArrowRight size={16} />
           </Button>
         </div>
       </div>

@@ -11,6 +11,7 @@ import {
 import { InvitesInvitesTrigger, PendingInvitesTrigger } from "./invites";
 import Artist from "@/components/artist";
 import { artists } from "@/data/artists";
+import { ArrowUp, ArrowUpRight, Disc, List, Music, Search, Star } from "lucide-react";
 
 function ArtistsPage() {
   return (
@@ -31,7 +32,7 @@ function ArtistsPage() {
       <section className="flex flex-col gap-8">
         <header className="container flex items-center justify-between gap-3">
           <div className="flex items-center gap-3.5 text-default-tertiary">
-            <Icon name="star" size={24} />
+            <Star size={24} />
             <h2 className="font-medium">Recently Added</h2>
           </div>
           <Link href="/" className="flex items-center gap-1 text-xs">
@@ -66,7 +67,7 @@ function ArtistsPage() {
               />
             </div>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="arrow-up" size={16} />
+              <ArrowUp size={16} />
               <span>All</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
@@ -74,7 +75,7 @@ function ArtistsPage() {
               <span>Album</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="music" size={16} />
+              <Music size={16} />
               <span>Single</span>
             </button>
             <Select defaultValue="recent">
@@ -133,7 +134,7 @@ function ArtistsPage() {
               </button>
               <span className="w-px h-4 bg-default-default/20" />
               <button>
-                <Icon name="list" size={18} />
+                <List size={18} />
               </button>
             </div>
           </div>

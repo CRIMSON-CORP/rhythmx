@@ -4,6 +4,7 @@ import { formatCount } from "@/lib/count-formatter";
 import { releases } from "@/data/releases";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft, ArrowUp, Edit, Trash2 } from "lucide-react";
 
 // About description mapping for each release to showcase rich details
 const ABOUT_DESCRIPTIONS: Record<string, string> = {
@@ -77,7 +78,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
               href="/discography"
               className="size-[42] bg-brand-blue text-white rounded-full p-2 hover:bg-brand-blue/90 active:scale-95 transition-[colors,transform]"
             >
-              <Icon name="arrow-left" size={27} />
+              <ArrowLeft name="arrow-left" size={27} />
             </Link>
             <h1 className="font-heading text-3xl md:text-5xl font-semibold leading-[0.7]">
               Release Details
@@ -86,12 +87,12 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
           <div className="bg-white flex items-center gap-2.5 px-5 py-4 rounded-full font-medium">
             <span className="text-sm text-border-default-secondary">All Platform plays</span>
             <span className="font-semibold">{formatCount(release.engagements)}</span>
-            <Icon name="arrow-up" size={32} className="text-positive-tertiary" />
+            <ArrowUp size={32} className="text-positive-tertiary" />
           </div>
         </div>
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
-            <Icon name="edit" size={16} />
+            <Edit size={16} />
             <span>Edit Release</span>
           </button>
           <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
@@ -150,7 +151,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
               {DUMMY_TRACKS.map((track) => (
                 <li
                   key={track.index}
-                  className="flex flex-wrap items-center justify-between gap-4 px-5 py-3 rounded-20 hover:bg-page-background transition-colors group"
+                  className="flex max-lg:flex-wrap items-center justify-between gap-4 px-5 py-3 rounded-20 hover:bg-page-background transition-colors group"
                 >
                   <span className="size-10 font-medium text-border-default-secondary text-center bg-page-background rounded-full flex items-center justify-center flex-none">
                     {track.index}

@@ -1,6 +1,7 @@
 "use client";
 import { ArrowUpRight, Search } from "lucide-react";
 
+import { ArrowUpRight, Search } from "lucide-react";
 import { Suspense, useState, useEffect } from "react";
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";

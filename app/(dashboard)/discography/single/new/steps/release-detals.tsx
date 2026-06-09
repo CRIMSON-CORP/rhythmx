@@ -19,6 +19,7 @@ import { releaseGenre } from "@/data/release-genre";
 import { releaseLanguage } from "@/data/release-language-dropdown";
 import { cn } from "@/lib/utils";
 import { goeyToast } from "goey-toast";
+import { ArrowRight, Calendar as CalendarIcon, Folder } from "lucide-react";
 
 function ReleaseDetalsPage() {
   const { form, setForm, next } = useNewReleaseStore();
@@ -322,7 +323,7 @@ function ReleaseDetalsPage() {
                         ? format(new Date(form.original_release_date), "PPP")
                         : "Pick a date"}
                     </span>
-                    <Icon name="calendar" size={16} className="text-default/50" />
+                    <CalendarIcon size={16} className="text-default/50" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -358,7 +359,7 @@ function ReleaseDetalsPage() {
             className="w-fit"
           >
             <span>Continue</span>
-            <Icon name="arrow-right" size={16} />
+            <ArrowRight size={16} />
           </Button>
         </div>
       </div>
@@ -449,7 +450,7 @@ function ReleaseDetalsPage() {
             ) : (
               <>
                 {previewUrl ? <span>Change Artwork</span> : <span>Browse Files</span>}
-                <Icon name="folder" size={16} />
+                <Folder size={16} />
               </>
             )}
           </label>

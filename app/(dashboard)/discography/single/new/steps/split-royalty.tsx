@@ -1,7 +1,4 @@
 "use client";
-import { Plus } from "lucide-react";
-
-import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import useNewReleaseStore from "@/store/new-release-store";
@@ -9,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { goeyToast } from "goey-toast";
+import { ArrowUpRight, DollarSign, Music, Plus, User } from "lucide-react";
 
 function SplitRoyalty() {
   const { form, setForm, next } = useNewReleaseStore();
@@ -183,7 +181,7 @@ function SplitRoyalty() {
                           {index + 1}
                         </div>
                         <div className="size-10.5 rounded-full bg-brand-purple/12 flex items-center justify-center flex-none">
-                          <Icon name="music" size={24} className="text-brand-purple" />
+                          <Music size={24} className="text-brand-purple" />
                         </div>
                         <div className="flex flex-col grow break-all min-w-0">
                           <span className="font-medium text-sm text-default truncate">
@@ -229,7 +227,7 @@ function SplitRoyalty() {
             className="w-fit"
           >
             <span>Continue</span>
-            <Icon name="arrow-right" size={16} />
+            <ArrowUpRight name="arrow-right" size={16} />
           </Button>
         </div>
       </div>
@@ -240,7 +238,7 @@ function SplitRoyalty() {
         {ownFullRoyalty ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-center p-8 min-h-100 my-auto">
             <div className="size-16 rounded-full bg-brand-purple/10 flex items-center justify-center mb-4">
-              <Icon name="dollar" size={32} className="text-brand-purple" />
+              <DollarSign name="dollar" size={32} className="text-brand-purple" />
             </div>
             <h3 className="text-lg font-medium text-default mb-2">Own Full Royalty Enabled</h3>
             <p className="text-xs text-border-default-secondary max-w-xs leading-normal">
@@ -250,7 +248,7 @@ function SplitRoyalty() {
         ) : !selectedTrack ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-center p-8 min-h-100 my-auto">
             <div className="size-16 rounded-full bg-brand-purple/10 flex items-center justify-center mb-4">
-              <Icon name="music" size={32} className="text-brand-purple" />
+              <Music name="music" size={32} className="text-brand-purple" />
             </div>
             <h3 className="text-xl font-heading font-medium mb-2">
               Select a Track to Split Royalty
@@ -323,7 +321,7 @@ function SplitRoyalty() {
                 className="px-5 py-2.5 rounded-full w-fit bg-transparent border-default-default/20 hover:bg-default-default/5 flex items-center gap-2"
               >
                 <span className="font-medium text-xs text-default">Add Collaborator</span>
-                <Plus size={24} className="text-default" />
+                <Plus name="plus" size={24} className="text-default" />
               </Button>
               {collaborators.length > 0 && (
                 <div className="bg-white rounded-20 p-6 border border-default-default flex flex-col divide-y divide-default-default">
@@ -331,7 +329,7 @@ function SplitRoyalty() {
                     <div key={index} className="flex items-center justify-between py-4">
                       <div className="flex items-center gap-3">
                         <div className="size-8 rounded-full bg-brand-purple/12 flex items-center justify-center shrink-0">
-                          <Icon name="user" className="text-brand-purple" size={20} />
+                          <User name="user" className="text-brand-purple" size={20} />
                         </div>
                         <div className="flex flex-col">
                           <span className="font-medium text-default">{collab.name}</span>

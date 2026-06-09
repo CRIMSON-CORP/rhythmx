@@ -3,6 +3,7 @@ import Image from "next/image";
 import Icon from "@/components/icon";
 import Form from "./form";
 import Link from "next/link";
+import { Lock, Plus } from "lucide-react";
 
 export default async function AccountForm() {
   const initialData: AccountFormProps = {
@@ -51,7 +52,7 @@ export default async function AccountForm() {
           href="/settings/security-privacy"
           className="w-full bg-white text-default hover:bg-default hover:text-white transition-colors duration-300 flex gap-3 p-3 rounded-20 text-left"
         >
-          <Icon name="lock" size={20} />
+          <Lock size={20} />
           <div className="flex flex-col">
             <span className="font-medium leading-tight">Update Password</span>
             <span className="text-xs font-medium text-default-tertiary leading-tight">

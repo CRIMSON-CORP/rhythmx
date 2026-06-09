@@ -1,4 +1,5 @@
 import Icon from "@/components/icon";
+import { Asterisk } from "lucide-react";
 
 const PLANS = [
   {
@@ -102,7 +103,7 @@ export default function ManagePlanPage() {
               <div className="bg-page-background p-4 flex flex-col gap-3 rounded-20">
                 {plan.features.map((feature, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-xs text-default-tertiary">
-                    <Icon name="asteriks" className="text-brand-orange" size={12} />
+                    <Asterisk className="text-brand-orange flex-none" size={12} />
                     <span className="leading-tight text-default-tertiary font-medium">
                       {feature}
                     </span>

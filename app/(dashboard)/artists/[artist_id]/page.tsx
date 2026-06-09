@@ -25,6 +25,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ArrowUpRight,
+  CircleMinus,
+  Disc,
+  Music,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 
 async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }) {
   const { artist_id } = await params;
@@ -44,7 +56,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               href="/artists"
               className="size-[42] bg-brand-blue text-white rounded-full p-2 hover:bg-brand-blue/90 active:scale-95 transition-[colors,transform]"
             >
-              <Icon name="arrow-left" size={27} />
+              <ArrowLeft name="arrow-left" size={27} />
             </Link>
             <h1 className="font-heading text-3xl md:text-5xl font-semibold leading-[0.7]">
               Artist Profile
@@ -53,7 +65,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
         </div>
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
-            <Icon name="minus-circle" size={16} />
+            <CircleMinus size={16} />
             <span>Disable Artist</span>
           </button>
           <Dialog>
@@ -138,14 +150,14 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               </div>
               <button className="px-6 py-5 bg-brand-orange rounded-full text-white flex items-center gap-2">
                 <span>Edit Profile</span>
-                <Icon name="arrow-right" size={16} />
+                <ArrowRight size={16} />
               </button>
             </div>
             <div className="p-6 bg-white flex flex-col gap-2 items-center justify-center rounded-30 grow flex-1 min-w-80">
               <p className="text-sm font-medium text-default">All Platform plays</p>
               <h2 className="flex items-center text-default gap-2">
                 <span className="text-5xl">12,303,394</span>
-                <Icon name="arrow-up" size={32} className="text-positive-tertiary" />
+                <ArrowUp size={32} className="text-positive-tertiary" />
               </h2>
               <p className="text-[#454545] text-sm font-medium">Increase compared to last week</p>
             </div>
@@ -188,7 +200,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               />
             </div>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="arrow-up" size={16} />
+              <ArrowUp size={16} />
               <span>All</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
@@ -196,7 +208,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               <span>Album</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="music" size={16} />
+              <Music size={16} />
               <span>Single</span>
             </button>
             <Select defaultValue="recent">

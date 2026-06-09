@@ -1,4 +1,3 @@
-import { ChevronDown, ChevronRight, Disc, Globe, Plus, Search as SearchIcon, Zap } from "lucide-react";
 import Icon from "@/components/icon";
 import {
   Command,
@@ -22,6 +21,20 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import Search from "./search";
+import {
+  ChevronDown,
+  ChevronRight,
+  CircleQuestionMark,
+  Disc,
+  Ellipsis,
+  Globe,
+  Inbox,
+  Music,
+  Plus,
+  Sidebar,
+  Zap,
+  Search as SearchIcon,
+} from "lucide-react";
 
 async function Header() {
   return (
@@ -31,7 +44,7 @@ async function Header() {
           <Icon name="logo" width={25} height={38} className="text-brand-orange" />
           <Popover>
             <PopoverTrigger className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
-              <Icon name="side-bar" size={20} />
+              <Sidebar size={20} />
               <ChevronDown size={16} className="text-default-tertiary" />
             </PopoverTrigger>
             <PopoverContent
@@ -48,7 +61,11 @@ async function Header() {
                             href={option.href.trim()}
                             className="flex items-center gap-2 px-4 py-3 w-full h-full"
                           >
-                            <Icon name={option.icon} size={20} className="text-brand-orange" />
+                            {typeof option.icon === "string" ? (
+                              <Icon name={option.icon} size={20} className="text-brand-orange" />
+                            ) : (
+                              <option.icon size={20} className="text-brand-orange" />
+                            )}
                             <span>{option.title}</span>
                             <CommandShortcut>{option.command}</CommandShortcut>
                           </Link>
@@ -64,7 +81,11 @@ async function Header() {
                             href={option.href.trim()}
                             className="flex items-center gap-2 px-4 py-3 w-full h-full"
                           >
-                            <Icon name={option.icon} size={20} className="text-brand-orange" />
+                            {typeof option.icon === "string" ? (
+                              <Icon name={option.icon} size={20} className="text-brand-orange" />
+                            ) : (
+                              <option.icon size={20} className="text-brand-orange" />
+                            )}
                             <span>{option.title}</span>
                             <CommandShortcut>{option.command}</CommandShortcut>
                           </Link>
@@ -76,7 +97,7 @@ async function Header() {
               </Command>
               <footer className="text-brand-blue p-2 flex items-stretch justify-end gap-3.5">
                 <Globe size={24} />
-                <Icon name="question" size={24} />
+                <CircleQuestionMark size={24} />
               </footer>
             </PopoverContent>
           </Popover>
@@ -97,7 +118,7 @@ async function Header() {
             </DialogContent>
           </Dialog>
           <Link href="/notifications" className="relative @max-2xl:hidden">
-            <Icon name="inbox" size={24} />
+            <Inbox size={24} />
             <span className="absolute size-2.5 bg-danger-default rounded-full top-0 right-0 block" />
           </Link>
           <Link
@@ -121,7 +142,7 @@ async function Header() {
                 />
                 <span className="@max-3xl:hidden">Captain RL</span>
               </div>
-              <Icon name="elipses-h" size={20} className="@max-lg:hidden" />
+              <Ellipsis size={20} className="@max-lg:hidden" />
             </PopoverTrigger>
             <PopoverContent
               align="end"
@@ -151,7 +172,11 @@ async function Header() {
                             href={option.href.trim()}
                             className="flex items-center gap-2 px-4 py-3 w-full h-full"
                           >
-                            <Icon name={option.icon} size={20} />
+                            {typeof option.icon === "string" ? (
+                              <Icon name={option.icon} size={20} className="text-brand-orange" />
+                            ) : (
+                              <option.icon size={20} className="text-brand-orange" />
+                            )}
                             <span>{option.title}</span>
                             <CommandShortcut>{option.command}</CommandShortcut>
                           </Link>
@@ -191,7 +216,7 @@ async function Header() {
                   <PopoverClose asChild>
                     <Link href="/discography/single/new" className="flex items-center gap-3">
                       <span className="p-1.5 bg-brand-blue/10 rounded-full">
-                        <Icon name="music" size={20} className="text-brand-blue" />
+                        <Music name="music" size={20} className="text-brand-blue" />
                       </span>
                       <div className="flex flex-col grow">
                         <span className="font-medium text-sm">Single</span>
@@ -225,7 +250,7 @@ async function Header() {
                 </p>
                 <footer className="text-brand-blue flex items-stretch justify-end gap-3.5">
                   <Globe size={24} />
-                  <Icon name="question" size={24} />
+                  <CircleQuestionMark size={24} />
                 </footer>
               </div>
             </PopoverContent>

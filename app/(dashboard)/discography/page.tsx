@@ -1,5 +1,3 @@
-import { ArrowUpRight, Disc, Search } from "lucide-react";
-import Icon from "@/components/icon";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ArrowUp, ArrowUpRight, CheckCircle, Disc, Music, Search } from "lucide-react";
 
 const DUMMY_RELEASES: ReleaseResult[] = [
   {
@@ -59,7 +58,7 @@ function DisocgraphyPage() {
         <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
-              <Icon name="check-circle" size={16} />
+              <CheckCircle size={16} />
               <span>Approved Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -76,7 +75,7 @@ function DisocgraphyPage() {
           </Dialog>
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <Icon name="check-circle" size={16} />
+              <CheckCircle size={16} />
               <span>Pending Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -93,7 +92,7 @@ function DisocgraphyPage() {
           </Dialog>
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <Icon name="check-circle" size={16} />
+              <CheckCircle size={16} />
               <span>Rejected Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -150,7 +149,7 @@ function DisocgraphyPage() {
               />
             </div>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="arrow-up" size={16} />
+              <ArrowUp size={16} />
               <span>All</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
@@ -158,7 +157,7 @@ function DisocgraphyPage() {
               <span>Album</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="music" size={16} />
+              <Music size={16} />
               <span>Single</span>
             </button>
             <Select defaultValue="recent">

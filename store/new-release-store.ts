@@ -5,6 +5,7 @@ import ReleaseDetalsPage from "@/app/(dashboard)/discography/single/new/steps/re
 import ReleaseSummary from "@/app/(dashboard)/discography/single/new/steps/release-summary";
 import ReleaseTracks from "@/app/(dashboard)/discography/single/new/steps/release-tracks";
 import SplitRoyalty from "@/app/(dashboard)/discography/single/new/steps/split-royalty";
+import { AlignLeft, Calendar, Disc, DollarSign, Info, Layers, Star } from "lucide-react";
 import { create } from "zustand";
 
 export interface ReleaseDetailsForm {
@@ -49,42 +50,42 @@ export const newReleaseStoreTitles = [
     title: "Release Details (Single)",
     subtitle: "Add all the necessary information for this release",
     tab_title: "Release Details",
-    icon: "info",
+    icon: Info,
     Component: ReleaseDetalsPage,
   },
   {
     title: "Add Artist",
     subtitle: "Assigned and manage the release artist",
     tab_title: "Artist",
-    icon: "star",
+    icon: Star,
     Component: AddArtistPage,
   },
   {
     title: "Release Tracks",
     subtitle: "Add release tracks and track meta data",
     tab_title: "Tracks",
-    icon: "disc",
+    icon: Disc,
     Component: ReleaseTracks,
   },
   {
     title: "Choose platforms",
     subtitle: "Select the platforms you would like to distribute to.",
     tab_title: "Platforms",
-    icon: "layers",
+    icon: Layers,
     Component: ChoosePlatform,
   },
   {
     title: "Split Royalty",
     subtitle: "Split revenue with collaborators and partners",
     tab_title: "Split Royalty",
-    icon: "dollar",
+    icon: DollarSign,
     Component: SplitRoyalty,
   },
   {
     title: "Release Date",
     subtitle: "Set your release date",
     tab_title: "Release Date",
-    icon: "calendar",
+    icon: Calendar,
     Component: ReleaseDate,
   },
   {
@@ -92,7 +93,7 @@ export const newReleaseStoreTitles = [
     subtitle:
       "Publish your release, fill all the necessary information, upload tracks, album art cover and more.",
     tab_title: "Review & Submit",
-    icon: "align-left",
+    icon: AlignLeft,
     Component: ReleaseSummary,
   },
 ];

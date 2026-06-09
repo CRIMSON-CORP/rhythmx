@@ -1,6 +1,7 @@
 import Icon from "@/components/icon";
 import { earnings } from "@/data/earnings";
 import { formatCurrency } from "@/lib/money-formatter";
+import { ArrowDown } from "lucide-react";
 
 export function EarningItem({ source, type, title, amount }: (typeof earnings)[number]) {
   return (
@@ -15,7 +16,7 @@ export function EarningItem({ source, type, title, amount }: (typeof earnings)[n
         </p>
       </div>
       <div className="flex items-center gap-1">
-        <Icon name="arrow-down" size={12} className="text-positive-tertiary" />
+        <ArrowDown size={12} className="text-positive-tertiary" />
         <span className="font-medium text-sm">+{formatCurrency(amount)}</span>
       </div>
     </li>

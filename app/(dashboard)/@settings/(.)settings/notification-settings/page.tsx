@@ -1,6 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import Icon from "@/components/icon";
+import { Bell } from "lucide-react";
 
 export default function NotificationSettingsPage() {
   return (
@@ -57,7 +57,7 @@ export default function NotificationSettingsPage() {
 
           <Button variant="outline" className="w-fit">
             <span>Allow Push Notification</span>
-            <Icon name="bell" size={24} className="text-default" />
+            <Bell size={24} className="text-default" />
           </Button>
         </div>
       </div>

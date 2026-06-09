@@ -1,7 +1,7 @@
 import { ArrowUpRight, X, Zap } from "lucide-react";
 import Image from "next/image";
-import Icon from "../../../components/icon";
 import Link from "next/link";
+import { ArrowUpRight, X, Zap } from "lucide-react";
 
 function CompletProfileCard() {
   return (

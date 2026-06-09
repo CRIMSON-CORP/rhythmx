@@ -36,6 +36,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ArrowUpRight, Check, ChevronDown, X, Zap } from "lucide-react";
 
 function WalletPage() {
   return (

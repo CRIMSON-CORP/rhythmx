@@ -3,10 +3,10 @@ import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 
 import * as React from "react";
 import { Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";
-import Icon from "@/components/icon";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/Input";
+import { ArrowRight, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 
 interface WithdrawalAccountClientProps {
   accountExists: boolean;
@@ -98,12 +98,12 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
       {!accountExists ? (
         <Button variant="outline" onClick={handleOpenModal} className="w-fit">
           Add Account
-          <Icon name="arrow-right" size={24} />
+          <ArrowRight size={24} />
         </Button>
       ) : (
         <Button variant="outline" onClick={handleOpenModal} className="w-fit">
           Change your Bank
-          <Icon name="arrow-right" size={24} />
+          <ArrowRight size={24} />
         </Button>
       )}
 

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import { artists } from "@/data/artists";
+import { ArrowRight, ArrowUpRight, ChevronRight, List, Plus, Search, Star, X } from "lucide-react";
 
 // Simple query cache to store the delay promises so React Suspense does not loop infinitely
 const promiseCache = new Map<string, Promise<Artist[]>>();
@@ -152,7 +153,7 @@ function AddArtistPage() {
             className="w-fit"
           >
             <span>Continue</span>
-            <Icon name="arrow-right" size={16} />
+            <ArrowRight size={16} />
           </Button>
         </div>
       </div>
@@ -455,7 +456,7 @@ const ArtistAdder = ({ sectionType }: { sectionType: "main" | "featured" | "prod
       <div className="bg-page-background/70 p-4 gap-4 rounded-20 flex flex-col md:flex-row md:items-center justify-between w-full">
         <div className="flex items-center gap-4">
           <div className="size-10.5 flex-none rounded-10 bg-brand-purple-2/12 flex items-center justify-center">
-            <Icon name="star" size={27} className="text-brand-purple-2" />
+            <Star size={27} className="text-brand-purple-2" />
           </div>
           <div className="flex flex-col gap-2">
             <p className="font-medium text-sm leading-none text-default">
@@ -727,7 +728,7 @@ const SelectArtist = ({
               onClick={() => setViewMode("list")}
               className={`${viewMode === "list" ? "text-default" : "text-border-default-secondary"}`}
             >
-              <Icon name="list" size={18} />
+              <List size={18} />
             </button>
           </div>
           <DialogClose className="p-2 rounded-full hover:bg-default-default/10 transition-colors">

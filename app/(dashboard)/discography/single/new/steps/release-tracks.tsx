@@ -1,5 +1,4 @@
 "use client";
-import { Check, ChevronRight, Plus, Search, Trash2, X } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
@@ -29,6 +28,18 @@ import { VisuallyHidden } from "radix-ui";
 import { artists } from "@/data/artists";
 import { releaseGenre } from "@/data/release-genre";
 import { releaseLanguage } from "@/data/release-language-dropdown";
+import {
+  ArrowRight,
+  Check,
+  ChevronRight,
+  Folder,
+  List,
+  Music,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 
 const promiseCache = new Map<string, Promise<Artist[]>>();
 
@@ -290,7 +301,7 @@ function ReleaseTracks() {
             className="w-fit p-4 rounded-full outline outline-black bg-white hover:bg-default/5 text-default font-medium flex items-center gap-2 cursor-pointer transition-colors"
           >
             <span>Browse Files</span>
-            <Icon name="folder" size={16} />
+            <Folder size={16} />
           </label>
           <input
             type="file"
@@ -338,7 +349,7 @@ function ReleaseTracks() {
               className="w-fit"
             >
               <span>Continue</span>
-              <Icon name="arrow-right" size={16} />
+              <ArrowRight size={16} />
             </Button>
           </div>
         </div>
@@ -362,7 +373,7 @@ function ReleaseTracks() {
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-center p-8 min-h-100 relative isolate">
             <div className="size-16 rounded-full bg-brand-purple/10 flex items-center justify-center mb-4">
-              <Icon name="music" size={32} className="text-brand-purple" />
+              <Music size={32} className="text-brand-purple" />
             </div>
             <h3 className="text-lg font-medium text-default mb-2">Select a Track to Edit</h3>
             <p className="text-xs text-border-default-secondary max-w-xs leading-normal">
@@ -422,11 +433,7 @@ function TrackItem({
             is_uploading ? "bg-white" : "bg-brand-purple/12",
           )}
         >
-          <Icon
-            name="music"
-            size={24}
-            className={is_uploading ? "text-brand-orange" : "text-brand-purple"}
-          />
+          <Music size={24} className={is_uploading ? "text-brand-orange" : "text-brand-purple"} />
         </div>
         <div className="flex flex-col grow break-all min-w-0">
           <span className="font-medium text-sm text-default truncate">{track_title}</span>
@@ -546,10 +553,7 @@ function TrackEditPanel({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium text-default">Edit Track Meta Data</h3>
         <button onClick={onDelete}>
-          <Trash2
-            size={16}
-            className="text-danger-default hover:scale-110 transition-transform"
-          />
+          <Trash2 size={16} className="text-danger-default hover:scale-110 transition-transform" />
         </button>
       </div>
 
@@ -566,7 +570,7 @@ function TrackEditPanel({
         {/* Track File Card */}
         <div className="flex items-center gap-4 p-4 border-b border-b-default-default">
           <div className="size-10.5 rounded-full bg-brand-purple/12 flex items-center justify-center flex-none">
-            <Icon name="music" size={24} className="text-brand-purple" />
+            <Music size={24} className="text-brand-purple" />
           </div>
           <div className="flex flex-col min-w-0">
             <span className="font-medium truncate">
@@ -1068,12 +1072,7 @@ const SelectArtist = ({
         <header className="px-6 pt-6 pb-2 flex gap-6 items-center">
           <div className="flex items-center grow gap-2.5 px-4 py-3 bg-white/20 rounded-full border border-default-default/10">
             <Search size={16} className="text-default-tertiary" />
-            <input
-              placeholder="Search Artist"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent outline-none w-full text-sm font-medium placeholder:text-border-default-secondary/75"
-            />
+            <input placeholder="Search Artist" />
           </div>
           <div className="flex items-center px-4 py-3 gap-2 bg-white rounded-full">
             <button
@@ -1087,7 +1086,7 @@ const SelectArtist = ({
               onClick={() => setViewMode("list")}
               className={`${viewMode === "list" ? "text-default" : "text-border-default-secondary"}`}
             >
-              <Icon name="list" size={18} />
+              <List size={18} />
             </button>
           </div>
           <DialogClose className="p-2 rounded-full hover:bg-default-default/10 transition-colors">

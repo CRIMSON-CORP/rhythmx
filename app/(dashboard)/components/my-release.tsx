@@ -1,7 +1,7 @@
-import { ArrowUpRight, Disc } from "lucide-react";
 import ReleaseCards from "@/components/realease-cards";
 import ReleaseCard from "@/components/release-card";
 import { releases } from "@/data/releases";
+import { ArrowUpRight, Disc } from "lucide-react";
 import Link from "next/link";
 
 function MyRelease() {

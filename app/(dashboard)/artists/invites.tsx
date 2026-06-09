@@ -1,6 +1,4 @@
 "use client";
-import { Plus, X } from "lucide-react";
-import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Clock, Link, Plus, User, X } from "lucide-react";
 import Image from "next/image";
 import { VisuallyHidden } from "radix-ui";
 import { ReactNode } from "react";
@@ -18,7 +17,7 @@ export function PendingInvitesTrigger() {
   return (
     <Invites>
       <button className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
-        <Icon name="clock" size={16} />
+        <Clock size={16} />
         <span>Pending Invites (3)</span>
       </button>
     </Invites>
@@ -50,7 +49,7 @@ function Invites({ children }: { children: ReactNode }) {
           <p className="text-sm font-medium grow">Invite Artist</p>
           <button className="p-2 rounded-md bg-white flex items-center gap-2">
             <span className="text-xs font-medium">Copy link</span>
-            <Icon name="link" size={16} className="text-brand-blue" />
+            <Link size={16} className="text-brand-blue" />
           </button>
           <DialogClose className="p-2">
             <X size={20} />
@@ -78,7 +77,7 @@ function Invites({ children }: { children: ReactNode }) {
               {Array.from({ length: 3 }).map((_, i) => (
                 <li key={i} className="flex items-center gap-3 py-4">
                   <div className="bg-brand-purple/12 rounded-full p-1.5">
-                    <Icon name="user" size={20} className="text-brand-purple" />
+                    <User size={20} className="text-brand-purple" />
                   </div>
                   <div className="grow">
                     <p className="text-default font-medium">mike.ross@example.com</p>

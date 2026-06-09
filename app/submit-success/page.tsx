@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
-import Icon from "@/components/icon";
 import Image from "next/image";
 import Link from "next/link";
+import Icon from "@/components/icon";
 
 export default function SubmitSuccessPage() {
   return (

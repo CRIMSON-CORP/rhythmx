@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ArrowUpRight, Plus, X, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 

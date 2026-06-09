@@ -1,7 +1,6 @@
 "use client";
 import { Search, X } from "lucide-react";
 
-import Icon from "@/components/icon";
 import { DialogClose } from "@/components/ui/dialog";
 import { useState } from "react";
 import {
@@ -12,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
+import { Clock, Search, X } from "lucide-react";
 
 const DUMMY_RELEASES: ReleaseResult[] = [
   {
@@ -129,7 +129,7 @@ function Releases({
                 <div className="p-2.5 rounded-20 bg-[#DCFCE7] text-[#14532D]">Approved</div>
               ) : type === "pending" ? (
                 <div className="p-2.5 rounded-20 bg-[#FFF1C2] text-[#FF9A03] flex items-center gap-2">
-                  <Icon name="clock" size={16} />
+                  <Clock size={16} />
                   Pending
                 </div>
               ) : (

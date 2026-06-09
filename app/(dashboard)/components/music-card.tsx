@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import Image from "next/image";
-import Icon from "../../../components/icon";
 
 function MusicCard() {
   return (

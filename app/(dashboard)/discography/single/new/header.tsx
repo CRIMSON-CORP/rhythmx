@@ -1,7 +1,7 @@
 "use client";
-import Icon from "@/components/icon";
 import { cn } from "@/lib/utils";
 import useNewReleaseStore, { newReleaseStoreTitles } from "@/store/new-release-store";
+import { ArrowLeft, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
@@ -24,7 +24,7 @@ function Header() {
             onClick={handleBackClick}
             className="size-[42] bg-brand-blue text-white rounded-full p-2 hover:bg-brand-blue/90 active:scale-95 transition-[colors,transform]"
           >
-            <Icon name="arrow-left" size={27} />
+            <ArrowLeft size={27} />
           </button>
           <div className="flex flex-col gap-3 md:gap-6">
             <h1 className="font-heading text-3xl md:text-5xl font-semibold leading-[0.7]">
@@ -55,12 +55,12 @@ export default Header;
 
 function StepTab({
   title,
-  icon,
+  icon: IconComponent,
   index,
   currentStep,
 }: {
   title: string;
-  icon: string;
+  icon: LucideIcon;
   index: number;
   currentStep: number;
 }) {
@@ -87,7 +87,7 @@ function StepTab({
         isActive ? "bg-[#EAF5FF] text-brand-blue" : "",
       )}
     >
-      <Icon name={icon} size={16} />
+      <IconComponent size={16} />
       <span>{title}</span>
     </button>
   );

@@ -1,5 +1,5 @@
 "use client";
-import { Trash2, X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Icon from "./icon";
 import Input from "./Input";
