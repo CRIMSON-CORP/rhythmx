@@ -1,5 +1,4 @@
 "use client";
-import { Search, X } from "lucide-react";
 
 import { DialogClose } from "@/components/ui/dialog";
 import { useState } from "react";

@@ -1,11 +1,9 @@
 "use client";
-import { X } from "lucide-react";
 
 import { X } from "lucide-react";
 import * as React from "react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useRouter } from "next/navigation";
-import Icon from "./icon";
 
 export default function NotificationsPanel({ children }: { children: React.ReactNode }) {
   const router = useRouter();

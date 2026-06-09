@@ -1,5 +1,4 @@
 "use client";
-import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 
 import * as React from "react";
 import { Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";

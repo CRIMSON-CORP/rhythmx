@@ -1,4 +1,3 @@
-import { Check, Search } from "lucide-react";
 import Icon from "@/components/icon";
 import { Check, Search } from "lucide-react";
 import Image from "next/image";

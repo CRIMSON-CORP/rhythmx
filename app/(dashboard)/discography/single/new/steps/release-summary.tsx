@@ -1,6 +1,4 @@
 "use client";
-import { ArrowUpRight, X } from "lucide-react";
-
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";

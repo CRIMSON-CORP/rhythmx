@@ -1,5 +1,4 @@
 "use client";
-import { ArrowUpRight, X } from "lucide-react";
 import useWithdrawalStore, { WithdrawalView } from "@/store/withdrawal-store";
 import React, { useEffect } from "react";
 import {

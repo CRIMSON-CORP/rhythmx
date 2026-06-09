@@ -1,5 +1,4 @@
 "use client";
-import { ArrowUpRight, ChevronRight, Plus, Search, X } from "lucide-react";
 
 import { useState, Suspense, use } from "react";
 import Image from "next/image";

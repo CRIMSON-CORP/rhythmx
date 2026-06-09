@@ -1,4 +1,3 @@
-import { Trash2 } from "lucide-react";
 import Icon from "@/components/icon";
 import { formatCount } from "@/lib/count-formatter";
 import { releases } from "@/data/releases";

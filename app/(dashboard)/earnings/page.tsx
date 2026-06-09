@@ -1,4 +1,3 @@
-import { ArrowUpRight, Plus, X, Zap } from "lucide-react";
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import {

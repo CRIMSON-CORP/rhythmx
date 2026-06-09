@@ -1,4 +1,3 @@
-import { ArrowUpRight, Disc, Search, Trash2, X } from "lucide-react";
 import Icon from "@/components/icon";
 import Link from "next/link";
 import { artists } from "@/data/artists";

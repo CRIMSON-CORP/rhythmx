@@ -1,5 +1,4 @@
 "use client";
-import { Search as SearchIcon, X } from "lucide-react";
 
 import { DialogClose } from "@/components/ui/dialog";
 import Image from "next/image";
