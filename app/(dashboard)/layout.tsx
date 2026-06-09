@@ -13,7 +13,7 @@ function DashbaordLayout({
 }>) {
   return (
     <>
-      <div className="bg-page-background grow flex flex-col gap-6 h-svh overflow-auto">
+      <div className="bg-page-background grow flex flex-col gap-3 md:gap-6 h-svh overflow-auto">
         <Header />
         <main className="flex flex-col h-full overflow-auto">{children}</main>
       </div>

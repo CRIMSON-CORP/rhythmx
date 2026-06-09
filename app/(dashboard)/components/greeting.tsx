@@ -10,7 +10,7 @@ function Greeting() {
   }
 
   return (
-    <h1 className="font-heading text-[32px] leading-tight font-semibold">
+    <h1 className="font-heading text-3xl md:text-[32px] leading-tight font-semibold">
       Good {greeting}, Captain 👨🏾‍🚀
     </h1>
   );

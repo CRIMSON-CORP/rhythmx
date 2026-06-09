@@ -1,6 +1,5 @@
-import { List, Plus, Search } from "lucide-react";
+import { List, Search } from "lucide-react";
 import Icon from "@/components/icon";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -10,8 +9,7 @@ import {
 } from "@/components/ui/select";
 import Team from "@/components/team";
 import { teams } from "@/data/team";
-import TeamForm from "@/components/team-form";
-import { Button } from "@/components/ui/button";
+import NewTeam from "./new-team";
 
 function DisocgraphyPage() {
   return (
@@ -25,15 +23,7 @@ function DisocgraphyPage() {
           </div>
         </h1>
         <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <span>New Team</span>
-                <Plus size={16} />
-              </Button>
-            </DialogTrigger>
-            <TeamForm />
-          </Dialog>
+          <NewTeam />
         </div>
       </div>
       <section className="flex flex-col gap-8 pt-8 pb-4 h-full overflow-auto">
