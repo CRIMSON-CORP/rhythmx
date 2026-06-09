@@ -16,7 +16,7 @@ function Option({ value, checked, onChange }: OptionProps) {
   return (
     <label
       htmlFor={value}
-      className="rounded-[30px] cursor-pointer outline outline-default-default has-checked:outline-brand-orange/10 has-checked:bg-brand-orange/10 hover:bg-brand-orange/10 px-6 py-7 w-full flex items-center gap-4 transition-colors duration-200"
+      className="rounded-30 cursor-pointer outline outline-default-default has-checked:outline-brand-orange/10 has-checked:bg-brand-orange/10 hover:bg-brand-orange/10 px-6 py-7 w-full flex items-center gap-4 transition-colors duration-200"
     >
       <input
         type="radio"

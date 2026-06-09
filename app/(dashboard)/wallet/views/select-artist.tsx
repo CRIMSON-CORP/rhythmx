@@ -1,9 +1,7 @@
 "use client";
-import { ArrowUpRight, Search } from "lucide-react";
+import { ArrowUpRight, Eye, Search } from "lucide-react";
 
-import { ArrowUpRight, Search } from "lucide-react";
 import { Suspense, useState, useEffect } from "react";
-import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import useWithdrawalStore from "@/store/withdrawal-store";
@@ -134,7 +132,7 @@ function SelectArtistView() {
           <p>Action</p>
           <p className="flex items-center gap-2 select-none">
             <span>Balance</span>
-            <Icon name="eye" size={16} />
+            <Eye size={16} />
           </p>
         </header>
 

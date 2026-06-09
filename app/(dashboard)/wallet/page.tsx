@@ -1,4 +1,4 @@
-import { ArrowUpRight, Check, ChevronDown, X, Zap } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Check, ChevronDown, X, Zap } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import WithdrawalFlow from "./withdrawal-flow";
 import ReportTransactionModal from "./report-transaction-modal";
@@ -16,7 +16,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Icon from "@/components/icon";
 import Image from "next/image";
 import {
   Pagination,
@@ -36,7 +35,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ArrowUpRight, Check, ChevronDown, X, Zap } from "lucide-react";
 
 function WalletPage() {
   return (
@@ -300,7 +298,7 @@ function TransactionDetails({ transaction_id }: { transaction_id: string }) {
             <div className="flex items-center gap-2.5">
               <p className="text-default">#RHY38849403</p>
               <div className="bg-[#EBFFEE] rounded-full p-0.5">
-                <Icon name="arrow-down" size={12} className="text-[#14AE5C]" />
+                <ArrowDown size={12} className="text-[#14AE5C]" />
               </div>
               {STATUS_MAP["paid"]}
             </div>

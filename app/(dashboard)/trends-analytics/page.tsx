@@ -1,4 +1,4 @@
-import { Activity, Disc, Globe } from "lucide-react";
+import { Activity, ArrowUp, CircleCheckBig, Disc, Globe, TrendingUp } from "lucide-react";
 import Icon from "@/components/icon";
 import {
   Dialog,
@@ -26,7 +26,7 @@ function TrendsAnalyticsPage() {
         <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
-              <Icon name="check-circle" size={16} />
+              <CircleCheckBig size={16} />
               <span>Approved Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -43,7 +43,7 @@ function TrendsAnalyticsPage() {
           </Dialog>
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <Icon name="check-circle" size={16} />
+              <CircleCheckBig size={16} />
               <span>Pending Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -60,7 +60,7 @@ function TrendsAnalyticsPage() {
           </Dialog>
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <Icon name="check-circle" size={16} />
+              <CircleCheckBig size={16} />
               <span>Rejected Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -149,7 +149,7 @@ function TrendsAnalyticsPage() {
                     Total Earnings
                   </span>
                   <span className="font-medium text-sm text-default">$2,384.00</span>
-                  <Icon name="arrow-up" size={18} className="text-positive-tertiary" />
+                  <ArrowUp size={18} className="text-positive-tertiary" />
                 </div>
               </header>
               <ul className="divide-y divide-default-default">
@@ -195,7 +195,7 @@ function TrendsAnalyticsPage() {
         <div className="container flex flex-col gap-8">
           <header className="container flex items-center justify-between gap-3">
             <div className="flex items-center gap-3.5 text-default">
-              <Icon name="trending-up" size={24} />
+              <TrendingUp name="trending-up" size={24} />
               <h2 className="font-medium">Growth by platform</h2>
             </div>
           </header>

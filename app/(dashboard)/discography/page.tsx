@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowUp, ArrowUpRight, CheckCircle, Disc, Music, Search } from "lucide-react";
+import { ArrowUp, ArrowUpRight, CircleCheckBig, Disc, Music, Search } from "lucide-react";
 
 const DUMMY_RELEASES: ReleaseResult[] = [
   {
@@ -58,7 +58,7 @@ function DisocgraphyPage() {
         <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
-              <CheckCircle size={16} />
+              <CircleCheckBig size={16} />
               <span>Approved Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -75,7 +75,7 @@ function DisocgraphyPage() {
           </Dialog>
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <CheckCircle size={16} />
+              <CircleCheckBig size={16} />
               <span>Pending Release (3)</span>
             </DialogTrigger>
             <DialogContent
@@ -92,7 +92,7 @@ function DisocgraphyPage() {
           </Dialog>
           <Dialog>
             <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <CheckCircle size={16} />
+              <CircleCheckBig size={16} />
               <span>Rejected Release (3)</span>
             </DialogTrigger>
             <DialogContent

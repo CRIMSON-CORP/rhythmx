@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react";
+import { List, Plus, Search } from "lucide-react";
 import Icon from "@/components/icon";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
@@ -11,7 +11,6 @@ import {
 import Team from "@/components/team";
 import { teams } from "@/data/team";
 import TeamForm from "@/components/team-form";
-import { Plus, Search } from "lucide-react";
 
 function DisocgraphyPage() {
   return (
@@ -78,7 +77,7 @@ function DisocgraphyPage() {
               </button>
               <span className="w-px h-4 bg-default-default/20" />
               <button>
-                <Icon name="list" size={18} />
+                <List size={18} />
               </button>
             </div>
           </div>

@@ -1,7 +1,6 @@
-import { X } from "lucide-react";
+import { ClockFading, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Icon from "@/components/icon";
 
 export default function SubmitSuccessPage() {
   return (
@@ -26,7 +25,7 @@ export default function SubmitSuccessPage() {
               className="object-contain object-center size-57.75"
             />
             <div className="bg-brand-blue p-2.5 rounded-full absolute right-0 top-1/2 text-white">
-              <Icon name="clock-02" size={33} />
+              <ClockFading size={33} />
             </div>
           </div>
           <div className="flex flex-col items-center text-center gap-1 max-w-113.25">

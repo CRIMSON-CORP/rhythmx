@@ -1,8 +1,8 @@
 "use client";
-import Icon from "@/components/icon";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import useToggle from "@/hooks/useToggle";
+import { Eye, EyeOff } from "lucide-react";
 import { InputHTMLAttributes } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -29,7 +29,7 @@ function Input({ type = "text", name, label, ...props }: InputProps) {
         {type === "password" ? (
           <button type="button" onClick={toggle}>
             <InputGroupAddon align="inline-end">
-              {isOpen ? <Icon name="eye-slash" size={16} /> : <Icon name="eye" size={16} />}
+              {isOpen ? <EyeOff size={16} /> : <Eye size={16} />}
             </InputGroupAddon>
           </button>
         ) : null}

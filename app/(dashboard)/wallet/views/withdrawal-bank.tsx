@@ -1,5 +1,5 @@
-import Icon from "@/components/icon";
 import useWithdrawalStore from "@/store/withdrawal-store";
+import { DollarSign } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -45,7 +45,7 @@ function WithdrawalBank() {
         href="/settings/withdrawal-account"
         className="w-full text-default hover:bg-default hover:text-white transition-colors duration-300 flex gap-3 p-3 rounded-20 text-left"
       >
-        <Icon name="dollar" size={20} />
+        <DollarSign size={20} />
         <div className="flex flex-col gap-1 text-border-default-secondary">
           <span className="font-medium">Withdrawal Acct</span>
           <span className="text-default-tertiary text-sm">Manage your withdrawal account</span>

@@ -1,7 +1,6 @@
 "use client";
-import { X } from "lucide-react";
+import { MessageSquare, X } from "lucide-react";
 
-import { X } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import Icon from "@/components/icon";
@@ -52,7 +51,7 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
       <DialogTrigger asChild>
         <button className="bg-white text-black p-4 flex items-center gap-2 rounded-full cursor-pointer">
           <span>Report Transaction</span>
-          <Icon name="chat" size={16} />
+          <MessageSquare size={16} />
         </button>
       </DialogTrigger>
       <DialogContent

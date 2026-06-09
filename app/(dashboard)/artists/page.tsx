@@ -1,4 +1,3 @@
-import { ArrowUpRight, Disc, Search } from "lucide-react";
 import Icon from "@/components/icon";
 import Link from "next/link";
 import {
