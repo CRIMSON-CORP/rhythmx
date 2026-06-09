@@ -1,12 +1,3 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { VisuallyHidden } from "radix-ui";
-import Releases from "./releases";
 import Link from "next/link";
 import ReleaseCards from "@/components/realease-cards";
 import { releases } from "@/data/releases";
@@ -18,31 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowUp, ArrowUpRight, CircleCheckBig, Disc, Music, Search } from "lucide-react";
-
-const DUMMY_RELEASES: ReleaseResult[] = [
-  {
-    id: "1",
-    title: "Standing B4 Him",
-    type: "Single",
-    platforms: "Apple Music. Spotify. Deezer",
-    image: "/images/release-1.png",
-  },
-  {
-    id: "2",
-    title: "Dancing in the Rain",
-    type: "Duet",
-    platforms: "Amazon Music. YouTube Music. Tidal",
-    image: "/images/release-2.png",
-  },
-  {
-    id: "3",
-    title: "Lost in the Echo",
-    type: "Cover",
-    platforms: "SoundCloud. Pandora. iHeartRadio",
-    image: "/images/release-3.png",
-  },
-];
+import { ArrowUp, ArrowUpRight, Disc, Music, Search } from "lucide-react";
+import ReleaseStatus from "@/components/release-status";
 
 function DisocgraphyPage() {
   return (
@@ -55,59 +23,7 @@ function DisocgraphyPage() {
             <span className="text-base">10203</span>
           </div>
         </h1>
-        <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
-          <Dialog>
-            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
-              <CircleCheckBig size={16} />
-              <span>Approved Release (3)</span>
-            </DialogTrigger>
-            <DialogContent
-              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
-              showCloseButton={false}
-            >
-              <VisuallyHidden.Root>
-                <DialogTitle>Approved releases Popup</DialogTitle>
-                <DialogDescription>Approved Releases Popup</DialogDescription>
-              </VisuallyHidden.Root>
-              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#14AE5C] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
-              <Releases title="Approved Release" releases={DUMMY_RELEASES} />
-            </DialogContent>
-          </Dialog>
-          <Dialog>
-            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <CircleCheckBig size={16} />
-              <span>Pending Release (3)</span>
-            </DialogTrigger>
-            <DialogContent
-              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
-              showCloseButton={false}
-            >
-              <VisuallyHidden.Root>
-                <DialogTitle>Pending releases Popup</DialogTitle>
-                <DialogDescription>Pending Releases Popup</DialogDescription>
-              </VisuallyHidden.Root>
-              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
-              <Releases title="Pending Release" releases={DUMMY_RELEASES} type="pending" />
-            </DialogContent>
-          </Dialog>
-          <Dialog>
-            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <CircleCheckBig size={16} />
-              <span>Rejected Release (3)</span>
-            </DialogTrigger>
-            <DialogContent
-              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
-              showCloseButton={false}
-            >
-              <VisuallyHidden.Root>
-                <DialogTitle>Rejected releases Popup</DialogTitle>
-                <DialogDescription>Rejected Releases Popup</DialogDescription>
-              </VisuallyHidden.Root>
-              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#EC221F] -z-10 opacity-25 blur-3xl"></div>
-              <Releases title="Rejected Release" releases={DUMMY_RELEASES} type="rejected" />
-            </DialogContent>
-          </Dialog>
-        </div>
+        <ReleaseStatus />
       </div>
       <section className="flex flex-col gap-8">
         <header className="container flex items-center justify-between gap-3">

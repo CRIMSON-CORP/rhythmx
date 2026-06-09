@@ -103,11 +103,7 @@ function AddArtistPage() {
               <div className="flex flex-col items-start gap-3">
                 <p className="font-medium text-border-default-secondary">Feature Artist</p>
                 {activeSection !== "featured" && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveSection("featured")}
-                    className="px-5 py-2.5 rounded-full w-fit"
-                  >
+                  <Button size="sm" variant="outline" onClick={() => setActiveSection("featured")}>
                     <span className="font-medium text-sm text-default">Add</span>
                     <Plus size={16} />
                   </Button>
@@ -125,11 +121,7 @@ function AddArtistPage() {
                   Producer & Engineer Credit
                 </p>
                 {activeSection !== "producer" && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveSection("producer")}
-                    className="px-5 py-2.5 rounded-full w-fit"
-                  >
+                  <Button size="sm" variant="outline" onClick={() => setActiveSection("producer")}>
                     <span className="font-medium text-sm text-default">Add</span>
                     <Plus size={16} />
                   </Button>
@@ -751,11 +743,7 @@ const SelectArtist = ({
           </div>
           {/* Floating Add artist outside button */}
           <div className="absolute bottom-6 right-6 flex justify-end pointer-events-none">
-            <Button
-              variant="outline"
-              onClick={onAddArtistOutside}
-              className="rounded-full pointer-events-auto bg-white hover:bg-[#f5f5f5] shadow-md border-default-default/30"
-            >
+            <Button variant="outline" onClick={onAddArtistOutside} className="bg-white">
               Add artist outside
             </Button>
           </div>

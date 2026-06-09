@@ -32,7 +32,13 @@ function AccountType() {
           onChange={() => setForm({ selected_account: "contributor" })}
         />
       </div>
-      <Button type="button" onClick={nextStep} disabled={!selected_account}>
+      <Button
+        rounded={10}
+        width="full"
+        type="button"
+        onClick={nextStep}
+        disabled={!selected_account}
+      >
         Continue
       </Button>
     </div>

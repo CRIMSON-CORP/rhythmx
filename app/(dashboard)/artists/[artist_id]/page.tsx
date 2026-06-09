@@ -63,16 +63,16 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
+          <Button variant="white">
             <CircleMinus size={16} />
             <span>Disable Artist</span>
-          </button>
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
+              <Button variant="white">
                 <Trash2 size={16} />
                 <span>Remove Artist</span>
-              </button>
+              </Button>
             </DialogTrigger>
             <DialogContent
               showCloseButton={false}
@@ -97,16 +97,11 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
                 {/* Action Buttons */}
                 <div className="flex items-center justify-end gap-3 mt-4">
                   <DialogClose asChild>
-                    <Button
-                      variant="outline"
-                      className="w-fit rounded-xl px-5 py-2.5 text-sm font-semibold border-default-default/10 text-default hover:bg-page-background cursor-pointer"
-                    >
+                    <Button size="sm" variant="outline">
                       Cancel
                     </Button>
                   </DialogClose>
-                  <Button className="w-fit rounded-xl px-5 py-2.5 text-sm font-semibold bg-[#E52E2E] hover:bg-[#E52E2E]/90 text-white border-0 cursor-pointer">
-                    Yes, Remove
-                  </Button>
+                  <Button variant="destructive">Yes, Remove</Button>
                 </div>
               </div>
             </DialogContent>
@@ -123,16 +118,16 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
                   alt={artist.name}
                   width={168}
                   height={168}
-                  className="rounded-full"
+                  className="rounded-full flex-none aspect-square object-cover object-center"
                 />
                 <div className="flex grow justify-center items-center divide-x divide-default-default">
                   <div className="flex flex-col p-5 w-full max-w-63">
-                    <p>20 February 1996</p>
-                    <p>Born</p>
+                    <p className="text-lg">20 February 1996</p>
+                    <p className="text-border-default-secondary">Born</p>
                   </div>
                   <div className="flex flex-col p-5 w-full max-w-63">
-                    <p>Pop</p>
-                    <p>Genre</p>
+                    <p className="text-lg">Pop</p>
+                    <p className="text-border-default-secondary">Genre</p>
                   </div>
                 </div>
               </div>
@@ -147,10 +142,10 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
                   taking the intimate and relatable and turning it into spectacular, pumped-up
                 </p>
               </div>
-              <button className="px-6 py-5 bg-brand-orange rounded-full text-white flex items-center gap-2">
+              <Button variant="orange" size="xl">
                 <span>Edit Profile</span>
                 <ArrowRight size={16} />
-              </button>
+              </Button>
             </div>
             <div className="p-6 bg-white flex flex-col gap-2 items-center justify-center rounded-30 grow flex-1 min-w-80">
               <p className="text-sm font-medium text-default">All Platform plays</p>
@@ -166,7 +161,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
                   <Icon name="dollar" size={16} />
                   <span>Earning History</span>
                 </div>
-                <Button className="w-fit rounded-full">
+                <Button>
                   <span>Withdraw</span>
                   <ArrowUpRight size={16} />
                 </Button>

@@ -101,7 +101,9 @@ function TeamForm({ id = "", image = "", name = "", role = "" }: Partial<Team> =
             name="password"
             placeholder="Password"
           />
-          <Button className="max-w-63.25 mx-auto">Update team</Button>
+          <Button rounded={10} className="min-w-63.25 mx-auto">
+            Update team
+          </Button>
         </div>
       </div>
     </DialogContent>

@@ -22,7 +22,7 @@ function Logo() {
         </h2>
       </div>
       <div className="space-y-6">
-        <div className="rounded-[30px] cursor-pointer outline outline-default-default has-checked:outline-brand-orange/10 has-checked:bg-brand-orange/10 px-6 py-7 w-full flex items-center gap-4 transition-colors duration-200">
+        <div className="rounded-30 cursor-pointer outline outline-default-default has-checked:outline-brand-orange/10 has-checked:bg-brand-orange/10 px-6 py-7 w-full flex items-center gap-4 transition-colors duration-200">
           <Icon name={accountTypeIconMap[selected_account]} size={32} />
           <div className="grow font-medium space-y-1">
             <p className="text-lg leading-tight">
@@ -53,7 +53,7 @@ function Logo() {
           </label>
         </div>
       </div>
-      <Button type="button" onClick={nextStep} disabled={!avatar}>
+      <Button rounded={10} width="full" type="button" onClick={nextStep} disabled={!avatar}>
         Continue
       </Button>
     </div>

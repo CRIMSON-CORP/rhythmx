@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import { goeyToast } from "goey-toast";
+import { Button } from "@/components/ui/button";
 
 function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
   // Use React controlled state to manage opening and programmatically closing the modal
@@ -49,10 +50,10 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-white text-black p-4 flex items-center gap-2 rounded-full cursor-pointer">
+        <Button variant="white">
           <span>Report Transaction</span>
           <MessageSquare size={16} />
-        </button>
+        </Button>
       </DialogTrigger>
       <DialogContent
         className="overflow-hidden rounded-30 isolate gap-0 max-w-150"
@@ -123,17 +124,18 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
           </div>
 
           {/* Action Submit Button */}
-          <button
+          <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full max-w-36 py-3.5 rounded-full border border-black hover:bg-black hover:text-white transition-all text-black font-semibold cursor-pointer select-none disabled:opacity-50 flex items-center justify-center mx-auto mt-4"
+            className="min-w-36 mx-auto mt-4"
+            variant="outline"
           >
             {loading ? (
               <span className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
             ) : (
               "Done"
             )}
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -73,7 +73,9 @@ function page() {
           </div>
           <p>I agree to RhythmX marketing communications</p>
         </label>
-        <Button>Continue</Button>
+        <Button rounded={10} width="full">
+          Continue
+        </Button>
       </form>
       <TermsPolicyText />
     </div>

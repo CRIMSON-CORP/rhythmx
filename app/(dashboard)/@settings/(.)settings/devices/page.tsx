@@ -47,9 +47,7 @@ export default function DevicesSettingsPage() {
               Log out of all other active sessions on other devices besides this one.
             </p>
           </div>
-          <Button variant="outline" className="w-fit rounded-full">
-            Log out devices
-          </Button>
+          <Button variant="outline">Log out devices</Button>
         </div>
       </div>
 
@@ -91,12 +89,9 @@ export default function DevicesSettingsPage() {
                     <td className="py-4.5 px-6 text-grey">{device.lastUsed}</td>
                     <td className="py-4.5 px-6 text-grey">{device.location}</td>
                     <td className="py-4.5 px-6 text-right">
-                      <button
-                        type="button"
-                        className="whitespace-nowrap px-4 py-1.5 border border-black/15 rounded-full text-xs font-semibold hover:bg-black/5 transition-all cursor-pointer"
-                      >
+                      <Button variant="outline" size="xs">
                         Log out
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}

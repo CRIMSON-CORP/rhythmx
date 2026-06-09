@@ -71,11 +71,7 @@ function ArtistList({ search, onSelectArtist }: ArtistListProps) {
               <p className="font-medium text-xs text-border-default-secondary">{artist.location}</p>
             </div>
           </div>
-          <Button
-            onClick={() => onSelectArtist(artist.id)}
-            variant="outline"
-            className="rounded-full w-fit bg-transparent px-3.5 py-2.5 text-xs hover:bg-neutral-50 border-default-default/20 transition-all font-semibold"
-          >
+          <Button onClick={() => onSelectArtist(artist.id)} size="sm" variant="outline">
             <span>Withdraw</span>
             <ArrowUpRight size={16} />
           </Button>

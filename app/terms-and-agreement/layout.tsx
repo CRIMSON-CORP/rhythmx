@@ -17,10 +17,10 @@ function Layout({
         <div className="grow h-full overflow-auto text-xs font-medium">{children}</div>
       </main>
       <footer className="max-w-xl flex items-center gap-6 w-full">
-        <Button variant="outline" className="grow w-auto">
+        <Button rounded={10} variant="outline" className="grow">
           Disagree
         </Button>
-        <Button className="grow w-auto" variant="blue">
+        <Button rounded={10} className="grow" variant="blue">
           Agree
         </Button>
       </footer>

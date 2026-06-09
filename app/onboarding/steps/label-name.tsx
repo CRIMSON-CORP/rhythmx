@@ -33,7 +33,7 @@ const CountrySelect = memo(function CountrySelect() {
 
   return (
     <Select onValueChange={(value) => setForm({ country: value })} value={country}>
-      <SelectTrigger className="w-full p-4 rounded-10">
+      <SelectTrigger className="w-full p-4 rounded-10 outline-solid outline outline-[#D9D9D9]">
         <SelectValue placeholder="Select a country" />
       </SelectTrigger>
       <SelectContent>
@@ -64,7 +64,7 @@ function LabelName() {
         <h2 className="text-2xl font-medium text-black/50 leading-tight">Gracias!</h2>
       </div>
       <div className="space-y-6">
-        <div className="rounded-[30px] cursor-pointer outline outline-default-default has-checked:outline-brand-orange/10 has-checked:bg-brand-orange/10 px-6 py-7 w-full flex items-center gap-4 transition-colors duration-200">
+        <div className="rounded-30 cursor-pointer outline outline-default-default has-checked:outline-brand-orange/10 has-checked:bg-brand-orange/10 px-6 py-7 w-full flex items-center gap-4 transition-colors duration-200">
           <Icon name={accountTypeIconMap[form.selected_account]} size={32} />
           <div className="grow font-medium space-y-1">
             <p className="text-lg leading-tight">
@@ -84,7 +84,13 @@ function LabelName() {
         />
         {currentStep == 1 && <CountrySelect />}
       </div>
-      <Button type="button" onClick={nextStep} disabled={!(form.name && form.country)}>
+      <Button
+        rounded={10}
+        width="full"
+        type="button"
+        onClick={nextStep}
+        disabled={!(form.name && form.country)}
+      >
         Continue
       </Button>
     </div>

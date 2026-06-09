@@ -16,10 +16,10 @@ import { ReactNode } from "react";
 export function PendingInvitesTrigger() {
   return (
     <Invites>
-      <button className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
+      <Button variant="white">
         <Clock size={16} />
         <span>Pending Invites (3)</span>
-      </button>
+      </Button>
     </Invites>
   );
 }
@@ -27,7 +27,7 @@ export function PendingInvitesTrigger() {
 export function InvitesInvitesTrigger() {
   return (
     <Invites>
-      <Button className="w-fit rounded-full flex items-center gap-2 whitespace-nowrap">
+      <Button>
         <span className="text-sm leading-none">Invite Artist</span>
         <Plus size={16} />
       </Button>

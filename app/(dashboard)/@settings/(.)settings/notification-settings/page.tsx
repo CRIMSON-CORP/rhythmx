@@ -55,7 +55,7 @@ export default function NotificationSettingsPage() {
             <p className="font-medium">Receive instant push notification directly on your device</p>
           </div>
 
-          <Button variant="outline" className="w-fit">
+          <Button variant="outline" rounded={10}>
             <span>Allow Push Notification</span>
             <Bell size={24} className="text-default" />
           </Button>

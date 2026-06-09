@@ -59,7 +59,9 @@ function Page() {
       </div>
       <form action="" className="space-y-6">
         <Input type="email" name="email" label="Email" placeholder="Enter your email address" />
-        <Button>Create Account</Button>
+        <Button rounded={10} width="full">
+          Create Account
+        </Button>
       </form>
       <TermsPolicyText />
     </div>

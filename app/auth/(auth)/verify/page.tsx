@@ -21,7 +21,9 @@ async function Page({ searchParams }: { searchParams: Promise<{ email: string }>
           placeholder="Enter your email address"
         />
         <Input name="otp" label="OTP" type="number" placeholder="Enter OTP here" />
-        <Button>Verify</Button>
+        <Button rounded={10} width="full">
+          Verify
+        </Button>
       </form>
       <TermsPolicyText />
     </div>

@@ -4,7 +4,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import Image from "next/image";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Funnel, X, Search as SearchIcon } from "lucide-react";
+import { X, Search as SearchIcon, ListFilter } from "lucide-react";
 
 type SearchResult = {
   id: string;
@@ -67,7 +67,7 @@ function Search() {
           />
         </div>
         <button>
-          <Funnel size={24} className="text-brand-orange" />
+          <ListFilter size={24} className="text-brand-orange" />
         </button>
         <DialogClose>
           <X size={24} className="text-default" />

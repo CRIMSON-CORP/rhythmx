@@ -352,12 +352,7 @@ function ReleaseDetalsPage() {
           <p className="font-medium text-default text-center">
             Please review your release details before clicking &quot;continue&quot;
           </p>
-          <Button
-            variant="orange"
-            onClick={handleContinue}
-            disabled={!isFormValid}
-            className="w-fit"
-          >
+          <Button variant="orange" onClick={handleContinue} disabled={!isFormValid}>
             <span>Continue</span>
             <ArrowRight size={16} />
           </Button>

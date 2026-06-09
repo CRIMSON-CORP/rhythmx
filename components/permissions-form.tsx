@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { goeyToast } from "goey-toast";
 import { roles, DEFAULT_PERMISSIONS } from "@/data/roles";
 import Link from "next/link";
+import { Button } from "./ui/button";
 
 interface PermissionsFormProps {
   roleId?: string;
@@ -236,12 +237,9 @@ export default function PermissionsForm({ roleId }: PermissionsFormProps) {
       </div>
 
       {/* Action Submit Button */}
-      <button
-        type="submit"
-        className="w-full max-w-[240px] py-3.5 rounded-full bg-black text-white hover:bg-neutral-800 transition-all font-semibold cursor-pointer select-none text-center mx-auto mt-auto"
-      >
+      <Button type="submit" rounded={10} className="min-w-60 mx-auto mt-auto">
         {isEditMode ? "Update Role Permission" : "Create Role"}
-      </button>
+      </Button>
     </form>
   );
 }

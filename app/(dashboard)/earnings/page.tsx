@@ -50,7 +50,7 @@ function EarningsPage() {
                 <span>$ 0.00</span>
                 <ArrowUpRight size={32} />
               </div>
-              <Button className="w-fit" variant="outline">
+              <Button rounded={10} variant="outline">
                 <span>Withdraw Funds</span>
                 <Plus size={16} />
               </Button>

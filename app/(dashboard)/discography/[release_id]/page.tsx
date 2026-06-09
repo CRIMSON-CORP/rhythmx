@@ -4,6 +4,7 @@ import { releases } from "@/data/releases";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowUp, Edit, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // About description mapping for each release to showcase rich details
 const ABOUT_DESCRIPTIONS: Record<string, string> = {
@@ -68,7 +69,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
   const aboutText = ABOUT_DESCRIPTIONS[release.id] || DEFAULT_ABOUT;
 
   return (
-    <div className="flex flex-col gap-8 container">
+    <div className="flex flex-col gap-8 container pb-6">
       {/* Header bar */}
       <header className="flex flex-wrap items-center justify-between gap-4 w-full pt-4 pb-10">
         <div className="flex items-center flex-wrap gap-4">
@@ -90,14 +91,14 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
+          <Button variant="white">
             <Edit size={16} />
             <span>Edit Release</span>
-          </button>
-          <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
-            <Trash2 size={16} className="text-danger-default" />
+          </Button>
+          <Button variant="white">
+            <Trash2 size={16} />
             <span>Delete Release</span>
-          </button>
+          </Button>
         </div>
       </header>
 

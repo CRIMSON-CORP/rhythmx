@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import Image from "next/image";
 
@@ -38,8 +39,10 @@ function TransferSuccess() {
           </span>
         </div>
       </div>
-      <DialogClose className="outline outline-black text-black w-full max-w-37 p-4 rounded-full">
-        Done
+      <DialogClose asChild>
+        <Button variant="outline" className="min-w-37">
+          Done
+        </Button>
       </DialogClose>
     </div>
   );

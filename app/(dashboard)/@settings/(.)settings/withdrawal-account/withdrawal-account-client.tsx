@@ -94,17 +94,10 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
   return (
     <>
       {/* Button to open Modal */}
-      {!accountExists ? (
-        <Button variant="outline" onClick={handleOpenModal} className="w-fit">
-          Add Account
-          <ArrowRight size={24} />
-        </Button>
-      ) : (
-        <Button variant="outline" onClick={handleOpenModal} className="w-fit">
-          Change your Bank
-          <ArrowRight size={24} />
-        </Button>
-      )}
+      <Button variant="outline" rounded={10} onClick={handleOpenModal}>
+        {!accountExists ? "Add Account" : "Change your Bank"}
+        <ArrowRight size={24} />
+      </Button>
 
       {/* Modal Dialog */}
       <DialogPrimitive.Root open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -271,7 +264,12 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
                 </div>
 
                 {/* Submit button */}
-                <Button type="submit" disabled={accountNumber.length !== 10 || isResolvingName}>
+                <Button
+                  rounded={10}
+                  width="full"
+                  type="submit"
+                  disabled={accountNumber.length !== 10 || isResolvingName}
+                >
                   Done
                 </Button>
               </form>

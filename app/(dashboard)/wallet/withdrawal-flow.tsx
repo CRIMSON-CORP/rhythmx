@@ -17,6 +17,7 @@ import EnterOtpView from "./views/enter-otp";
 import TransferSuccess from "./views/transfer-success";
 import { VisuallyHidden } from "radix-ui";
 import { ArrowUpRight, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const VIEW_MAP: Record<WithdrawalView, React.ComponentType> = {
   "select-artist": SelectArtistView,
@@ -43,9 +44,11 @@ function WithdrawalFlow() {
   useEffect(() => resetState, [resetState]);
   return (
     <Dialog>
-      <DialogTrigger className="bg-black text-white p-4 flex items-center gap-2 rounded-full">
-        <span>Withdraw</span>
-        <ArrowUpRight size={16} />
+      <DialogTrigger asChild>
+        <Button>
+          <span>Withdraw</span>
+          <ArrowUpRight size={16} />
+        </Button>
       </DialogTrigger>
       <DialogContent
         className="overflow-hidden rounded-30 isolate gap-0 max-w-150"

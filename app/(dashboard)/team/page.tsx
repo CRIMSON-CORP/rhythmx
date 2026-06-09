@@ -11,6 +11,7 @@ import {
 import Team from "@/components/team";
 import { teams } from "@/data/team";
 import TeamForm from "@/components/team-form";
+import { Button } from "@/components/ui/button";
 
 function DisocgraphyPage() {
   return (
@@ -25,9 +26,11 @@ function DisocgraphyPage() {
         </h1>
         <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
           <Dialog>
-            <DialogTrigger className="bg-black text-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
-              <span className="leading-tight">New Team</span>
-              <Plus size={16} />
+            <DialogTrigger asChild>
+              <Button>
+                <span>New Team</span>
+                <Plus size={16} />
+              </Button>
             </DialogTrigger>
             <TeamForm />
           </Dialog>

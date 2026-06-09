@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 function Layout({
   children,
@@ -46,13 +47,13 @@ function Layout({
               <SelectItem value="yearly">Yearly</SelectItem>
             </SelectContent>
           </Select>
-          <Link
-            href="/roles-permission/new"
-            className="bg-black text-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap"
-          >
-            <span className="leading-tight">New Role</span>
-            <Plus size={16} />
-          </Link>
+
+          <Button asChild>
+            <Link href="/roles-permission/new">
+              <span className="leading-tight">New Role</span>
+              <Plus size={16} />
+            </Link>
+          </Button>
         </div>
       </div>
       <div className="container h-full overflow-auto">{children}</div>
