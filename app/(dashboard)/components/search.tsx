@@ -1,4 +1,5 @@
 "use client";
+import { Search as SearchIcon, X } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { DialogClose } from "@/components/ui/dialog";
@@ -58,7 +59,7 @@ function Search() {
     <>
       <header className="px-6 pt-6 flex gap-6 items-center">
         <div className="flex items-center grow gap-2.5 px-4 py-3 bg-white/20 rounded-full">
-          <Icon name="search" size={16} className="text-default-tertiary" />
+          <SearchIcon size={16} className="text-default-tertiary" />
           <input
             placeholder="Search anything"
             value={searchQuery}
@@ -70,7 +71,7 @@ function Search() {
           <Icon name="funnel" size={24} className="text-brand-orange" />
         </button>
         <DialogClose>
-          <Icon name="cancel" size={24} className="text-default" />
+          <X size={24} className="text-default" />
         </DialogClose>
       </header>
       <div className="p-6 flex flex-col gap-4">
@@ -105,7 +106,7 @@ function Search() {
                       </div>
                     </div>
                     <button className="self-start" onClick={() => removeSearch(search.id)}>
-                      <Icon name="cancel" size={16} />
+                      <X size={16} />
                     </button>
                   </motion.div>
                 ))}

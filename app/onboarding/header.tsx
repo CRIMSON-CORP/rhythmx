@@ -1,5 +1,5 @@
 "use client";
-import Icon from "@/components/icon";
+import { ChevronLeft } from "lucide-react";
 import useOnBoardingStore, { stepsComponent } from "@/store/onboarding-store";
 
 const stepHeaderContent = [
@@ -28,7 +28,7 @@ function Header() {
             onClick={previousStep}
             className="p-2 rounded-full outline outline-border-default-secondary"
           >
-            <Icon name="chevron-left" size={20} />
+            <ChevronLeft size={20} />
           </button>
         )}
       </div>

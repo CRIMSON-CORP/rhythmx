@@ -1,4 +1,4 @@
-import Icon from "@/components/icon";
+import { ArrowUpRight, Disc } from "lucide-react";
 import ReleaseCards from "@/components/realease-cards";
 import ReleaseCard from "@/components/release-card";
 import { releases } from "@/data/releases";
@@ -9,12 +9,12 @@ function MyRelease() {
     <section className="flex flex-col gap-8">
       <header className="container flex items-center justify-between gap-3">
         <div className="flex items-center gap-3.5 text-default-tertiary">
-          <Icon name="disc" size={24} />
+          <Disc size={24} />
           <h2 className="font-medium">My Release</h2>
         </div>
         <Link href="/discography" className="flex items-center gap-1">
           <span>See all releases</span>
-          <Icon name="arrow-up-right" size={16} />
+          <ArrowUpRight size={16} />
         </Link>
       </header>
       <ReleaseCards scrollable>

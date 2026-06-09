@@ -1,3 +1,4 @@
+import { Plus, Search } from "lucide-react";
 import Icon from "@/components/icon";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
@@ -26,7 +27,7 @@ function DisocgraphyPage() {
           <Dialog>
             <DialogTrigger className="bg-black text-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
               <span className="leading-tight">New Team</span>
-              <Icon name="plus" size={16} />
+              <Plus size={16} />
             </DialogTrigger>
             <TeamForm />
           </Dialog>
@@ -37,7 +38,7 @@ function DisocgraphyPage() {
           <h2 className="font-medium whitespace-nowrap">All Team</h2>
           <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
             <div className="flex items-center p-4 gap-x-2">
-              <Icon name="search" size={16} />
+              <Search size={16} />
               <input
                 type="search"
                 placeholder="Search team by name, email or phone"

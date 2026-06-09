@@ -1,5 +1,5 @@
+import { Command, Search, Users } from "lucide-react";
 import Link from "next/link";
-import Icon from "@/components/icon";
 import { roles } from "@/data/roles";
 import SidebarSearch from "./sidebar-search";
 import { Suspense } from "react";
@@ -22,7 +22,7 @@ export default function RolesSidebar({ searchQuery = "", activeRoleId }: RolesSi
       <Suspense
         fallback={
           <div className="flex items-center p-4 gap-x-2 bg-page-background rounded-full">
-            <Icon name="search" size={16} />
+            <Search size={16} />
             <input
               type="text"
               placeholder="Search Roles"
@@ -56,14 +56,14 @@ export default function RolesSidebar({ searchQuery = "", activeRoleId }: RolesSi
                   }`}
                 >
                   <div className="size-11 flex items-center justify-center bg-brand-purple/10 text-brand-purple rounded-20 shrink-0">
-                    <Icon name="command" size={27.5} />
+                    <Command size={27.5} />
                   </div>
                   <div className="flex flex-col grow min-w-0">
                     <h3 className="font-medium text-sm truncate">{role.name}</h3>
                     <span className="text-default/50 text-xs truncate">{role.description}</span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Icon name="users" size={16} className="text-neutral-400" />
+                    <Users size={16} className="text-neutral-400" />
                     <p className="text-border-default-secondary font-medium text-xs">
                       {role.teamCount} {role.teamCount === 1 ? "Team" : "Teams"}
                     </p>

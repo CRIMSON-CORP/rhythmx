@@ -1,3 +1,4 @@
+import { Activity, Disc, Globe } from "lucide-react";
 import Icon from "@/components/icon";
 import {
   Dialog,
@@ -82,7 +83,7 @@ function TrendsAnalyticsPage() {
             {/* Lifetime Streams Card */}
             <div className="bg-white rounded-30 basis-91.25">
               <header className="flex items-center gap-1 text-default-tertiary px-4 py-5">
-                <Icon name="activity" size={16} />
+                <Activity size={16} />
                 <h2 className="font-medium leading-tight">Lifetime Streams</h2>
               </header>
               <div className="flex flex-col px-6 pb-6 gap-6">
@@ -112,7 +113,7 @@ function TrendsAnalyticsPage() {
             {/* All Artist Card */}
             <div className="bg-white rounded-30 basis-91.25">
               <header className="flex items-center gap-1 text-default-tertiary px-4 py-5">
-                <Icon name="activity" size={16} />
+                <Activity size={16} />
                 <h2 className="font-medium leading-tight">All Artist</h2>
               </header>
               <div className="flex flex-col px-6 pb-6 gap-6">
@@ -160,7 +161,7 @@ function TrendsAnalyticsPage() {
             {/* Total Release */}
             <div className="bg-white rounded-30 basis-91.25">
               <header className="flex items-center gap-1 text-default-tertiary px-4 py-5">
-                <Icon name="disc" size={16} />
+                <Disc size={16} />
                 <h2 className="font-medium leading-tight">Total Release</h2>
               </header>
               <div className="flex flex-col px-6 pb-6 gap-6">
@@ -175,7 +176,7 @@ function TrendsAnalyticsPage() {
             {/* Total Revenue */}
             <div className="bg-white rounded-30 basis-91.25">
               <header className="flex items-center gap-1 text-default-tertiary px-4 py-5">
-                <Icon name="disc" size={16} />
+                <Disc size={16} />
                 <h2 className="font-medium leading-tight">Total Revenue</h2>
               </header>
               <div className="flex flex-col px-6 pb-6 gap-6">
@@ -287,7 +288,7 @@ function TrendsAnalyticsPage() {
         <div className="container flex flex-col gap-8">
           <header className="container flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3.5 text-default">
-              <Icon name="globe" size={24} />
+              <Globe size={24} />
               <h2 className="font-medium">World Domination</h2>
             </div>
             <div className="px-5 py-4 bg-white rounded-full flex items-center gap-2">

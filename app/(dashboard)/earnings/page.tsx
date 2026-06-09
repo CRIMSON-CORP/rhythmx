@@ -1,3 +1,4 @@
+import { ArrowUpRight, Plus, X, Zap } from "lucide-react";
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,11 +48,11 @@ function EarningsPage() {
               <h2 className="font-medium leading-tight mb-4">Available Funds</h2>
               <div className="flex gap-2 grow text-[32px] font-medium">
                 <span>$ 0.00</span>
-                <Icon name="arrow-up-right" size={32} />
+                <ArrowUpRight size={32} />
               </div>
               <Button className="w-fit" variant="outline">
                 <span>Withdraw Funds</span>
-                <Icon name="plus" size={16} />
+                <Plus size={16} />
               </Button>
             </div>
             {/* Payment Cleared */}
@@ -68,7 +69,7 @@ function EarningsPage() {
                 </h2>
                 <div className="flex items-center gap-2 grow text-[32px] font-medium">
                   <span>$ 0.00</span>
-                  <Icon name="arrow-up-right" size={32} />
+                  <ArrowUpRight size={32} />
                 </div>
               </div>
             </div>
@@ -149,9 +150,9 @@ function EarningsPage() {
             </div>
             <div className="flex-[0.45] min-w-70 bg-brand-orange outline outline-default-default rounded-30 p-4 flex flex-col gap-6 basis-94.75">
               <header className="flex items-center justify-between">
-                <Icon name="zap" size={32} className="text-white" />
+                <Zap size={32} className="text-white" />
                 <button>
-                  <Icon name="cancel" size={12} className="text-white" />
+                  <X size={12} className="text-white" />
                 </button>
               </header>
               <div className="grow flex items-center justify-center">

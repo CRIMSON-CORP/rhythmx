@@ -1,4 +1,5 @@
 "use client";
+import { X } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,7 @@ export function XpressDialog({
             {xpressRelease ? "GO Xpress" : "Learn about Xpress Release"}
           </DialogTitle>
           <DialogClose>
-            <Icon name="cancel" size={22} />
+            <X size={22} />
           </DialogClose>
         </DialogHeader>
 

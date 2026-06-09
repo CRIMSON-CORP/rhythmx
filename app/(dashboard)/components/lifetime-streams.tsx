@@ -1,4 +1,5 @@
 "use client";
+import { Activity } from "lucide-react";
 import Link from "next/link";
 import Icon from "../../../components/icon";
 import { useSearchParams } from "next/navigation";
@@ -29,7 +30,7 @@ function LifeTimeStreams() {
   return (
     <div className="bg-white rounded-30 basis-91.25">
       <header className="flex items-center gap-1 text-default-tertiary px-4 py-5">
-        <Icon name="activity" size={16} />
+        <Activity size={16} />
         <h2 className="font-medium leading-tight">Lifetime Streams</h2>
       </header>
       <div className="flex flex-col px-6 pb-6 gap-6">

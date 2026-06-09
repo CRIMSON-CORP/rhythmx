@@ -1,3 +1,4 @@
+import { ChevronDown, ChevronRight, Disc, Globe, Plus, Search as SearchIcon, Zap } from "lucide-react";
 import Icon from "@/components/icon";
 import {
   Command,
@@ -31,7 +32,7 @@ async function Header() {
           <Popover>
             <PopoverTrigger className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
               <Icon name="side-bar" size={20} />
-              <Icon name="chevron-down" size={16} className="text-default-tertiary" />
+              <ChevronDown size={16} className="text-default-tertiary" />
             </PopoverTrigger>
             <PopoverContent
               align="start"
@@ -74,7 +75,7 @@ async function Header() {
                 </CommandList>
               </Command>
               <footer className="text-brand-blue p-2 flex items-stretch justify-end gap-3.5">
-                <Icon name="globe" size={24} />
+                <Globe size={24} />
                 <Icon name="question" size={24} />
               </footer>
             </PopoverContent>
@@ -84,7 +85,7 @@ async function Header() {
         <div className="flex items-center gap-4 lg:gap-8 text-default font-medium">
           <Dialog>
             <DialogTrigger className="@max-4xl:hidden">
-              <Icon name="search" size={24} />
+              <SearchIcon size={24} />
             </DialogTrigger>
             <DialogContent className="overflow-hidden isolate gap-0" showCloseButton={false}>
               <VisuallyHidden.Root>
@@ -105,7 +106,7 @@ async function Header() {
           >
             <span>$394,000.00</span>
             <span className="block p-1.5">
-              <Icon name="zap" size={20} className="text-brand-orange" />
+              <Zap size={20} className="text-brand-orange" />
             </span>
           </Link>
           <Popover>
@@ -176,7 +177,7 @@ async function Header() {
           </Popover>
           <Popover>
             <PopoverTrigger className="p-2 bg-brand-orange rounded-full @max-xl:hidden">
-              <Icon name="plus" size={20} className="text-white" />
+              <Plus size={20} className="text-white" />
             </PopoverTrigger>
             <PopoverContent
               align="end"
@@ -198,13 +199,13 @@ async function Header() {
                           Add a single to your discography
                         </span>
                       </div>
-                      <Icon name="chevron-right" size={20} className="text-default-tertiary" />
+                      <ChevronRight size={20} className="text-default-tertiary" />
                     </Link>
                   </PopoverClose>
                   <PopoverClose asChild>
                     <Link href="/releases" className="flex items-center gap-3">
                       <span className="p-1.5 bg-brand-blue/10 rounded-full">
-                        <Icon name="disc" size={20} className="text-brand-blue" />
+                        <Disc size={20} className="text-brand-blue" />
                       </span>
                       <div className="flex flex-col grow">
                         <span className="font-medium text-sm">Album</span>
@@ -212,7 +213,7 @@ async function Header() {
                           Add an album to your discography
                         </span>
                       </div>
-                      <Icon name="chevron-right" size={20} className="text-default-tertiary" />
+                      <ChevronRight size={20} className="text-default-tertiary" />
                     </Link>
                   </PopoverClose>
                 </div>
@@ -223,7 +224,7 @@ async function Header() {
                   </Link>
                 </p>
                 <footer className="text-brand-blue flex items-stretch justify-end gap-3.5">
-                  <Icon name="globe" size={24} />
+                  <Globe size={24} />
                   <Icon name="question" size={24} />
                 </footer>
               </div>

@@ -1,4 +1,5 @@
 "use client";
+import { Search, X } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { DialogClose } from "@/components/ui/dialog";
@@ -52,13 +53,13 @@ function Releases({
       <header className="p-5 flex items-center gap-4 text-default justify-between">
         <span className="text-sm leading-tight font-semibold ">{title}</span>
         <DialogClose className="p-2">
-          <Icon name="cancel" size={24} className="text-default" />
+          <X size={24} className="text-default" />
         </DialogClose>
       </header>
       <div className="px-3 md:px-6 pb-10.5 overflow-auto">
         <header className="flex gap-1.5 md:gap-4 flex-wrap items-center">
           <div className="flex items-center grow w-full gap-2.5 px-4 py-3 bg-white/20 rounded-full">
-            <Icon name="search" size={16} className="text-default-tertiary" />
+            <Search size={16} className="text-default-tertiary" />
             <input
               placeholder="Search anything"
               value={searchQuery}

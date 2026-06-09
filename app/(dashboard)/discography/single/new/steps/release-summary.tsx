@@ -1,4 +1,5 @@
 "use client";
+import { ArrowUpRight, X } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
@@ -60,7 +61,7 @@ function SubmitDialog({ isOpen, onOpenChange, xpressRelease, onSubmit }: SubmitD
               Submit Release?
             </DialogTitle>
             <DialogClose className="cursor-pointer text-default hover:opacity-80">
-              <Icon name="cancel" size={20} />
+              <X size={20} />
             </DialogClose>
           </div>
 
@@ -168,7 +169,7 @@ function ReleaseSummary() {
             className="text-brand-orange hover:underline font-medium text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
-            <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
+            <ArrowUpRight size={14} className="text-brand-orange" />
           </button>
         </div>
 
@@ -279,7 +280,7 @@ function ReleaseSummary() {
             className="text-brand-orange hover:underline font-medium text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
-            <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
+            <ArrowUpRight size={14} className="text-brand-orange" />
           </button>
         </div>
 
@@ -435,7 +436,7 @@ function ReleaseSummary() {
             className="text-brand-orange hover:underline font-medium text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
-            <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
+            <ArrowUpRight size={14} className="text-brand-orange" />
           </button>
         </div>
 
@@ -467,7 +468,7 @@ function ReleaseSummary() {
             className="text-brand-orange hover:underline font-semibold text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
-            <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
+            <ArrowUpRight size={14} className="text-brand-orange" />
           </button>
         </div>
 
@@ -516,7 +517,7 @@ function ReleaseSummary() {
             className="text-brand-orange hover:underline font-semibold text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
-            <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
+            <ArrowUpRight size={14} className="text-brand-orange" />
           </button>
         </div>
 
@@ -560,7 +561,7 @@ function ReleaseSummary() {
             className="text-brand-orange hover:underline font-medium text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
-            <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
+            <ArrowUpRight size={14} className="text-brand-orange" />
           </button>
         </div>
 
@@ -630,7 +631,7 @@ function ReleaseSummary() {
             className="text-brand-orange hover:underline font-semibold text-xs flex items-center gap-1 cursor-pointer"
           >
             <span>Edit</span>
-            <Icon name="arrow-up-right" size={14} className="text-brand-orange" />
+            <ArrowUpRight size={14} className="text-brand-orange" />
           </button>
         </div>
 

@@ -1,4 +1,4 @@
-import Icon from "@/components/icon";
+import { Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -51,7 +51,7 @@ function Layout({
             className="bg-black text-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap"
           >
             <span className="leading-tight">New Role</span>
-            <Icon name="plus" size={16} />
+            <Plus size={16} />
           </Link>
         </div>
       </div>

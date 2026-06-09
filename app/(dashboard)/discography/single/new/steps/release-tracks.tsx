@@ -1,4 +1,5 @@
 "use client";
+import { Check, ChevronRight, Plus, Search, Trash2, X } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
@@ -457,8 +458,7 @@ function TrackItem({
             onClick={onDelete}
             className="rounded-full group/btn cursor-pointer hover:bg-page-background transition-colors"
           >
-            <Icon
-              name="trash"
+            <Trash2
               size={16}
               className="text-[#EC221F] group-hover/btn:scale-110 transition-transform"
             />
@@ -546,8 +546,7 @@ function TrackEditPanel({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium text-default">Edit Track Meta Data</h3>
         <button onClick={onDelete}>
-          <Icon
-            name="trash"
+          <Trash2
             size={16}
             className="text-danger-default hover:scale-110 transition-transform"
           />
@@ -745,7 +744,7 @@ function TrackEditPanel({
                     : "bg-transparent text-transparent hover:bg-page-background/50",
                 )}
               >
-                <Icon name="check" size={14} className="stroke-[2.5]" />
+                <Check size={14} className="stroke-[2.5]" />
               </button>
             </div>
 
@@ -763,7 +762,7 @@ function TrackEditPanel({
                     : "bg-transparent text-transparent hover:bg-page-background/50",
                 )}
               >
-                <Icon name="check" size={14} className="stroke-[2.5]" />
+                <Check size={14} className="stroke-[2.5]" />
               </button>
             </div>
 
@@ -781,7 +780,7 @@ function TrackEditPanel({
                     : "bg-transparent text-transparent hover:bg-page-background/50",
                 )}
               >
-                <Icon name="check" size={14} className="stroke-[2.5]" />
+                <Check size={14} className="stroke-[2.5]" />
               </button>
             </div>
           </div>
@@ -794,7 +793,7 @@ function TrackEditPanel({
               className="w-fit rounded-full px-6 py-2.5 text-sm font-medium"
             >
               <span>Save</span>
-              <Icon name="check" size={16} className="stroke-[2.5]" />
+              <Check size={16} className="stroke-[2.5]" />
             </Button>
           </div>
         </div>
@@ -936,7 +935,7 @@ function TrackArtistAdder({
                 onClick={handleSaveCustom}
                 className="p-3 bg-[#EBFFEE] hover:bg-[#d8fcdb] text-default rounded-xl transition-colors"
               >
-                <Icon name="chevron-right" size={20} className="text-[#009951]" />
+                <ChevronRight size={20} className="text-[#009951]" />
               </button>
             )}
           </div>
@@ -1053,7 +1052,7 @@ const SelectArtist = ({
           className="px-5 py-2.5 rounded-full w-fit bg-transparent border-default-default/20 hover:bg-default-default/5 flex items-center gap-2"
         >
           <span className="font-medium text-xs text-default">Add More</span>
-          <Icon name="plus" size={24} className="text-default" />
+          <Plus size={24} className="text-default" />
         </Button>
       </DialogTrigger>
       <DialogContent className="gap-0 max-w-150 w-full p-0 overflow-hidden" showCloseButton={false}>
@@ -1068,7 +1067,7 @@ const SelectArtist = ({
 
         <header className="px-6 pt-6 pb-2 flex gap-6 items-center">
           <div className="flex items-center grow gap-2.5 px-4 py-3 bg-white/20 rounded-full border border-default-default/10">
-            <Icon name="search" size={16} className="text-default-tertiary" />
+            <Search size={16} className="text-default-tertiary" />
             <input
               placeholder="Search Artist"
               value={searchQuery}
@@ -1092,7 +1091,7 @@ const SelectArtist = ({
             </button>
           </div>
           <DialogClose className="p-2 rounded-full hover:bg-default-default/10 transition-colors">
-            <Icon name="cancel" size={16} className="text-default" />
+            <X size={16} className="text-default" />
           </DialogClose>
         </header>
 

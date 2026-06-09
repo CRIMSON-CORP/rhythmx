@@ -1,4 +1,5 @@
 "use client";
+import { Plus, X } from "lucide-react";
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,7 @@ export function InvitesInvitesTrigger() {
     <Invites>
       <Button className="w-fit rounded-full flex items-center gap-2 whitespace-nowrap">
         <span className="text-sm leading-none">Invite Artist</span>
-        <Icon name="plus" size={16} />
+        <Plus size={16} />
       </Button>
     </Invites>
   );
@@ -52,7 +53,7 @@ function Invites({ children }: { children: ReactNode }) {
             <Icon name="link" size={16} className="text-brand-blue" />
           </button>
           <DialogClose className="p-2">
-            <Icon name="cancel" size={20} />
+            <X size={20} />
           </DialogClose>
         </header>
         <div className="flex flex-col gap-4 px-8 pb-8">

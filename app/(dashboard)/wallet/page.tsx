@@ -1,3 +1,4 @@
+import { ArrowUpRight, Check, ChevronDown, X, Zap } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import WithdrawalFlow from "./withdrawal-flow";
 import ReportTransactionModal from "./report-transaction-modal";
@@ -72,7 +73,7 @@ function WalletPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger className="bg-white rounded-full flex px-4 py-3 items-center gap-2">
                   <span>Export Transactions</span>
-                  <Icon name="chevron-down" size={16} />
+                  <ChevronDown size={16} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem asChild>
@@ -240,9 +241,9 @@ function WalletPage() {
         </div>
         <div className="bg-brand-purple outline outline-default-default rounded-30 p-4 flex flex-col gap-6 basis-94.75 max-xl:hidden">
           <header className="flex items-center justify-between">
-            <Icon name="zap" size={32} className="text-white" />
+            <Zap size={32} className="text-white" />
             <button>
-              <Icon name="cancel" size={12} className="text-white" />
+              <X size={12} className="text-white" />
             </button>
           </header>
           <div className="grow flex items-center justify-center">
@@ -260,7 +261,7 @@ function WalletPage() {
             <p className="text-xs">Start with setting up your account</p>
             <Link href="/profile" className="flex items-center gap-2 text-xs">
               <span>Complete Profile</span>
-              <Icon name="arrow-up-right" size={16} className="text-default" />
+              <ArrowUpRight size={16} className="text-default" />
             </Link>
           </div>
         </div>
@@ -274,7 +275,7 @@ export default WalletPage;
 const STATUS_MAP = {
   paid: (
     <div className="px-1.5! py-1! rounded-full flex items-center gap-2 bg-secondary w-fit">
-      <Icon name="check" size={16} className="text-[#14AE5C]" />
+      <Check size={16} className="text-[#14AE5C]" />
       <span className="text-sm">Paid</span>
     </div>
   ),
@@ -290,7 +291,7 @@ function TransactionDetails({ transaction_id }: { transaction_id: string }) {
             Transaction Details
           </DialogTitle>
           <DialogClose className="p-2 text-default">
-            <Icon name="cancel" size={20} />
+            <X size={20} />
           </DialogClose>
         </DialogHeader>
         <div className="p-6 flex flex-col gap-6">

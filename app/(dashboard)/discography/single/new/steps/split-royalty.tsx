@@ -1,4 +1,5 @@
 "use client";
+import { Plus } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
@@ -322,7 +323,7 @@ function SplitRoyalty() {
                 className="px-5 py-2.5 rounded-full w-fit bg-transparent border-default-default/20 hover:bg-default-default/5 flex items-center gap-2"
               >
                 <span className="font-medium text-xs text-default">Add Collaborator</span>
-                <Icon name="plus" size={24} className="text-default" />
+                <Plus size={24} className="text-default" />
               </Button>
               {collaborators.length > 0 && (
                 <div className="bg-white rounded-20 p-6 border border-default-default flex flex-col divide-y divide-default-default">

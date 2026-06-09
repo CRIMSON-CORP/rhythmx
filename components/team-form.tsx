@@ -1,4 +1,5 @@
 "use client";
+import { Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Icon from "./icon";
 import Input from "./Input";
@@ -26,7 +27,7 @@ function TeamForm({ id = "", image = "", name = "", role = "" }: Partial<Team> =
       <DialogHeader className="flex-row items-center justify-between px-6 py-5">
         <DialogTitle className="text-sm text-default font-medium">Team</DialogTitle>
         <DialogClose className="p-2 text-default">
-          <Icon name="cancel" size={20} />
+          <X size={20} />
         </DialogClose>
       </DialogHeader>
       <VisuallyHidden.Root>
@@ -58,7 +59,7 @@ function TeamForm({ id = "", image = "", name = "", role = "" }: Partial<Team> =
               </label>
             </div>
             <button className="bg-[#EC221F] rounded-full p-2">
-              <Icon name="trash" size={26.25} className="text-white" />
+              <Trash2 size={26.25} className="text-white" />
             </button>
           </div>
         ) : (

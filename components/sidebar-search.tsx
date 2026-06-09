@@ -1,8 +1,8 @@
 "use client";
+import { Search as SearchIcon } from "lucide-react";
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Icon from "@/components/icon";
 
 interface SidebarSearchProps {
   defaultValue?: string;
@@ -39,7 +39,7 @@ export default function SidebarSearch({ defaultValue = "" }: SidebarSearchProps)
 
   return (
     <div className="flex items-center p-4 gap-x-2 bg-page-background rounded-full">
-      <Icon name="search" size={16} />
+      <SearchIcon size={16} />
       <input
         type="text"
         placeholder="Search Roles"

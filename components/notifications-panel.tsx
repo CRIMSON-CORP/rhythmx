@@ -1,4 +1,5 @@
 "use client";
+import { X } from "lucide-react";
 
 import * as React from "react";
 import { Dialog as DialogPrimitive } from "radix-ui";
@@ -27,7 +28,7 @@ export default function NotificationsPanel({ children }: { children: React.React
             <DialogPrimitive.Title className="font-medium">Notifications</DialogPrimitive.Title>
             <DialogPrimitive.Close asChild>
               <button>
-                <Icon name="cancel" size={24} className="text-default-tertiary" />
+                <X size={24} className="text-default-tertiary" />
               </button>
             </DialogPrimitive.Close>
           </header>

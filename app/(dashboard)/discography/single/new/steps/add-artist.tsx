@@ -1,4 +1,5 @@
 "use client";
+import { ArrowUpRight, ChevronRight, Plus, Search, X } from "lucide-react";
 
 import { useState, Suspense, use } from "react";
 import Image from "next/image";
@@ -88,7 +89,7 @@ function AddArtistPage() {
                     className="px-5 py-2.5 rounded-full w-fit"
                   >
                     <span className="font-medium text-sm text-default">Add</span>
-                    <Icon name="plus" size={16} />
+                    <Plus size={16} />
                   </Button>
                 )}
               </div>
@@ -108,7 +109,7 @@ function AddArtistPage() {
                     className="px-5 py-2.5 rounded-full w-fit"
                   >
                     <span className="font-medium text-sm text-default">Add</span>
-                    <Icon name="plus" size={16} />
+                    <Plus size={16} />
                   </Button>
                 )}
               </div>
@@ -130,7 +131,7 @@ function AddArtistPage() {
                     className="px-5 py-2.5 rounded-full w-fit"
                   >
                     <span className="font-medium text-sm text-default">Add</span>
-                    <Icon name="plus" size={16} />
+                    <Plus size={16} />
                   </Button>
                 )}
               </div>
@@ -553,7 +554,7 @@ const ArtistAdder = ({ sectionType }: { sectionType: "main" | "featured" | "prod
           className="px-5 py-2.5 rounded-full bg-[#EBFFEE] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2.5 transition-opacity"
         >
           <span className="font-medium text-sm text-default">Save</span>
-          <Icon name="chevron-right" size={24} className="text-[#009951]" />
+          <ChevronRight size={24} className="text-[#009951]" />
         </button>
       </div>
     </div>
@@ -691,7 +692,7 @@ const SelectArtist = ({
       <DialogTrigger asChild>
         <button className="rounded-10 px-3 py-2 bg-brand-purple-2 text-white font-medium text-xs whitespace-nowrap flex items-center gap-2">
           <span>Select Artist</span>
-          <Icon name="arrow-up-right" size={24} />
+          <ArrowUpRight size={24} />
         </button>
       </DialogTrigger>
       <DialogContent className="gap-0 max-w-150 w-full p-0 overflow-hidden" showCloseButton={false}>
@@ -706,7 +707,7 @@ const SelectArtist = ({
 
         <header className="px-6 pt-6 pb-2 flex gap-6 items-center">
           <div className="flex items-center grow gap-2.5 px-4 py-3 bg-white/20 rounded-full border border-default-default/10">
-            <Icon name="search" size={16} className="text-default-tertiary" />
+            <Search size={16} className="text-default-tertiary" />
             <input
               placeholder="Search Artist"
               value={searchQuery}
@@ -730,7 +731,7 @@ const SelectArtist = ({
             </button>
           </div>
           <DialogClose className="p-2 rounded-full hover:bg-default-default/10 transition-colors">
-            <Icon name="cancel" size={16} className="text-default" />
+            <X size={16} className="text-default" />
           </DialogClose>
         </header>
 

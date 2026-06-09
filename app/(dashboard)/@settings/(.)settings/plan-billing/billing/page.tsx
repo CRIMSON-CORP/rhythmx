@@ -1,3 +1,4 @@
+import { Check, Search } from "lucide-react";
 import Icon from "@/components/icon";
 import Image from "next/image";
 
@@ -152,7 +153,7 @@ export default async function BillingPage() {
           {/* If populated, show the search input; if empty, show Help? */}
           {billingHistory.length > 0 ? (
             <div className="flex items-center gap-2 px-4 py-3 text-sm text-default-tertiary w-full max-w-82">
-              <Icon name="search" size={16} />
+              <Search size={16} />
               <input
                 type="text"
                 placeholder="Search history by date, card or plan"
@@ -208,7 +209,7 @@ export default async function BillingPage() {
                       <td className="py-4.5 px-6">{history.card}</td>
                       <td className="py-4.5 px-6">
                         <span className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-default-secondary">
-                          <Icon name="check" size={16} className="text-positive-tertiary" />
+                          <Check size={16} className="text-positive-tertiary" />
                           {history.status}
                         </span>
                       </td>

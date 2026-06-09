@@ -1,4 +1,5 @@
 "use client";
+import { Check, Search } from "lucide-react";
 
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
@@ -65,7 +66,7 @@ function ChoosePlatform() {
             Distribution Platforms
           </p>
           <div className="flex items-center grow gap-2.5 px-4 py-3 bg-page-background rounded-full max-w-89.25">
-            <Icon name="search" size={16} className="text-default-tertiary" />
+            <Search size={16} className="text-default-tertiary" />
             <input
               placeholder="Search Platform"
               value={searchQuery}
@@ -90,7 +91,7 @@ function ChoosePlatform() {
                   : "bg-transparent text-transparent hover:bg-page-background/50",
               )}
             >
-              <Icon name="check" size={14} className="stroke-[2.5]" />
+              <Check size={14} className="stroke-[2.5]" />
             </div>
           </button>
         </div>
@@ -124,7 +125,7 @@ function ChoosePlatform() {
                           : "bg-transparent text-transparent hover:bg-page-background/50",
                       )}
                     >
-                      <Icon name="check" size={14} className="stroke-[2.5]" />
+                      <Check size={14} className="stroke-[2.5]" />
                     </button>
                   </div>
                 ))
@@ -161,7 +162,7 @@ function ChoosePlatform() {
                           : "bg-transparent text-transparent hover:bg-page-background/50",
                       )}
                     >
-                      <Icon name="check" size={14} className="stroke-[2.5]" />
+                      <Check size={14} className="stroke-[2.5]" />
                     </button>
                   </div>
                 ))
@@ -226,7 +227,7 @@ function ChoosePlatform() {
                     }}
                     className="size-5 absolute top-2.5 right-2.5 rounded-full bg-brand-blue outline outline-brand-blue text-white flex items-center justify-center transition-colors"
                   >
-                    <Icon name="check" size={14} className="stroke-[2.5]" />
+                    <Check size={14} className="stroke-[2.5]" />
                   </button>
                 </div>
               );

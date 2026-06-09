@@ -1,3 +1,4 @@
+import { ArrowUpRight, Disc, Search } from "lucide-react";
 import Icon from "@/components/icon";
 import Link from "next/link";
 import {
@@ -35,7 +36,7 @@ function ArtistsPage() {
           </div>
           <Link href="/" className="flex items-center gap-1 text-xs">
             <span>See Trends & Analytics</span>
-            <Icon name="arrow-up-right" size={16} />
+            <ArrowUpRight size={16} />
           </Link>
         </header>
         <div className="container">
@@ -57,7 +58,7 @@ function ArtistsPage() {
           <h2 className="font-medium whitespace-nowrap">All Artists</h2>
           <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
             <div className="flex items-center p-4 gap-x-2">
-              <Icon name="search" size={16} />
+              <Search size={16} />
               <input
                 type="search"
                 placeholder="Search releases"
@@ -69,7 +70,7 @@ function ArtistsPage() {
               <span>All</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="disc" size={16} />
+              <Disc size={16} />
               <span>Album</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">

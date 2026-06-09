@@ -1,4 +1,5 @@
 "use client";
+import { ArrowUpRight, Search } from "lucide-react";
 
 import { Suspense, useState, useEffect } from "react";
 import Icon from "@/components/icon";
@@ -77,7 +78,7 @@ function ArtistList({ search, onSelectArtist }: ArtistListProps) {
             className="rounded-full w-fit bg-transparent px-3.5 py-2.5 text-xs hover:bg-neutral-50 border-default-default/20 transition-all font-semibold"
           >
             <span>Withdraw</span>
-            <Icon name="arrow-up-right" size={16} />
+            <ArrowUpRight size={16} />
           </Button>
           <p className="px-2.5 py-2 rounded-full bg-page-background font-semibold text-sm text-center text-default">
             {"$" +
@@ -116,7 +117,7 @@ function SelectArtistView() {
       <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-b from-[#8800FF] to-[#00F2EA]/0 -z-10 opacity-25 blur-3xl"></div>
       <div className="px-6">
         <div className="flex w-full gap-2.5 p-4 rounded-full items-center bg-transparent">
-          <Icon name="search" size={16} className="text-default-tertiary" />
+          <Search size={16} className="text-default-tertiary" />
           <input
             type="search"
             className="bg-transparent w-full outline-none placeholder:text-default-tertiary text-default font-medium"

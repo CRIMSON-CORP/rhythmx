@@ -1,3 +1,4 @@
+import { ArrowUpRight, Disc, Search, Trash2, X } from "lucide-react";
 import Icon from "@/components/icon";
 import Link from "next/link";
 import { artists } from "@/data/artists";
@@ -58,7 +59,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
           <Dialog>
             <DialogTrigger asChild>
               <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
-                <Icon name="trash" size={16} />
+                <Trash2 size={16} />
                 <span>Remove Artist</span>
               </button>
             </DialogTrigger>
@@ -73,7 +74,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
                     Remove Artist
                   </DialogTitle>
                   <DialogClose className="cursor-pointer text-default hover:opacity-80">
-                    <Icon name="cancel" size={20} />
+                    <X size={20} />
                   </DialogClose>
                 </div>
 
@@ -156,7 +157,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
                 </div>
                 <Button className="w-fit rounded-full">
                   <span>Withdraw</span>
-                  <Icon name="arrow-up-right" size={16} />
+                  <ArrowUpRight size={16} />
                 </Button>
               </header>
               <div className="overflow-y-auto max-h-77.25">
@@ -179,7 +180,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
           <h2 className="font-medium whitespace-nowrap">All Releases</h2>
           <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
             <div className="flex items-center p-4 gap-x-2">
-              <Icon name="search" size={16} />
+              <Search size={16} />
               <input
                 type="search"
                 placeholder="Search releases"
@@ -191,7 +192,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               <span>All</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="disc" size={16} />
+              <Disc size={16} />
               <span>Album</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">

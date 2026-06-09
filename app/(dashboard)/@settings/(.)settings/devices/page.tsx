@@ -1,4 +1,4 @@
-import Icon from "@/components/icon";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const DEVICES = [
@@ -60,7 +60,7 @@ export default function DevicesSettingsPage() {
 
           {/* Search box */}
           <div className="flex items-center gap-2.5 px-4 py-3 text-sm text-border-default-secondary w-full max-w-60">
-            <Icon name="search" size={16} className="text-default-tertiary" />
+            <Search size={16} className="text-default-tertiary" />
             <input
               type="text"
               placeholder="Search devices"

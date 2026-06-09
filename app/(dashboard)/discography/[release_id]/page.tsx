@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import Icon from "@/components/icon";
 import { formatCount } from "@/lib/count-formatter";
 import { releases } from "@/data/releases";
@@ -94,7 +95,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
             <span>Edit Release</span>
           </button>
           <button className="flex items-center gap-2 p-4 bg-white rounded-full hover:bg-page-background transition-colors cursor-pointer">
-            <Icon name="trash" size={16} className="text-danger-default" />
+            <Trash2 size={16} className="text-danger-default" />
             <span>Delete Release</span>
           </button>
         </div>

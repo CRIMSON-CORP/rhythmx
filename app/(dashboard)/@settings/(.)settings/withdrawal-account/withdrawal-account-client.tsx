@@ -1,4 +1,5 @@
 "use client";
+import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
 
 import * as React from "react";
 import { Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";
@@ -124,7 +125,7 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
                     type="button"
                     className="p-1.5 rounded-full hover:bg-black/5 text-default transition-all mr-1 cursor-pointer"
                   >
-                    <Icon name="chevron-left" size={18} />
+                    <ChevronLeft size={18} />
                   </button>
                 )}
                 <DialogPrimitive.Title className="font-semibold text-default text-base">
@@ -133,7 +134,7 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
               </div>
               <DialogPrimitive.Close asChild>
                 <button className="p-2 rounded-full hover:bg-black/5 text-default transition-all cursor-pointer">
-                  <Icon name="cancel" size={20} />
+                  <X size={20} />
                 </button>
               </DialogPrimitive.Close>
             </div>
@@ -147,7 +148,7 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
 
                 {/* Search */}
                 <div className="flex items-center gap-2.5 px-4 py-3 bg-[#F4F5F7] rounded-xl border border-black/2">
-                  <Icon name="search" size={18} className="text-default-tertiary" />
+                  <Search size={18} className="text-default-tertiary" />
                   <input
                     type="text"
                     placeholder="Search"
@@ -181,8 +182,7 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
                           <p className="text-xs text-default-tertiary">{bank.fullName}</p>
                         </div>
                       </div>
-                      <Icon
-                        name="chevron-right"
+                      <ChevronRight
                         size={16}
                         className="text-default-tertiary opacity-60 group-hover:opacity-100 transition-opacity"
                       />

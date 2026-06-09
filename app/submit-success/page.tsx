@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import Icon from "@/components/icon";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +12,7 @@ export default function SubmitSuccessPage() {
         <header className="flex flex-row items-center justify-between px-6 py-5">
           <p className="font-medium text-sm">Release Submission</p>
           <Link href="/discography" className="p-2">
-            <Icon name="cancel" size={20} />
+            <X size={20} />
           </Link>
         </header>
 

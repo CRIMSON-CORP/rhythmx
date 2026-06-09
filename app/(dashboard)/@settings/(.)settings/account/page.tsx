@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import Image from "next/image";
 import Icon from "@/components/icon";
 import Form from "./form";
@@ -28,7 +29,7 @@ export default async function AccountForm() {
             className="rounded-full bg-[#C7FFB3] object-cover"
           />
           <button className="absolute text-white inset-0 flex justify-center items-center bg-black/20">
-            <Icon name="plus" size={24} />
+            <Plus size={24} />
           </button>
         </div>
         <div className="flex flex-col gap-1.5">

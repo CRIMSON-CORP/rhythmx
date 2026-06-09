@@ -1,4 +1,5 @@
 "use client";
+import { Search, Trash2, X } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -131,7 +132,7 @@ export default function PermissionsForm({ roleId }: PermissionsFormProps) {
         <div className="flex items-center justify-between py-1">
           <h2 className="font-medium font-heading text-xl">Role Details & Permission</h2>
           <Link href="/roles-permission" className="p-2">
-            <Icon name="cancel" size={20} />
+            <X size={20} />
           </Link>
         </div>
         {/* Role Name Row */}
@@ -152,7 +153,7 @@ export default function PermissionsForm({ roleId }: PermissionsFormProps) {
                 className="p-2.5 bg-brand-orange/10 hover:bg-brand-orange/20 text-brand-orange rounded-20 transition-colors shrink-0"
                 title="Delete Role"
               >
-                <Icon name="trash" size={33.75} />
+                <Trash2 size={33.75} />
               </button>
             )}
           </div>
@@ -163,7 +164,7 @@ export default function PermissionsForm({ roleId }: PermissionsFormProps) {
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <h3 className="font-medium text-lg">Permissions</h3>
             <div className="flex items-center p-4 gap-x-2 bg-white rounded-full w-full max-w-117.5">
-              <Icon name="search" size={14} className="text-neutral-400" />
+              <Search size={14} className="text-neutral-400" />
               <input
                 type="text"
                 placeholder="Search Permission"

@@ -1,3 +1,4 @@
+import { ArrowUpRight, Disc, Search } from "lucide-react";
 import Icon from "@/components/icon";
 import {
   Dialog,
@@ -112,12 +113,12 @@ function DisocgraphyPage() {
       <section className="flex flex-col gap-8">
         <header className="container flex items-center justify-between gap-3">
           <div className="flex items-center gap-3.5 text-default-tertiary">
-            <Icon name="disc" size={24} />
+            <Disc size={24} />
             <h2 className="font-medium">Top Releases</h2>
           </div>
           <Link href="/trends-analytics" className="flex items-center gap-1 text-xs">
             <span>See Trends & Analytics</span>
-            <Icon name="arrow-up-right" size={16} />
+            <ArrowUpRight size={16} />
           </Link>
         </header>
         <ReleaseCards scrollable>
@@ -141,7 +142,7 @@ function DisocgraphyPage() {
           <h2 className="font-medium whitespace-nowrap">All Releases</h2>
           <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
             <div className="flex items-center p-4 gap-x-2">
-              <Icon name="search" size={16} />
+              <Search size={16} />
               <input
                 type="search"
                 placeholder="Search releases"
@@ -153,7 +154,7 @@ function DisocgraphyPage() {
               <span>All</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Icon name="disc" size={16} />
+              <Disc size={16} />
               <span>Album</span>
             </button>
             <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">

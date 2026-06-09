@@ -1,4 +1,5 @@
 "use client";
+import { X } from "lucide-react";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -60,7 +61,7 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
         <DialogHeader className="flex-row items-center justify-between px-6 py-5">
           <DialogTitle className="text-sm text-default font-medium">Report Transaction</DialogTitle>
           <DialogClose className="p-2 text-default">
-            <Icon name="cancel" size={20} />
+            <X size={20} />
           </DialogClose>
         </DialogHeader>
         <VisuallyHidden.Root>

@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import Image from "next/image";
 import Icon from "../../../components/icon";
 
@@ -16,7 +17,7 @@ function MusicCard() {
         <p className="text-[#838383] leading-tight text-trim">Apple Music. Spotify. Deezer...</p>
       </div>
       <button className="self-start">
-        <Icon name="cancel" size={16} className="text-default" />
+        <X size={16} className="text-default" />
       </button>
     </aside>
   );
