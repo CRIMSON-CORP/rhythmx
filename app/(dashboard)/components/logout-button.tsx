@@ -8,8 +8,8 @@ export default function LogoutButton() {
     <CommandItem
       key="logout"
       className="px-4 py-3 cursor-pointer"
-      onSelect={() => signOut({ callbackUrl: "/auth/get-started" })}
-      onClick={() => signOut({ callbackUrl: "/auth/get-started" })}
+      onSelect={() => signOut({ callbackUrl: "/auth/login" })}
+      onClick={() => signOut({ callbackUrl: "/auth/login" })}
     >
       <span>Logout</span>
     </CommandItem>

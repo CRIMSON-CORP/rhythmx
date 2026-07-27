@@ -122,7 +122,10 @@ export const authOptions: NextAuthOptions = {
 
             return true;
           } else {
-            console.error("[NextAuth Google Sign-In] Backend social authentication failed:", responseData);
+            console.error(
+              "[NextAuth Google Sign-In] Backend social authentication failed:",
+              responseData,
+            );
             return "/auth/get-started?error=google_auth_failed";
           }
         } catch (error) {
@@ -164,7 +167,29 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async signOut({ token }) {
+      if (token?.accessToken) {
+        try {
+          await fetch(`${BACKEND_API_URL}${API_ROUTES.AUTH.LOGOUT}`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token.accessToken}`,
+              "Content-Type": "application/json",
+            },
+          });
+          console.log("[NextAuth signOut Event] Backend logout called successfully.");
+        } catch (error) {
+          console.error("[NextAuth signOut Event] Error calling backend logout:", error);
+        }
+      }
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET || "rhythmx_super_secret_key_change_me_in_production",
+  pages: {
+    signIn: "/auth/login",
+    newUser: "/auth/get-started",
+  },
 };
 
 const handler = NextAuth(authOptions);

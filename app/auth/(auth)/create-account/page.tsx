@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 function CreateAccountForm() {
   const searchParams = useSearchParams();
@@ -48,6 +49,12 @@ function CreateAccountForm() {
 
   return (
     <div className="flex flex-col max-w-107.5 m-auto gap-8">
+      <button
+        onClick={router.back}
+        className="absolute top-16 left-5 p-2 rounded-full outline outline-border-default-secondary"
+      >
+        <ChevronLeft size={20} />
+      </button>
       <div className="space-y-1 text-2xl font-semibold text-center">
         <h1 className="text-[32px]">Create a profile</h1>
         <p className="text-black/50">This is how you&apos;ll appear in RhythmX</p>

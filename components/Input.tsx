@@ -11,15 +11,19 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   placeholder?: string;
   error?: string;
+  prefilled?: boolean;
 }
 
-function Input({ type = "text", name, label, error, ...props }: InputProps) {
+function Input({ type = "text", name, label, error, prefilled, ...props }: InputProps) {
   const [isOpen, toggle] = useToggle(false);
 
   return (
     <Field>
       <FieldLabel htmlFor={props.id || name}>{label}</FieldLabel>
-      <InputGroup className="bg-white outline outline-[#D9D9D9] p-4 rounded-10 flex items-center gap-2">
+      <InputGroup
+        data-prefilled={prefilled}
+        className="bg-white outline outline-[#D9D9D9] p-4 rounded-10 flex items-center gap-2 data-[prefilled=true]:outline-none data-[prefilled=true]:border-none data-[prefilled=true]:bg-[#EBFFEE]"
+      >
         <InputGroupInput
           id={name}
           name={name}

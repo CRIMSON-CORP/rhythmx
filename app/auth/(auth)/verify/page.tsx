@@ -6,6 +6,7 @@ import TermsPolicyText from "../TermsPolicyText";
 import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 function VerifyForm() {
   const searchParams = useSearchParams();
@@ -45,6 +46,12 @@ function VerifyForm() {
 
   return (
     <div className="flex flex-col max-w-107.5 m-auto gap-8">
+      <button
+        onClick={router.back}
+        className="absolute top-16 left-5 p-2 rounded-full outline outline-border-default-secondary"
+      >
+        <ChevronLeft size={20} />
+      </button>
       <div className="space-y-1 text-2xl font-semibold text-center">
         <h1>Verification</h1>
         <p className="text-black/50">
@@ -54,13 +61,13 @@ function VerifyForm() {
       {error && <div className="text-red-500 text-sm text-center font-medium">{error}</div>}
       <form onSubmit={handleVerify} className="space-y-6">
         <Input
+          prefilled
           name="email"
           label="Email"
           type="email"
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           placeholder="Enter your email address"
-          required
         />
         <Input
           name="otp"

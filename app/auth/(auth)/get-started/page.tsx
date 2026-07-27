@@ -1,23 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import Input from "../../../../components/Input";
 import TermsPolicyText from "../TermsPolicyText";
 import { handleGetStartedAction } from "../../actions";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
-
-const getStartedSchema = z.object({
-  email: z.string().min(1, "Email address is required").email("Please enter a valid email address"),
-});
+import { getStartedSchema } from "@/models/get-started-schema";
 
 function Page() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setError("");
 

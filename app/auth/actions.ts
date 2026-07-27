@@ -18,5 +18,5 @@ export async function handleGetStartedAction(email: string) {
   if (email) {
     redirect(`/auth/verify?email=${encodeURIComponent(email)}`);
   }
-  redirect("/auth/create-account");
+  redirect("/auth/get-started");
 }
