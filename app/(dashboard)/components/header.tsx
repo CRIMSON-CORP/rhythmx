@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import Search from "./search";
+import LogoutButton from "./logout-button";
 import {
   ChevronDown,
   ChevronRight,
@@ -192,9 +193,7 @@ async function Header() {
                     <CommandItem key="terms-of-use" className="px-4 py-3 cursor-pointer">
                       <span>Terms of Use</span>
                     </CommandItem>
-                    <CommandItem key="logout" className="px-4 py-3 cursor-pointer">
-                      <span>Logout</span>
-                    </CommandItem>
+                    <LogoutButton />
                   </CommandGroup>
                 </CommandList>
               </Command>

@@ -1,9 +1,51 @@
+"use client";
+
 import Icon from "@/components/icon";
 import TermsPolicyText from "../TermsPolicyText";
 import Input from "../../../../components/Input";
 import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-function page() {
+function CreateAccountForm() {
+  const searchParams = useSearchParams();
+  const initialEmail = searchParams.get("email") || "";
+  const [email, setEmail] = useState(initialEmail);
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Direct credential sign-in using NextAuth
+      const res = await signIn("credentials", {
+        email,
+        password,
+        firstName,
+        lastName,
+        redirect: false,
+      });
+
+      if (res?.ok) {
+        router.push("/auth/verify?email=" + encodeURIComponent(email));
+      } else {
+        // Fallback to verify step
+        router.push("/auth/verify?email=" + encodeURIComponent(email));
+      }
+    } catch (err) {
+      console.error("Account creation error:", err);
+      router.push("/auth/verify?email=" + encodeURIComponent(email));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col max-w-107.5 m-auto gap-8">
       <div className="space-y-1 text-2xl font-semibold text-center">
@@ -16,7 +58,7 @@ function page() {
         </div>
         <label
           htmlFor="avatar"
-          className="outline outline-neutral-default rounded-10 p-1.5 flex items-center gap-2.5 font-medium text-xs"
+          className="outline outline-neutral-default rounded-10 p-1.5 flex items-center gap-2.5 font-medium text-xs cursor-pointer"
         >
           <input type="file" name="avatar" id="avatar" className="hidden" />
           <Icon name="image" size={20} />
@@ -24,14 +66,30 @@ function page() {
         </label>
       </div>
 
-      <form action="" className="space-y-6">
-        <Input name="first-name" label="Enter your First Name" placeholder="First Name" required />
-        <Input name="last-name" label="Enter your Last Name" placeholder="last Name" required />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Input
+          name="first-name"
+          label="Enter your First Name"
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
+          required
+        />
+        <Input
+          name="last-name"
+          label="Enter your Last Name"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
+          required
+        />
         <Input
           name="password"
           label="Set a Password"
           placeholder="Password"
           type="password"
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
           required
         />
         <label
@@ -73,8 +131,8 @@ function page() {
           </div>
           <p>I agree to RhythmX marketing communications</p>
         </label>
-        <Button rounded={10} width="full">
-          Continue
+        <Button rounded={10} width="full" type="submit" disabled={loading}>
+          {loading ? "Processing..." : "Continue"}
         </Button>
       </form>
       <TermsPolicyText />
@@ -82,4 +140,10 @@ function page() {
   );
 }
 
-export default page;
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="text-center p-8">Loading...</div>}>
+      <CreateAccountForm />
+    </Suspense>
+  );
+}

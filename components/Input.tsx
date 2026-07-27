@@ -1,5 +1,5 @@
 "use client";
-import { Field, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import useToggle from "@/hooks/useToggle";
 import { Eye, EyeOff } from "lucide-react";
@@ -10,14 +10,15 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
   placeholder?: string;
+  error?: string;
 }
 
-function Input({ type = "text", name, label, ...props }: InputProps) {
+function Input({ type = "text", name, label, error, ...props }: InputProps) {
   const [isOpen, toggle] = useToggle(false);
 
   return (
     <Field>
-      <FieldLabel htmlFor={name}>{label}</FieldLabel>
+      <FieldLabel htmlFor={props.id || name}>{label}</FieldLabel>
       <InputGroup className="bg-white outline outline-[#D9D9D9] p-4 rounded-10 flex items-center gap-2">
         <InputGroupInput
           id={name}
@@ -34,6 +35,7 @@ function Input({ type = "text", name, label, ...props }: InputProps) {
           </button>
         ) : null}
       </InputGroup>
+      {error && <FieldError>{error}</FieldError>}
     </Field>
   );
 }
