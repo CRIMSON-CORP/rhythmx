@@ -65,7 +65,7 @@ function LabelName() {
       </div>
       <div className="space-y-6">
         <div className="rounded-30 cursor-pointer outline outline-default-default has-checked:outline-brand-orange/10 has-checked:bg-brand-orange/10 px-6 py-7 w-full flex items-center gap-4 transition-colors duration-200">
-          <Icon name={accountTypeIconMap[form.selected_account]} size={32} />
+          <Icon name={accountTypeIconMap[form.selected_account] + "-icon"} size={32} local />
           <div className="grow font-medium space-y-1">
             <p className="text-lg leading-tight">
               {accountTypeOptionContentMap[form.selected_account]?.title}

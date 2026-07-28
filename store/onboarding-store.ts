@@ -1,6 +1,8 @@
 import AccountType from "@/app/onboarding/steps/account-type";
 import LabelName from "@/app/onboarding/steps/label-name";
 import Logo from "@/app/onboarding/steps/logo";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 import { create } from "zustand";
 
 export type AccountType = "record-label" | "artist" | "contributor" | "";
@@ -52,9 +54,11 @@ interface OnBoardingStore {
     avatar: File | null;
   };
   setForm: (form: Partial<OnBoardingStore["form"]>) => void;
+  submitForm: () => Promise<void>;
+  isSubmitting: boolean;
 }
 
-const useOnBoardingStore = create<OnBoardingStore>((set) => ({
+const useOnBoardingStore = create<OnBoardingStore>((set, get) => ({
   currentStep: 0,
   form: {
     selected_account: "",
@@ -62,9 +66,79 @@ const useOnBoardingStore = create<OnBoardingStore>((set) => ({
     country: "",
     avatar: null,
   },
+  isSubmitting: false,
   next: () => set((state) => ({ currentStep: state.currentStep + 1 })),
   previous: () => set((state) => ({ currentStep: state.currentStep - 1 })),
   setForm: (form) => set((state) => ({ form: { ...state.form, ...form } })),
+  submitForm: async () => {
+    const { form } = get();
+    set({ isSubmitting: true });
+
+    try {
+      // 1. Map selected_account to backend account_type string
+      let accountTypeStr = "artist";
+      if (form.selected_account === "record-label") {
+        accountTypeStr = "label";
+      } else if (form.selected_account === "contributor") {
+        accountTypeStr = "collaborator";
+      } else if (form.selected_account === "artist") {
+        accountTypeStr = "artist";
+      }
+
+      // 2. Determine details endpoint and payload structure
+      let detailsEndpoint = API_ROUTES.ONBOARDING.ARTIST_DETAILS;
+      let detailsPayload: Record<string, unknown> = {
+        artist_name: form.name,
+        country: form.country,
+      };
+
+      if (form.selected_account === "record-label") {
+        detailsEndpoint = API_ROUTES.ONBOARDING.LABEL_DETAILS;
+        detailsPayload = {
+          label_name: form.name,
+          region: form.country,
+        };
+      } else if (form.selected_account === "contributor") {
+        detailsEndpoint = API_ROUTES.ONBOARDING.COLLABORATOR_DETAILS;
+        detailsPayload = {
+          artist_name: form.name,
+          country: form.country,
+        };
+      }
+
+      // 3. Determine photo endpoint
+      let photoEndpoint = API_ROUTES.ONBOARDING.ARTIST_PHOTO;
+      if (form.selected_account === "record-label") {
+        photoEndpoint = API_ROUTES.ONBOARDING.LABEL_PHOTO;
+      } else if (form.selected_account === "contributor") {
+        photoEndpoint = API_ROUTES.ONBOARDING.COLLABORATOR_PHOTO;
+      }
+
+      await api.post(API_ROUTES.ONBOARDING.ACCOUNT_TYPE, {
+        account_type: accountTypeStr,
+      });
+
+      await api.patch(detailsEndpoint, detailsPayload);
+
+      // Photo upload request (if photo file selected)
+      if (form.avatar) {
+        const photoFormData = new FormData();
+        photoFormData.append("photo", form.avatar);
+        await api.postFormData({
+          url: photoEndpoint,
+          formData: photoFormData,
+        });
+      }
+
+      // On success, redirect to dashboard /
+      window.location.href = `/terms-and-agreement/${form.selected_account}`;
+    } catch (error: unknown) {
+      console.error("Onboarding submission error:", error);
+      throw error;
+    } finally {
+      set({ isSubmitting: false });
+    }
+  },
 }));
 
 export default useOnBoardingStore;

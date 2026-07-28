@@ -28,7 +28,7 @@ function Option({ value, checked, onChange }: OptionProps) {
         checked={checked}
         onChange={onChange}
       />
-      <Icon name={accountTypeIconMap[value]} size={32} />
+      <Icon name={accountTypeIconMap[value] + "-icon"} size={32} local />
       <div className="grow font-medium space-y-1">
         <p className="text-lg leading-tight">{accountTypeOptionContentMap[value].title}</p>
         <p className="leading-tight text-black/50">{accountTypeOptionContentMap[value].subtitle}</p>

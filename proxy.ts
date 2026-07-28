@@ -6,9 +6,14 @@ export const proxy = withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
-    // Redirect signed-in users away from auth pages to dashboard
-    if (token && pathname.startsWith("/auth")) {
+    // Redirect signed-in users away from pre-login auth pages (get-started, login, verify) to dashboard
+    if (token && pathname.startsWith("/auth") && !pathname.startsWith("/auth/create-account")) {
       return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // Redirect unauthenticated users trying to access /auth/create-account to /auth/get-started
+    if (!token && pathname.startsWith("/auth/create-account")) {
+      return NextResponse.redirect(new URL("/auth/get-started", req.url));
     }
 
     return NextResponse.next();
@@ -18,12 +23,12 @@ export const proxy = withAuth(
       authorized: ({ req, token }) => {
         const { pathname } = req.nextUrl;
 
-        // Always allow access check to pass for /auth routes so custom function handles redirect
-        if (pathname.startsWith("/auth")) {
+        // Allow public access to pre-login auth pages
+        if (pathname.startsWith("/auth") && !pathname.startsWith("/auth/create-account")) {
           return true;
         }
 
-        // Require active token for all protected dashboard routes
+        // Require active session token for /auth/create-account and all dashboard pages
         return !!token;
       },
     },

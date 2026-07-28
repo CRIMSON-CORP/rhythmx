@@ -1,23 +1,35 @@
-type REST_API_VERBS = "GET" | "POST" | "PUT" | "DELETE";
+import { getSession } from "next-auth/react";
+
+const BACKEND_API_URL =
+  process.env.NEXT_PUBLIC_BACKEND_API_URL ||
+  process.env.BACKEND_API_URL ||
+  "https://rhythmx.tushcode.com";
+
+type REST_API_VERBS = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export const api = {
   get(url: string) {
     return this.fetch(url, "GET");
   },
-  post(url: string, payload: Record<string, unknown>) {
-    return this.fetch(url, "POST", payload);
+  post<T>(url: string, payload: Record<string, unknown>) {
+    return this.fetch(url, "POST", payload) as Promise<T>;
   },
-  put(url: string, payload: Record<string, unknown>) {
-    return this.fetch(url, "PUT", payload);
+  patch<T>(url: string, payload: Record<string, unknown>) {
+    return this.fetch(url, "PATCH", payload) as Promise<T>;
   },
-  delete(url: string) {
-    return this.fetch(url, "DELETE");
+  put<T>(url: string, payload: Record<string, unknown>) {
+    return this.fetch(url, "PUT", payload) as Promise<T>;
+  },
+  delete<T>(url: string) {
+    return this.fetch(url, "DELETE") as Promise<T>;
   },
   async fetch(url: string, method: REST_API_VERBS, payload?: Record<string, unknown>) {
+    const session = await getSession();
     try {
-      const response = await fetch(process.env.BACKEND_API_URL + url, {
+      const response = await fetch(BACKEND_API_URL + url, {
         headers: {
           "content-type": "application/json",
+          ...(session?.accessToken && { Authorization: `Bearer ${session.accessToken}` }),
         },
         method,
         body: JSON.stringify(payload),
@@ -28,7 +40,7 @@ export const api = {
       throw error;
     }
   },
-  async processRequest<T>(response: Response) {
+  async processRequest(response: Response) {
     if (!response) throw new Error("Network request failed");
     let data;
     try {
@@ -39,19 +51,22 @@ export const api = {
       }
       throw error;
     }
-    console.log(data);
-    if (!data.status) throw new Error(data.message);
-    return data.data as T;
+    if (!data.status) {
+      if (data.errors) throw data.errors;
+      throw new Error(data.message);
+    }
+    return data.data;
   },
-  postFormData({
+  async postFormData({
     url,
     formData,
     onUploadProgress = () => {},
   }: {
     url: string;
     formData: FormData;
-    onUploadProgress: (uploadProgress: number) => void;
+    onUploadProgress?: (uploadProgress: number) => void;
   }): Promise<string> {
+    const session = await getSession();
     const xhr = new XMLHttpRequest();
 
     if (onUploadProgress) {
@@ -83,8 +98,13 @@ export const api = {
         reject(new Error("Request timed out"));
       });
 
-      xhr.open("POST", url, true);
-      xhr.timeout = 30000; // 30 seconds timeout
+      const targetUrl = url.startsWith("http") ? url : BACKEND_API_URL + url;
+
+      xhr.open("POST", targetUrl, true);
+      if (session?.accessToken) {
+        xhr.setRequestHeader("Authorization", `Bearer ${session.accessToken}`);
+      }
+      xhr.timeout = 30000;
       xhr.send(formData);
     });
   },

@@ -16,9 +16,10 @@ type IconProps = {
   className?: string;
   name: string;
   viewBox?: `${number} ${number} ${number} ${number}`;
+  local?: boolean;
 } & (SizeProps | DimensionProps);
 
-export default function Icon({ name, size, width, height, className, viewBox }: IconProps) {
+export default function Icon({ name, size, width, height, className, viewBox, local }: IconProps) {
   return (
     <svg
       width={size || width}
@@ -26,7 +27,7 @@ export default function Icon({ name, size, width, height, className, viewBox }: 
       viewBox={viewBox}
       className={cn("flex-none", className)}
     >
-      <use href={`/icons.svg#${name}`} />
+      <use href={local ? `#${name}` : `/icons.svg#${name}`} />
     </svg>
   );
 }

@@ -8,37 +8,53 @@ import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 
+import { verifySchema } from "@/models/verify-schema";
+
 function VerifyForm() {
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get("email") || "";
   const [email, setEmail] = useState(initialEmail);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; otp?: string; form?: string }>({});
   const router = useRouter();
 
-  const handleVerify = async (e: React.FormEvent) => {
+  const handleVerify = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    setErrors({});
+
+    const result = verifySchema.safeParse({ email, otp });
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setErrors({
+        email: fieldErrors.email?.[0],
+        otp: fieldErrors.otp?.[0],
+      });
+      return;
+    }
+
     setLoading(true);
-    setError("");
 
     try {
       const res = await signIn("credentials", {
         email,
         otp,
         redirect: false,
-        callbackUrl: "/",
+        callbackUrl: "/auth/create-account",
       });
 
       if (res?.ok) {
-        router.push("/");
+        window.location.href = "/auth/create-account";
+      } else if (res?.error) {
+        setErrors({ form: res.error });
       } else {
-        // Fallback redirect for onboarding flow demo
-        router.push("/");
+        setErrors({ form: "Verification failed. Please try again." });
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Verification error:", err);
-      setError("Failed to verify code. Please try again.");
+      setErrors({
+        form: (err as Error).message || "Failed to verify code. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -58,7 +74,11 @@ function VerifyForm() {
           Enter the code we sent to <span className="text-black">{email || "your email"}</span>
         </p>
       </div>
-      {error && <div className="text-red-500 text-sm text-center font-medium">{error}</div>}
+      {errors.form && (
+        <div className="text-red-500 text-sm font-medium text-center bg-red-50 p-3 rounded-md border border-red-200">
+          {errors.form}
+        </div>
+      )}
       <form onSubmit={handleVerify} className="space-y-6">
         <Input
           prefilled
@@ -66,17 +86,28 @@ function VerifyForm() {
           label="Email"
           type="email"
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setEmail(e.target.value);
+            if (errors.email || errors.form) {
+              setErrors((prev) => ({ ...prev, email: undefined, form: undefined }));
+            }
+          }}
           placeholder="Enter your email address"
+          error={errors.email}
         />
         <Input
           name="otp"
           label="OTP"
           type="text"
           value={otp}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setOtp(e.target.value);
+            if (errors.otp || errors.form) {
+              setErrors((prev) => ({ ...prev, otp: undefined, form: undefined }));
+            }
+          }}
           placeholder="Enter OTP here"
-          required
+          error={errors.otp}
         />
         <Button rounded={10} width="full" type="submit" disabled={loading}>
           {loading ? "Verifying..." : "Verify"}

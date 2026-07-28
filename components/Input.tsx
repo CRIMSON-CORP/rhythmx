@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { InputHTMLAttributes } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  type?: "text" | "email" | "number" | "password";
+  type?: "text" | "email" | "number" | "password" | "date";
   name: string;
   label: string;
   placeholder?: string;

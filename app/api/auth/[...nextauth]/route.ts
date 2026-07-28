@@ -2,6 +2,7 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { API_ROUTES } from "@/lib/api-routes";
+import { api } from "@/lib/api";
 
 const BACKEND_API_URL =
   process.env.BACKEND_API_URL ||
@@ -27,43 +28,41 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const res = await fetch(`${BACKEND_API_URL}/api/auth/login`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-              otp: credentials.otp,
-            }),
-          });
+          const endpoint = credentials.otp ? API_ROUTES.AUTH.VERIFY : API_ROUTES.AUTH.LOGIN;
+          const payload = credentials.otp
+            ? { email: credentials.email, otp: credentials.otp }
+            : { email: credentials.email, password: credentials.password };
 
-          const data = await res.json().catch(() => ({}));
+          const data = await api.post<VerifyResponse>(endpoint, payload);
 
-          if (res.ok && (data?.data?.user || data?.user)) {
-            const userData = data?.data?.user || data?.user;
-            const tokenData = data?.data?.tokens || data?.tokens || data;
+          if (data?.user) {
+            const userData = data.user;
+            const tokenData = data.tokens;
 
             return {
-              id: userData.reference || userData.id || userData._id || "1",
+              id: userData.reference,
               reference: userData.reference,
-              name:
-                userData.name ||
-                `${userData.first_name || userData.firstName || ""} ${userData.last_name || userData.lastName || ""}`.trim() ||
-                credentials.email.split("@")[0],
-              email: userData.email || credentials.email,
-              image: userData.avatar_url || userData.avatar || userData.image || null,
-              accessToken: tokenData.access_token || data.token || data.accessToken || "",
+              email: userData.email,
+              first_name: userData.first_name,
+              last_name: userData.last_name,
+              image: userData.avatar_url,
+              avatar: userData.avatar,
+              accessToken: tokenData.access_token,
               refreshToken: tokenData.refresh_token,
-              firstName: userData.first_name || userData.firstName,
-              lastName: userData.last_name || userData.lastName,
-              role: userData.account_type || userData.role,
-              accountType: userData.account_type || userData.accountType,
+              firstName: userData.first_name,
+              lastName: userData.last_name,
+              role: userData.account_type,
+              accountType: userData.account_type,
+              auth_provider: userData.auth_provider,
+              status: userData.status,
+              locale: userData.locale,
+              country: userData.country,
+              two_factor_enabled: userData.two_factor_enabled,
+              created_at: userData.created_at,
             };
           }
 
-          const errorMessage = data?.message || "Invalid credentials. Please try again.";
+          const errorMessage = "Invalid credentials. Please try again.";
           console.error("[NextAuth Credentials Authorize Failed]:", errorMessage);
           throw new Error(errorMessage);
         } catch (error: unknown) {
@@ -86,48 +85,37 @@ export const authOptions: NextAuthOptions = {
         console.log("[NextAuth Google Sign-In] Provider ID token:", idToken);
 
         try {
-          const res = await fetch(`${BACKEND_API_URL}${API_ROUTES.AUTH.SOCIAL}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              provider: "google",
-              provider_token: idToken,
-            }),
+          const responseData = await api.post<VerifyResponse>(API_ROUTES.AUTH.SOCIAL, {
+            provider: "google",
+            provider_token: idToken,
           });
 
-          const responseData = await res.json();
           console.log("[BACKEND GOOGLE AUTH RESPONSE]:", JSON.stringify(responseData, null, 2));
 
-          if (res.ok && responseData.status === true && responseData.data) {
-            const backendUser = responseData.data.user || responseData.user || {};
-            const tokens = responseData.data.tokens || responseData.tokens || {};
+          const backendUser = responseData?.user;
+          const tokens = responseData?.tokens;
 
-            user.id = backendUser.reference || backendUser.id || user.id;
+          if (backendUser && tokens) {
+            user.id = backendUser.reference || user.id;
             user.reference = backendUser.reference;
             user.name =
-              `${backendUser.first_name || ""} ${backendUser.last_name || ""}`.trim() ||
-              backendUser.name ||
-              user.name;
+              `${backendUser.first_name || ""} ${backendUser.last_name || ""}`.trim() || user.name;
             user.email = backendUser.email || user.email;
-            user.image = backendUser.avatar_url || backendUser.avatar || user.image;
-            user.firstName = backendUser.first_name || backendUser.firstName;
-            user.lastName = backendUser.last_name || backendUser.lastName;
-            user.accountType = backendUser.account_type || backendUser.accountType;
-            user.role = backendUser.account_type || backendUser.role;
-            user.accessToken = tokens.access_token || responseData.token;
+            user.image = backendUser.avatar_url || user.image;
+            user.firstName = backendUser.first_name;
+            user.lastName = backendUser.last_name;
+            user.accountType = backendUser.account_type;
+            user.role = backendUser.account_type;
+            user.accessToken = tokens.access_token;
             user.refreshToken = tokens.refresh_token;
-            user.nextStep = responseData.data.next_step;
-
-            return true;
-          } else {
-            console.error(
-              "[NextAuth Google Sign-In] Backend social authentication failed:",
-              responseData,
-            );
-            return "/auth/get-started?error=google_auth_failed";
+            user.nextStep = responseData.next_step;
           }
+
+          if (responseData?.next_step === "profile_setup") {
+            return "/auth/create-account";
+          }
+
+          return true;
         } catch (error) {
           console.error("[NextAuth Google Sign-In] Network error sending token to backend:", error);
           return "/auth/get-started?error=google_auth_failed";

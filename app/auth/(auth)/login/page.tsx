@@ -39,7 +39,11 @@ function Page() {
       if (res.ok) {
         window.location.href = "/";
       } else if (res.error) {
-        setErrors({ form: res.error });
+        if (res.status === 401) {
+          setErrors({ form: "Invalid email or Password" });
+          return;
+        }
+        throw res;
       }
     } catch (err: unknown) {
       setErrors({
