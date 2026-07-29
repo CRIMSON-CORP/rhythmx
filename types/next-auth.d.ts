@@ -3,9 +3,9 @@ import "next-auth/jwt";
 
 declare module "next-auth" {
   interface Session {
-    accessToken?: string;
-    refreshToken?: string;
-    nextStep?: string | null;
+    access_token?: string;
+    refresh_token?: string;
+    next_step?: string | null;
     user: {
       id?: string;
       reference?: string;
@@ -17,23 +17,23 @@ declare module "next-auth" {
       avatar_url?: string;
       phone?: string;
       role?: string;
-      accountType?: string;
+      account_type?: string;
     } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {
     id: string;
     reference?: string;
-    accessToken?: string;
-    refreshToken?: string;
+    access_token?: string;
+    refresh_token?: string;
     first_name?: string;
     last_name?: string;
     avatar?: string;
     avatar_url?: string;
     phone?: string;
     role?: string;
-    accountType?: string;
-    nextStep?: string | null;
+    account_type?: string;
+    next_step?: string | null;
   }
 }
 
@@ -41,15 +41,15 @@ declare module "next-auth/jwt" {
   interface JWT {
     id?: string;
     reference?: string;
-    accessToken?: string;
-    refreshToken?: string;
+    access_token?: string;
+    refresh_token?: string;
     first_name?: string;
     last_name?: string;
     avatar?: string;
     avatar_url?: string;
     phone?: string;
     role?: string;
-    accountType?: string;
-    nextStep?: string | null;
+    account_type?: string;
+    next_step?: string | null;
   }
 }

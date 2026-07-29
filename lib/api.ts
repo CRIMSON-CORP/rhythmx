@@ -38,12 +38,13 @@ export const api = {
 
   async fetch(url: string, method: REST_API_VERBS, payload?: Record<string, unknown>) {
     const session = await getUserSession();
+    const token = session?.access_token;
 
     const options: RequestInit = {
       method,
       headers: {
         "content-type": "application/json",
-        ...(session?.accessToken && { Authorization: `Bearer ${session.accessToken}` }),
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
     };
 
@@ -68,11 +69,10 @@ export const api = {
     // Handle Token Expiry
     if (response.status === 401) {
       const session = await getUserSession();
-
       const refreshResponse = await fetch(BACKEND_API_URL + API_ROUTES.AUTH.REFRESH, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ refresh_token: session?.refreshToken }),
+        body: JSON.stringify({ refresh_token: session?.refresh_token }),
       });
 
       // Refresh failed -> Force Logout
@@ -86,15 +86,29 @@ export const api = {
         return;
       }
 
-      const refreshData = await refreshResponse.json();
+      const refreshPayload = await refreshResponse.json();
+      const dataObj = refreshPayload.data;
+      const newAccessToken = dataObj.access_token;
+      const newRefreshToken = dataObj.refresh_token;
 
-      // Fix: Retry the original request with the new token
-      if (refreshData?.accessToken) {
+      // Fix: Retry the original request with the new token & sync NextAuth session
+      if (newAccessToken) {
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("auth:update-session", {
+              detail: {
+                access_token: newAccessToken,
+                refresh_token: newRefreshToken,
+              },
+            }),
+          );
+        }
+
         const retryOptions = {
           ...originalOptions,
           headers: {
             ...originalOptions.headers,
-            Authorization: `Bearer ${refreshData.accessToken}`,
+            Authorization: `Bearer ${newAccessToken}`,
           },
         };
         const retryResponse = await fetch(BACKEND_API_URL + originalUrl, retryOptions);
@@ -175,8 +189,9 @@ export const api = {
       const targetUrl = url.startsWith("http") ? url : BACKEND_API_URL + url;
 
       xhr.open("POST", targetUrl, true);
-      if (session?.accessToken) {
-        xhr.setRequestHeader("Authorization", `Bearer ${session.accessToken}`);
+      const token = session?.access_token;
+      if (token) {
+        xhr.setRequestHeader("Authorization", `Bearer ${token}`);
       }
       xhr.timeout = 30000;
       xhr.send(formData);

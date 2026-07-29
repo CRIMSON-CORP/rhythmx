@@ -48,13 +48,11 @@ export const authOptions: NextAuthOptions = {
               image: userData.avatar_url,
               avatar_url: userData.avatar_url,
               avatar: userData.avatar,
-              accessToken: tokenData.access_token,
-              refreshToken: tokenData.refresh_token,
-              firstName: userData.first_name,
-              lastName: userData.last_name,
+              access_token: tokenData.access_token,
+              refresh_token: tokenData.refresh_token,
               phone: userData.phone || "",
               role: userData.account_type,
-              accountType: userData.account_type,
+              account_type: userData.account_type,
               auth_provider: userData.auth_provider,
               status: userData.status,
               locale: userData.locale,
@@ -109,11 +107,11 @@ export const authOptions: NextAuthOptions = {
             user.phone = backendUser.phone || "";
             user.name =
               `${backendUser.first_name || ""} ${backendUser.last_name || ""}`.trim() || user.name;
-            user.accountType = backendUser.account_type;
+            user.account_type = backendUser.account_type;
             user.role = backendUser.account_type;
-            user.accessToken = tokens.access_token;
-            user.refreshToken = tokens.refresh_token;
-            user.nextStep = responseData.next_step;
+            user.access_token = tokens.access_token;
+            user.refresh_token = tokens.refresh_token;
+            user.next_step = responseData.next_step;
           }
 
           if (responseData?.next_step === "profile_setup") {
@@ -132,16 +130,16 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.reference = user.reference;
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
+        token.access_token = user.access_token;
+        token.refresh_token = user.refresh_token;
         token.first_name = user.first_name;
         token.last_name = user.last_name;
         token.avatar = user.avatar;
         token.avatar_url = user.avatar_url;
         token.phone = user.phone;
         token.role = user.role;
-        token.accountType = user.accountType;
-        token.nextStep = user.nextStep;
+        token.account_type = user.account_type;
+        token.next_step = user.next_step;
       }
       if (account) {
         token.provider = account.provider;
@@ -165,11 +163,11 @@ export const authOptions: NextAuthOptions = {
         if (session.user?.phone) {
           token.phone = session.user.phone;
         }
-        if (session.accessToken) {
-          token.accessToken = session.accessToken;
+        if (session.access_token) {
+          token.access_token = session.access_token;
         }
-        if (session.refreshToken) {
-          token.refreshToken = session.refreshToken;
+        if (session.refresh_token) {
+          token.refresh_token = session.refresh_token;
         }
       }
       return token;
@@ -178,9 +176,9 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.reference = token.reference as string;
-        session.accessToken = token.accessToken as string;
-        session.refreshToken = token.refreshToken as string;
-        session.nextStep = token.nextStep as string | null;
+        session.access_token = token.access_token as string;
+        session.refresh_token = token.refresh_token as string;
+        session.next_step = token.next_step as string | null;
         session.user.first_name = token.first_name as string;
         session.user.last_name = token.last_name as string;
         session.user.avatar = token.avatar as string;
@@ -188,19 +186,19 @@ export const authOptions: NextAuthOptions = {
         session.user.phone = token.phone as string;
 
         session.user.role = token.role as string;
-        session.user.accountType = token.accountType as string;
+        session.user.account_type = token.account_type as string;
       }
       return session;
     },
   },
   events: {
     async signOut({ token }) {
-      if (token?.accessToken) {
+      if (token?.access_token) {
         try {
           await fetch(`${BACKEND_API_URL}${API_ROUTES.AUTH.LOGOUT}`, {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${token.accessToken}`,
+              Authorization: `Bearer ${token.access_token}`,
               "Content-Type": "application/json",
             },
           });
