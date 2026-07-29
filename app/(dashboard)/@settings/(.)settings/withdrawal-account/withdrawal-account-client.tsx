@@ -1,39 +1,119 @@
 "use client";
 
 import * as React from "react";
+import { Suspense, use } from "react";
 import { Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/Input";
 import { ArrowRight, ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 
 interface WithdrawalAccountClientProps {
   accountExists: boolean;
 }
 
-const BANKS = [
-  {
-    id: "moniepoint",
-    name: "Moniepoint",
-    fullName: "Moniepoint Microfinance Bank",
-    image: "/images/avatar.png",
-  },
-  { id: "access", name: "Access Bank", fullName: "Access Bank Plc", image: "/images/avatar.png" },
-  { id: "gtco", name: "GTCO", fullName: "Guaranty Trust Bank", image: "/images/avatar.png" },
-  {
-    id: "polaris",
-    name: "Polaris Bank",
-    fullName: "Polaris Bank Nigeria",
-    image: "/images/avatar.png",
-  },
-  { id: "uba", name: "UBA", fullName: "United Bank of Africa", image: "/images/avatar.png" },
-  { id: "union", name: "Union Bank", fullName: "Union Bank Nigeria", image: "/images/avatar.png" },
-];
+async function fetchBanks(): Promise<Bank[]> {
+  try {
+    const { banks } = await api.get<{ banks: Bank[] }>(API_ROUTES.META.BANKS);
+    return banks;
+  } catch (error) {
+    console.error("Failed to fetch banks:", error);
+    return [];
+  }
+}
+
+function BankSkeletonList() {
+  return (
+    <div className="max-h-75 overflow-y-auto pr-1 flex flex-col gap-1 scrollbar-none">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between p-3 rounded-xl w-full animate-pulse"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-full bg-black/10 shrink-0" />
+            <div className="flex flex-col gap-1.5">
+              <div className="w-32 h-4 rounded bg-black/10" />
+              <div className="w-20 h-3 rounded bg-black/10" />
+            </div>
+          </div>
+          <div className="w-4 h-4 rounded bg-black/10 opacity-60" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BankList({
+  banksPromise,
+  searchQuery,
+  onSelectBank,
+}: {
+  banksPromise: Promise<Bank[]>;
+  searchQuery: string;
+  onSelectBank: (bank: Bank) => void;
+}) {
+  const banks = use(banksPromise);
+
+  const filteredBanks = React.useMemo(() => {
+    if (!banks || !Array.isArray(banks)) return [];
+    return banks.filter(
+      (bank) =>
+        bank.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        bank.slug?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        bank.code?.includes(searchQuery),
+    );
+  }, [banks, searchQuery]);
+
+  return (
+    <div className="max-h-75 overflow-y-auto pr-1 flex flex-col gap-1 scrollbar-none">
+      {filteredBanks.map((bank) => (
+        <button
+          key={bank.code || bank.slug || bank.name}
+          onClick={() => onSelectBank(bank)}
+          type="button"
+          className="flex items-center justify-between p-3 rounded-xl hover:bg-black/3 transition-all text-left w-full group cursor-pointer"
+        >
+          <div className="flex items-center gap-3.5">
+            <Image
+              src={(bank as { image?: string }).image || "/images/avatar.png"}
+              alt={bank.name}
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full object-cover border border-black/5"
+            />
+            <div>
+              <h4 className="text-sm font-semibold text-default group-hover:text-brand-orange transition-colors">
+                {bank.name}
+              </h4>
+              <p className="text-xs text-default-tertiary">
+                {(bank as { fullName?: string }).fullName || bank.slug || bank.currency}
+              </p>
+            </div>
+          </div>
+          <ChevronRight
+            size={16}
+            className="text-default-tertiary opacity-60 group-hover:opacity-100 transition-opacity"
+          />
+        </button>
+      ))}
+      {filteredBanks.length === 0 && (
+        <div className="py-8 text-center text-sm text-default-tertiary">
+          No banks found matching &quot;{searchQuery}&quot;
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function WithdrawalAccountClient({ accountExists }: WithdrawalAccountClientProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [modalStep, setModalStep] = React.useState<"select-bank" | "bank-details">("select-bank");
-  const [selectedBank, setSelectedBank] = React.useState<(typeof BANKS)[0] | null>(null);
+  const [selectedBank, setSelectedBank] = React.useState<Bank | null>(null);
+
+  const banksPromise = React.useMemo(() => fetchBanks(), []);
 
   // Form Fields
   const [accountNumber, setAccountNumber] = React.useState("");
@@ -72,7 +152,7 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
     setIsModalOpen(true);
   };
 
-  const handleSelectBank = (bank: (typeof BANKS)[0]) => {
+  const handleSelectBank = (bank: Bank) => {
     setSelectedBank(bank);
     setModalStep("bank-details");
   };
@@ -84,12 +164,6 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
     // Only closes the modal, backend revalidation/actions handles data updates
     setIsModalOpen(false);
   };
-
-  const filteredBanks = BANKS.filter(
-    (bank) =>
-      bank.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bank.fullName.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
 
   return (
     <>
@@ -151,48 +225,20 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
                 </div>
 
                 {/* Bank List */}
-                <div className="max-h-75 overflow-y-auto pr-1 flex flex-col gap-1 scrollbar-none">
-                  {filteredBanks.map((bank) => (
-                    <button
-                      key={bank.id}
-                      onClick={() => handleSelectBank(bank)}
-                      type="button"
-                      className="flex items-center justify-between p-3 rounded-xl hover:bg-black/3 transition-all text-left w-full group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <Image
-                          src={bank.image}
-                          alt={bank.name}
-                          width={40}
-                          height={40}
-                          className="w-10 h-10 rounded-full object-cover border border-black/5"
-                        />
-                        <div>
-                          <h4 className="text-sm font-semibold text-default group-hover:text-brand-orange transition-colors">
-                            {bank.name}
-                          </h4>
-                          <p className="text-xs text-default-tertiary">{bank.fullName}</p>
-                        </div>
-                      </div>
-                      <ChevronRight
-                        size={16}
-                        className="text-default-tertiary opacity-60 group-hover:opacity-100 transition-opacity"
-                      />
-                    </button>
-                  ))}
-                  {filteredBanks.length === 0 && (
-                    <div className="py-8 text-center text-sm text-default-tertiary">
-                      No banks found matching &quot;{searchQuery}&quot;
-                    </div>
-                  )}
-                </div>
+                <Suspense fallback={<BankSkeletonList />}>
+                  <BankList
+                    banksPromise={banksPromise}
+                    searchQuery={searchQuery}
+                    onSelectBank={handleSelectBank}
+                  />
+                </Suspense>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5 overflow-y-auto">
                 {/* Selected Bank Preview */}
                 <div className="flex items-center gap-3.5 p-3.5 bg-light-blue rounded-xl">
                   <Image
-                    src={selectedBank?.image || ""}
+                    src={(selectedBank as { image?: string })?.image || "/images/avatar.png"}
                     alt={selectedBank?.name || ""}
                     width={40}
                     height={40}
@@ -200,7 +246,11 @@ export default function WithdrawalAccountClient({ accountExists }: WithdrawalAcc
                   />
                   <div>
                     <h4 className="text-sm font-semibold text-default">{selectedBank?.name}</h4>
-                    <p className="text-xs text-default-tertiary">{selectedBank?.fullName}</p>
+                    <p className="text-xs text-default-tertiary">
+                      {(selectedBank as { fullName?: string })?.fullName ||
+                        selectedBank?.slug ||
+                        selectedBank?.currency}
+                    </p>
                   </div>
                 </div>
 

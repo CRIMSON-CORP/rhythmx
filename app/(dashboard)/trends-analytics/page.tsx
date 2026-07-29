@@ -9,14 +9,16 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
 import Releases from "../discography/releases";
-import { earnings } from "@/data/earnings";
 import { EarningItem } from "../components/earning-item";
 import TimeSorterSelect from "@/components/time-sorter-select";
 import Image from "next/image";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 
 const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
 const dataMax = Math.max(...data);
-function TrendsAnalyticsPage() {
+async function TrendsAnalyticsPage() {
+  const analysis = await api.get<AnalysisOverViewResponse>(API_ROUTES.ANALYTICS.OVERVIEW);
   return (
     <div className="flex flex-col gap-6">
       <div className="container flex flex-wrap items-center justify-between gap-6">
@@ -24,57 +26,63 @@ function TrendsAnalyticsPage() {
           <span>Trends & Analytics</span>
         </h1>
         <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
-          <Dialog>
-            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
-              <CircleCheckBig size={16} />
-              <span>Approved Release (3)</span>
-            </DialogTrigger>
-            <DialogContent
-              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
-              showCloseButton={false}
-            >
-              <VisuallyHidden.Root>
-                <DialogTitle>Approved releases Popup</DialogTitle>
-                <DialogDescription>Approved Releases Popup</DialogDescription>
-              </VisuallyHidden.Root>
-              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#14AE5C] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
-              <Releases title="Approved Release" />
-            </DialogContent>
-          </Dialog>
-          <Dialog>
-            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <CircleCheckBig size={16} />
-              <span>Pending Release (3)</span>
-            </DialogTrigger>
-            <DialogContent
-              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
-              showCloseButton={false}
-            >
-              <VisuallyHidden.Root>
-                <DialogTitle>Pending releases Popup</DialogTitle>
-                <DialogDescription>Pending Releases Popup</DialogDescription>
-              </VisuallyHidden.Root>
-              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
-              <Releases title="Pending Release" type="pending" />
-            </DialogContent>
-          </Dialog>
-          <Dialog>
-            <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
-              <CircleCheckBig size={16} />
-              <span>Rejected Release (3)</span>
-            </DialogTrigger>
-            <DialogContent
-              className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
-              showCloseButton={false}
-            >
-              <VisuallyHidden.Root>
-                <DialogTitle>Rejected releases Popup</DialogTitle>
-                <DialogDescription>Rejected Releases Popup</DialogDescription>
-              </VisuallyHidden.Root>
-              <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#EC221F] -z-10 opacity-25 blur-3xl"></div>
-              <Releases title="Rejected Release" type="rejected" />
-            </DialogContent>
-          </Dialog>
+          {analysis.releases.approved > 0 && (
+            <Dialog>
+              <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2 whitespace-nowrap">
+                <CircleCheckBig size={16} />
+                <span>Approved Release ({analysis.releases.approved})</span>
+              </DialogTrigger>
+              <DialogContent
+                className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
+                showCloseButton={false}
+              >
+                <VisuallyHidden.Root>
+                  <DialogTitle>Approved releases Popup</DialogTitle>
+                  <DialogDescription>Approved Releases Popup</DialogDescription>
+                </VisuallyHidden.Root>
+                <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#14AE5C] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
+                <Releases title="Approved Release" />
+              </DialogContent>
+            </Dialog>
+          )}
+          {analysis.releases.pending > 0 && (
+            <Dialog>
+              <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
+                <CircleCheckBig size={16} />
+                <span>Pending Release ({analysis.releases.pending})</span>
+              </DialogTrigger>
+              <DialogContent
+                className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
+                showCloseButton={false}
+              >
+                <VisuallyHidden.Root>
+                  <DialogTitle>Pending releases Popup</DialogTitle>
+                  <DialogDescription>Pending Releases Popup</DialogDescription>
+                </VisuallyHidden.Root>
+                <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#FFC107] -z-10 opacity-25 blur-3xl"></div>
+                <Releases title="Pending Release" type="pending" />
+              </DialogContent>
+            </Dialog>
+          )}
+          {analysis.releases.rejected > 0 && (
+            <Dialog>
+              <DialogTrigger className="bg-white p-4 rounded-full flex items-center gap-2">
+                <CircleCheckBig size={16} />
+                <span>Rejected Release ({analysis.releases.rejected})</span>
+              </DialogTrigger>
+              <DialogContent
+                className="overflow-hidden rounded-30 isolate gap-0 max-w-204.25"
+                showCloseButton={false}
+              >
+                <VisuallyHidden.Root>
+                  <DialogTitle>Rejected releases Popup</DialogTitle>
+                  <DialogDescription>Rejected Releases Popup</DialogDescription>
+                </VisuallyHidden.Root>
+                <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#FF7247] to-[#EC221F] -z-10 opacity-25 blur-3xl"></div>
+                <Releases title="Rejected Release" type="rejected" />
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
       <section className="flex flex-col gap-8">
@@ -89,7 +97,7 @@ function TrendsAnalyticsPage() {
               <div className="flex flex-col px-6 pb-6 gap-6">
                 <div className="flex flex-col gap-2 py-4 border-b border-b-default/10">
                   <span className="font-heading text-xl font-medium leading-tight">
-                    192,463,897
+                    {analysis.streams.lifetime}
                   </span>
                   <span className="text-default/40 font-medium leading-tight">Streams</span>
                 </div>
@@ -119,7 +127,7 @@ function TrendsAnalyticsPage() {
               <div className="flex flex-col px-6 pb-6 gap-6">
                 <div className="flex flex-col gap-2 py-4 border-b border-b-default/10">
                   <span className="font-heading text-xl font-medium leading-tight">
-                    192,463,897
+                    {analysis.artists.lifetime.toLocaleString()}
                   </span>
                   <span className="text-default/40 font-medium leading-tight">Artists</span>
                 </div>
@@ -153,8 +161,8 @@ function TrendsAnalyticsPage() {
                 </div>
               </header>
               <ul className="divide-y divide-default-default">
-                {earnings.slice(0, 4).map((earning) => (
-                  <EarningItem key={earning.id} {...earning} />
+                {analysis.earnings_history.map((earning, index) => (
+                  <EarningItem key={index} amount={earning.amount} source={earning.platform} />
                 ))}
               </ul>
             </div>
@@ -167,7 +175,7 @@ function TrendsAnalyticsPage() {
               <div className="flex flex-col px-6 pb-6 gap-6">
                 <div className="flex flex-col gap-2 py-4">
                   <span className="font-heading text-xl font-medium leading-tight">
-                    192,463,897
+                    {analysis.releases.total.toLocaleString()}
                   </span>
                   <span className="text-default/40 font-medium leading-tight">Streams</span>
                 </div>
@@ -182,7 +190,10 @@ function TrendsAnalyticsPage() {
               <div className="flex flex-col px-6 pb-6 gap-6">
                 <div className="flex flex-col gap-2 py-4">
                   <span className="font-heading text-xl font-medium leading-tight">
-                    192,463,897
+                    {new Intl.NumberFormat(undefined, {
+                      style: "currency",
+                      currency: analysis.revenue.currency,
+                    }).format(analysis.revenue.total)}
                   </span>
                   <span className="text-default/40 font-medium leading-tight">Streams</span>
                 </div>

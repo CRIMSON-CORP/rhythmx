@@ -1,18 +1,10 @@
 import Icon from "@/components/icon";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 
-const COUNTRIES = [
-  { flag: "🇺🇸", name: "United State" },
-  { flag: "🇬🇧", name: "United kingdom" },
-  { flag: "🇨🇦", name: "Canada" },
-  { flag: "🇳🇫", name: "Norfolk Island" },
-  { flag: "🇳🇺", name: "Niue" },
-  { flag: "🇰🇵", name: "North Korea" },
-  { flag: "🇲🇰", name: "North Makedonia" },
-  { flag: "🇳🇴", name: "Norway" },
-  { flag: "🇴🇲", name: "Oman" },
-];
+export default async function LanguageSettingsPage() {
+  const { timezones } = await api.get<{ timezones: TimeZone[] }>(API_ROUTES.META.TIMEZONES);
 
-export default function LanguageSettingsPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Current Language */}
@@ -51,14 +43,16 @@ export default function LanguageSettingsPage() {
           </div>
         </div>
 
-        {/* Other Countries list */}
+        {/* Timezones list */}
         <div className="bg-white p-5 rounded-2xl flex flex-col gap-5">
-          {COUNTRIES.map((country) => (
-            <div key={country.name} className="flex items-center gap-4">
-              <span className="text-2xl shrink-0">{country.flag}</span>
-              <span className="text-sm font-medium text-default">{country.name}</span>
+          {timezones.map((tz) => (
+            <div key={tz.slug || tz.label} className="flex items-center gap-4">
+              <span className="text-sm font-medium text-default">{tz.label}</span>
             </div>
           ))}
+          {timezones.length === 0 && (
+            <p className="text-sm text-default-tertiary">No timezones available.</p>
+          )}
         </div>
       </div>
     </div>

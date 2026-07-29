@@ -132,3 +132,39 @@ interface Device {
   first_seen_at: string;
   is_current: boolean;
 }
+
+interface EarningHistory {
+  platform: string;
+  amount: number;
+  share: number;
+}
+
+interface Notification {
+  reference: string;
+  title: string;
+  message: string;
+  is_read: boolean;
+  read_at: string | null;
+  created_at: string;
+  image?: string;
+}
+
+interface Country {
+  code: string;
+  name: string;
+  currency: string;
+  dial: string;
+}
+
+interface Bank {
+  code: string;
+  name: string;
+  slug: string;
+  type: string;
+  currency: string;
+}
+
+interface TimeZone {
+  slug: string;
+  label: string;
+}

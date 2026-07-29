@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
+import { goeyToast } from "goey-toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import PhoneInput from "react-phone-number-input";
@@ -66,6 +67,7 @@ function Form(props: FormErrors) {
 
         isDirty.current = false;
         router.refresh();
+        goeyToast.success("Profile Updated!");
       } catch (error: unknown) {
         console.error("[Debounced Profile Update Failed]:", error);
         setErrors(error as FormErrors);
@@ -148,7 +150,7 @@ function Form(props: FormErrors) {
             <SelectItem value="female">Female</SelectItem>
           </SelectContent>
         </Select>
-        {errors.last_name && <p className="text-red-500 text-xs mt-0.5">{errors.last_name}</p>}
+        {errors.gender && <p className="text-red-500 text-xs mt-0.5">{errors.gender}</p>}
       </div>
       <div className="flex flex-col gap-2 col-span-2">
         <label className="text-[11px] font-bold text-default-tertiary uppercase tracking-wider pl-1">
@@ -160,10 +162,11 @@ function Form(props: FormErrors) {
           onChange={(e) => {
             isDirty.current = true;
             setDob(e.target.value);
-            setErrors((prev) => ({ ...prev, dateOfBirth: undefined }));
+            setErrors((prev) => ({ ...prev, dob: "" }));
           }}
           className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-all"
         />
+        {errors.dob && <p className="text-red-500 text-xs mt-0.5">{errors.dob}</p>}
       </div>
     </form>
   );

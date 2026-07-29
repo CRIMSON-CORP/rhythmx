@@ -16,17 +16,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { memo, useState, useEffect } from "react";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 
 const CountrySelect = memo(function CountrySelect() {
   const country = useOnBoardingStore((state) => state.form.country);
   const setForm = useOnBoardingStore((state) => state.setForm);
-  const [countries, setCountries] = useState<{ name: string; code: string }[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
 
   useEffect(() => {
     const fetchCountries = async () => {
-      const res = await fetch("/countries.json");
-      const data = await res.json();
-      setCountries(data);
+      const data = await api.get<{ countries: Country[] }>(API_ROUTES.META.COUNTRIES);
+      setCountries(data.countries);
     };
     fetchCountries();
   }, []);

@@ -31,3 +31,29 @@ interface MeResponse {
     balance: "0.00";
   };
 }
+
+interface AnalysisOverViewResponse {
+  streams: {
+    lifetime: number;
+    range: number;
+  };
+  downloads: {
+    lifetime: number;
+    range: number;
+  };
+  artists: {
+    lifetime: number;
+    range: number;
+  };
+  releases: {
+    total: number;
+    approved: number;
+    rejected: number;
+    pending: number;
+  };
+  revenue: {
+    total: number;
+    currency: string;
+  };
+  earnings_history: EarningHistory[];
+}

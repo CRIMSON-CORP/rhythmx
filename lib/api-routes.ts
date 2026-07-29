@@ -29,4 +29,18 @@ export const API_ROUTES = {
     DEVICE_SIGN_OUT: "/api/me/devices",
     DEVICE_SIGN_OUTS: "/api/me/device-sign-outs",
   },
+  RELEASES: {
+    MY: "/api/releases",
+  },
+  ANALYTICS: {
+    OVERVIEW: "/api/analytics/overview",
+  },
+  NOTFICATIONS: {
+    LIST: "/api/notifications",
+  },
+  META: {
+    COUNTRIES: "/api/meta/countries",
+    BANKS: "/api/meta/banks",
+    TIMEZONES: "/api/meta/timezones",
+  },
 };

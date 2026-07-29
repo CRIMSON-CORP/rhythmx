@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 import * as React from "react";
-import { Dialog as DialogPrimitive } from "radix-ui";
+import { Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";
 import { useRouter } from "next/navigation";
 
 export default function NotificationsPanel({ children }: { children: React.ReactNode }) {
@@ -25,6 +25,9 @@ export default function NotificationsPanel({ children }: { children: React.React
         <DialogPrimitive.Content className="fixed top-4 right-4 bottom-4 z-50 flex w-full max-w-md rounded-20 flex-col gap-6 bg-white shadow-2xl duration-200 outline-none border-l border-default/10 data-open:animate-in data-open:slide-in-from-right data-closed:animate-out data-closed:slide-out-to-right">
           <header className="flex items-center justify-between border-b border-default/5 p-6">
             <DialogPrimitive.Title className="font-medium">Notifications</DialogPrimitive.Title>
+            <VisuallyHidden.Root>
+              <DialogPrimitive.Description>Notifications Popup Content</DialogPrimitive.Description>
+            </VisuallyHidden.Root>
             <DialogPrimitive.Close asChild>
               <button>
                 <X size={24} className="text-default-tertiary" />
