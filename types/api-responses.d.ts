@@ -6,6 +6,7 @@ interface VerifyResponse {
     email: string;
     avatar: string;
     avatar_url: string;
+    phone: string | null;
     account_type: string;
     auth_provider: string;
     status: string;
@@ -21,4 +22,12 @@ interface VerifyResponse {
     expires_in: number;
   };
   next_step: string;
+}
+
+interface MeResponse {
+  user: User;
+  subscription: null;
+  wallet: {
+    balance: "0.00";
+  };
 }

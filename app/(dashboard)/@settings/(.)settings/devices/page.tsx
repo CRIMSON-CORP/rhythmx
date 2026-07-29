@@ -1,41 +1,13 @@
 import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import SignOutAllDevices from "./sign-out-all-devices";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+import { formatDate } from "@/lib/date-formatter";
+import SignOutButton from "./sign-out-button";
 
-const DEVICES = [
-  { name: "MacOS", lastUsed: "Now", location: "Lagos, Nigeria" },
-  { name: "iPhone", lastUsed: "Jan 4, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-  { name: "Windows 11", lastUsed: "Jan 2, 2022", location: "Lagos, Nigeria" },
-];
+export default async function DevicesSettingsPage() {
+  const { devices } = await api.get<{ devices: Array<Device> }>(API_ROUTES.USER.DEVICES);
 
-export default function DevicesSettingsPage() {
   return (
     <div className="flex flex-col gap-6 h-full overflow-auto">
       {/* Log out all devices */}
@@ -47,7 +19,7 @@ export default function DevicesSettingsPage() {
               Log out of all other active sessions on other devices besides this one.
             </p>
           </div>
-          <Button variant="outline">Log out devices</Button>
+          <SignOutAllDevices />
         </div>
       </div>
 
@@ -80,18 +52,16 @@ export default function DevicesSettingsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/3">
-                {DEVICES.map((device, idx) => (
+                {devices.map((device, idx) => (
                   <tr
                     key={idx}
                     className="text-xs text-default font-medium hover:bg-black/1 transition-colors"
                   >
                     <td className="py-4.5 px-6">{device.name}</td>
-                    <td className="py-4.5 px-6 text-grey">{device.lastUsed}</td>
+                    <td className="py-4.5 px-6 text-grey">{formatDate(device.last_login_at)}</td>
                     <td className="py-4.5 px-6 text-grey">{device.location}</td>
                     <td className="py-4.5 px-6 text-right">
-                      <Button variant="outline" size="xs">
-                        Log out
-                      </Button>
+                      <SignOutButton device_id={device.id} />
                     </td>
                   </tr>
                 ))}

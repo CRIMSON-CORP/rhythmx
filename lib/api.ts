@@ -1,4 +1,7 @@
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
+import { API_ROUTES } from "./api-routes";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { goeyToast } from "goey-toast";
 
 const BACKEND_API_URL =
   process.env.NEXT_PUBLIC_BACKEND_API_URL ||
@@ -7,9 +10,18 @@ const BACKEND_API_URL =
 
 type REST_API_VERBS = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
+async function getUserSession() {
+  if (typeof window === "undefined") {
+    const { getServerSession } = await import("next-auth");
+    const { authOptions } = await import("@/app/api/auth/[...nextauth]/route");
+    return await getServerSession(authOptions);
+  }
+  return await getSession();
+}
+
 export const api = {
-  get(url: string) {
-    return this.fetch(url, "GET");
+  get<T>(url: string) {
+    return this.fetch(url, "GET") as Promise<T>;
   },
   post<T>(url: string, payload: Record<string, unknown>) {
     return this.fetch(url, "POST", payload) as Promise<T>;
@@ -23,25 +35,77 @@ export const api = {
   delete<T>(url: string) {
     return this.fetch(url, "DELETE") as Promise<T>;
   },
+
   async fetch(url: string, method: REST_API_VERBS, payload?: Record<string, unknown>) {
-    const session = await getSession();
+    const session = await getUserSession();
+
+    const options: RequestInit = {
+      method,
+      headers: {
+        "content-type": "application/json",
+        ...(session?.accessToken && { Authorization: `Bearer ${session.accessToken}` }),
+      },
+    };
+
+    // Fix: Prevent GET requests from having a body
+    if (payload && method !== "GET") {
+      options.body = JSON.stringify(payload);
+    }
+
     try {
-      const response = await fetch(BACKEND_API_URL + url, {
-        headers: {
-          "content-type": "application/json",
-          ...(session?.accessToken && { Authorization: `Bearer ${session.accessToken}` }),
-        },
-        method,
-        body: JSON.stringify(payload),
-      });
-      const data = await this.processRequest(response);
-      return data;
+      const response = await fetch(BACKEND_API_URL + url, options);
+      // Pass context down so we can retry if needed
+      return await this.processRequest(response, url, options);
     } catch (error) {
+      if (isRedirectError(error)) throw error;
       throw error;
     }
   },
-  async processRequest(response: Response) {
+
+  async processRequest(response: Response, originalUrl: string, originalOptions: RequestInit) {
     if (!response) throw new Error("Network request failed");
+
+    // Handle Token Expiry
+    if (response.status === 401) {
+      const session = await getUserSession();
+
+      const refreshResponse = await fetch(BACKEND_API_URL + API_ROUTES.AUTH.REFRESH, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ refresh_token: session?.refreshToken }),
+      });
+
+      // Refresh failed -> Force Logout
+      if (refreshResponse.status === 401) {
+        if (typeof window !== "undefined") {
+          signOut({ callbackUrl: "/login" });
+        } else {
+          const { redirect } = await import("next/navigation");
+          redirect("/api/auth/logout");
+        }
+        return;
+      }
+
+      const refreshData = await refreshResponse.json();
+
+      // Fix: Retry the original request with the new token
+      if (refreshData?.accessToken) {
+        const retryOptions = {
+          ...originalOptions,
+          headers: {
+            ...originalOptions.headers,
+            Authorization: `Bearer ${refreshData.accessToken}`,
+          },
+        };
+        const retryResponse = await fetch(BACKEND_API_URL + originalUrl, retryOptions);
+        return this.parseAndValidate(retryResponse);
+      }
+    }
+
+    return this.parseAndValidate(response);
+  },
+
+  async parseAndValidate(response: Response) {
     let data;
     try {
       data = await response.json();
@@ -51,9 +115,13 @@ export const api = {
       }
       throw error;
     }
+
     if (!data.status) {
       if (data.errors) throw data.errors;
-      throw new Error(data.message);
+      if (typeof window !== "undefined") {
+        goeyToast.error(data.message);
+        return;
+      }
     }
     return data.data;
   },
@@ -65,8 +133,11 @@ export const api = {
     url: string;
     formData: FormData;
     onUploadProgress?: (uploadProgress: number) => void;
-  }): Promise<string> {
-    const session = await getSession();
+  }): Promise<{
+    message: string;
+    data: Record<string, unknown>;
+  }> {
+    const session = await getUserSession();
     const xhr = new XMLHttpRequest();
 
     if (onUploadProgress) {
@@ -81,7 +152,10 @@ export const api = {
         try {
           const response = JSON.parse(xhr.response);
           if (response.status) {
-            resolve(response.message);
+            resolve({
+              message: response.message,
+              data: response.data,
+            });
           } else {
             reject(new Error(response.message));
           }

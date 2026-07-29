@@ -17,6 +17,10 @@ import {
   Sidebar,
 } from "lucide-react";
 import Icon from "@/components/icon";
+import { goeyToast } from "goey-toast";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+import { signOut } from "next-auth/react";
 
 interface SettingsDialogLayoutProps {
   children: React.ReactNode;
@@ -134,6 +138,21 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
     }
   };
 
+  const requestAccountDelete = async () => {
+    goeyToast("Are you sure you want to delete your account?", {
+      action: {
+        label: "Yes, Delete it",
+        successLabel: "Account deleted successfully",
+        onClick: async () => {
+          await api.post(API_ROUTES.USER.ACCOUNT_DELETION, {});
+          signOut({
+            callbackUrl: "/auth/get-started",
+          });
+        },
+      },
+    });
+  };
+
   return (
     <DialogPrimitive.Root open={open} onOpenChange={handleOpenChange}>
       <DialogPrimitive.Portal>
@@ -216,7 +235,10 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
 
             {/* Bottom Actions - Delete Account */}
             <div className="mt-8 pt-4 border-t border-default/5">
-              <button className="flex items-center gap-3.5 px-4 py-3 w-full rounded-xl transition-all duration-200 text-sm font-medium text-danger-default hover:bg-danger-default/10">
+              <button
+                onClick={requestAccountDelete}
+                className="flex items-center gap-3.5 px-4 py-3 w-full rounded-xl transition-all duration-200 text-sm font-medium text-danger-default hover:bg-danger-default/10"
+              >
                 <Trash2 size={18} />
                 <span>Delete Account</span>
               </button>

@@ -100,3 +100,35 @@ interface Role {
   permissions: PermissionGroup[];
 }
 
+interface User {
+  reference: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar: string;
+  avatar_url: string;
+  account_type: string;
+  auth_provider: string;
+  status: string;
+  locale: string;
+  country: string | null;
+  two_factor_enabled: boolean;
+  created_at: string;
+  phone: string | null;
+  dial_code: string | null;
+  phone_number: string | null;
+  gender: string;
+  dob: string | null;
+  timezone: string | null;
+}
+
+interface Device {
+  id: number;
+  name: string;
+  type: string;
+  location: string;
+  ip: string;
+  last_login_at: string;
+  first_seen_at: string;
+  is_current: boolean;
+}

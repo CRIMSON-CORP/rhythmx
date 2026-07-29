@@ -5,6 +5,7 @@ export const API_ROUTES = {
     VERIFY: "/api/auth/email-verification",
     SOCIAL: "/api/auth/social",
     LOGOUT: "/api/auth/logout",
+    REFRESH: "/api/auth/refresh",
   },
   ONBOARDING: {
     PROFILE: "/api/onboarding/profile",
@@ -17,5 +18,15 @@ export const API_ROUTES = {
     COLLABORATOR_PHOTO: "/api/onboarding/account-type/collaborator/photo",
     LABEL_PHOTO: "/api/onboarding/account-type/label/photo",
     TERMS_AGREEMENT: "/api/onboarding/accept-terms",
+  },
+  USER: {
+    ME: "/api/me",
+    AVATAR: "/api/me/avatar",
+    REGISTER_PUSH_NOTIFICATION_TOKEN: "/api/me/fcm-tokens",
+    NOTIFICTION_PREFERENCES: "/api/me/notification-preferences",
+    ACCOUNT_DELETION: "/api/me/account-deletion",
+    DEVICES: "/api/me/devices",
+    DEVICE_SIGN_OUT: "/api/me/devices",
+    DEVICE_SIGN_OUTS: "/api/me/device-sign-outs",
   },
 };

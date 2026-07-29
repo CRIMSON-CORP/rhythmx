@@ -46,11 +46,13 @@ export const authOptions: NextAuthOptions = {
               first_name: userData.first_name,
               last_name: userData.last_name,
               image: userData.avatar_url,
+              avatar_url: userData.avatar_url,
               avatar: userData.avatar,
               accessToken: tokenData.access_token,
               refreshToken: tokenData.refresh_token,
               firstName: userData.first_name,
               lastName: userData.last_name,
+              phone: userData.phone || "",
               role: userData.account_type,
               accountType: userData.account_type,
               auth_provider: userData.auth_provider,
@@ -98,12 +100,15 @@ export const authOptions: NextAuthOptions = {
           if (backendUser && tokens) {
             user.id = backendUser.reference || user.id;
             user.reference = backendUser.reference;
+            user.email = backendUser.email || user.email;
+            user.first_name = backendUser.first_name;
+            user.last_name = backendUser.last_name;
+            user.image = backendUser.avatar_url;
+            user.avatar = backendUser.avatar;
+            user.avatar_url = backendUser.avatar_url;
+            user.phone = backendUser.phone || "";
             user.name =
               `${backendUser.first_name || ""} ${backendUser.last_name || ""}`.trim() || user.name;
-            user.email = backendUser.email || user.email;
-            user.image = backendUser.avatar_url || user.image;
-            user.firstName = backendUser.first_name;
-            user.lastName = backendUser.last_name;
             user.accountType = backendUser.account_type;
             user.role = backendUser.account_type;
             user.accessToken = tokens.access_token;
@@ -123,20 +128,49 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.reference = user.reference;
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
+        token.first_name = user.first_name;
+        token.last_name = user.last_name;
+        token.avatar = user.avatar;
+        token.avatar_url = user.avatar_url;
+        token.phone = user.phone;
         token.role = user.role;
         token.accountType = user.accountType;
         token.nextStep = user.nextStep;
       }
       if (account) {
         token.provider = account.provider;
+      }
+
+      if (trigger === "update" && session) {
+        console.log(session, "updating session");
+
+        if (session.user?.avatar) {
+          token.avatar = session.user.avatar;
+        }
+        if (session.user?.avatar_url) {
+          token.avatar_url = session.user.avatar_url;
+        }
+        if (session.user?.first_name) {
+          token.first_name = session.user.first_name;
+        }
+        if (session.user?.last_name) {
+          token.last_name = session.user.last_name;
+        }
+        if (session.user?.phone) {
+          token.phone = session.user.phone;
+        }
+        if (session.accessToken) {
+          token.accessToken = session.accessToken;
+        }
+        if (session.refreshToken) {
+          token.refreshToken = session.refreshToken;
+        }
       }
       return token;
     },
@@ -147,8 +181,12 @@ export const authOptions: NextAuthOptions = {
         session.accessToken = token.accessToken as string;
         session.refreshToken = token.refreshToken as string;
         session.nextStep = token.nextStep as string | null;
-        session.user.firstName = token.firstName as string;
-        session.user.lastName = token.lastName as string;
+        session.user.first_name = token.first_name as string;
+        session.user.last_name = token.last_name as string;
+        session.user.avatar = token.avatar as string;
+        session.user.avatar_url = token.avatar_url as string;
+        session.user.phone = token.phone as string;
+
         session.user.role = token.role as string;
         session.user.accountType = token.accountType as string;
       }

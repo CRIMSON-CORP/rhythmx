@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./components/header";
 import GooeyToaster from "./GooeyToaster";
+import SessionUpdateListener from "@/components/SessionUpdateListener";
 
 function DashbaordLayout({
   children,
@@ -18,6 +19,7 @@ function DashbaordLayout({
         <main className="flex flex-col h-full overflow-auto">{children}</main>
       </div>
       <GooeyToaster />
+      <SessionUpdateListener />
       {notifications}
       {settings}
     </>

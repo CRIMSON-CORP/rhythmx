@@ -36,8 +36,13 @@ import {
   Zap,
   Search as SearchIcon,
 } from "lucide-react";
+import { Suspense } from "react";
+import HeaderWalletBalance from "./header-wallet-balance";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 async function Header() {
+  const session = await getServerSession(authOptions);
   return (
     <div className="@container container w-full mx-auto px-4 pt-4 md:pt-10">
       <header className="bg-white px-4 md:px-8 py-3 md:py-6 rounded-full flex items-center justify-between">
@@ -126,7 +131,9 @@ async function Header() {
             href="/wallet"
             className="flex items-center gap-3 bg-brand-orange/10 rounded-full px-2.5 py-2 pl-4 @max-4xl:hidden"
           >
-            <span>$394,000.00</span>
+            <Suspense fallback={<div className="w-20 h-6 rounded bg-black/10 animate-pulse" />}>
+              <HeaderWalletBalance />
+            </Suspense>
             <span className="block p-1.5">
               <Zap size={20} className="text-brand-orange" />
             </span>
@@ -135,13 +142,13 @@ async function Header() {
             <PopoverTrigger className="bg-page-background px-2.5 py-2 rounded-40 flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <Image
-                  src="/images/avatar.png"
+                  src={session?.user?.avatar_url || "/images/avatar.png"}
                   width={32}
                   height={32}
-                  alt="Captain RL"
-                  className="bg-[#C7FFB3] rounded-lg"
+                  alt={`${session?.user?.first_name} ${session?.user?.last_name}`}
+                  className="bg-[#C7FFB3] rounded-lg w-8 h-8"
                 />
-                <span className="@max-3xl:hidden">Captain RL</span>
+                <span className="@max-3xl:hidden">Captain {session?.user?.first_name}</span>
               </div>
               <Ellipsis size={20} className="@max-lg:hidden" />
             </PopoverTrigger>
@@ -152,14 +159,14 @@ async function Header() {
               <Command className="p-0">
                 <div className="flex items-center gap-4 p-4">
                   <Image
-                    src="/images/avatar.png"
+                    src={session?.user?.avatar_url || "/images/avatar.png"}
                     width={32}
                     height={32}
-                    alt="Captain RL"
-                    className="bg-[#C7FFB3] rounded-lg"
+                    alt={`${session?.user?.first_name} ${session?.user?.last_name}`}
+                    className="bg-[#C7FFB3] rounded-lg w-8 h-8"
                   />
                   <div className="flex flex-col leading-tight">
-                    <span className="font-semibold">Captain RL</span>
+                    <span className="font-semibold">Captain {session?.user?.first_name}</span>
                     <span className="text-border-default-secondary text-sm">Admin</span>
                   </div>
                 </div>

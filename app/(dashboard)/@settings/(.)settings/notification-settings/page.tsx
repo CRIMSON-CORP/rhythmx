@@ -1,6 +1,9 @@
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
+import { NotificationSwitchRow } from "./notification-switch-row";
+
+import AllowPushNotifications from "./allow-push-notifications";
 
 export default function NotificationSettingsPage() {
   return (
@@ -20,12 +23,13 @@ export default function NotificationSettingsPage() {
               </span>
               <Switch defaultChecked={true} />
             </div>
-            <div className="flex items-center justify-between gap-4 pt-3">
-              <span className="text-sm text-default font-medium">
-                Email me about my new releases
-              </span>
-              <Switch defaultChecked={true} />
-            </div>
+            <NotificationSwitchRow
+              label="Email me about my new releases"
+              category="new_releases"
+              channel="email"
+              defaultChecked={true}
+              className="pt-3"
+            />
           </div>
         </div>
 
@@ -33,12 +37,12 @@ export default function NotificationSettingsPage() {
         <div className="bg-white p-5 rounded-2xl flex flex-col gap-4">
           <h3 className="text-sm font-bold text-default">News Alerts</h3>
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-sm text-default font-medium">
-                Notify me of important updates and announcements
-              </span>
-              <Switch defaultChecked={false} />
-            </div>
+            <NotificationSwitchRow
+              label="Notify me of important updates and announcements"
+              category="updates_announcements"
+              channel="email"
+              defaultChecked={false}
+            />
             <div className="flex items-center justify-between gap-4 pt-3">
               <span className="text-sm text-default font-medium">
                 Email me about new features and updates
@@ -55,10 +59,7 @@ export default function NotificationSettingsPage() {
             <p className="font-medium">Receive instant push notification directly on your device</p>
           </div>
 
-          <Button variant="outline" rounded={10}>
-            <span>Allow Push Notification</span>
-            <Bell size={24} className="text-default" />
-          </Button>
+          <AllowPushNotifications />
         </div>
       </div>
     </div>
