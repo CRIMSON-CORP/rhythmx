@@ -30,6 +30,7 @@ function ImageUpload({ image }: { image: string }) {
         const response = await api.postFormData({ url: API_ROUTES.USER.AVATAR, formData });
         goeyToast.success("Profile picture updated successfully");
         await update({ user: response.data });
+        // updateTag("user");
         router.refresh();
       } catch (error) {
         console.error(error);

@@ -38,7 +38,7 @@ function LifeTimeStreamsInner() {
           <span className="font-heading text-xl font-medium leading-tight">192,463,897</span>
           <span className="text-default/40 font-medium leading-tight">Streams</span>
           <Link
-            href=""
+            href="/trends-analytics"
             className="text-default/40 font-medium px-9 py-2.5 rounded-full bg-default/5 leading-tight self-start"
           >
             See trends
@@ -66,7 +66,9 @@ function LifeTimeStreamsInner() {
 
 export default function LifeTimeStreams() {
   return (
-    <Suspense fallback={<div className="bg-white rounded-30 basis-91.25 h-[230px] animate-pulse" />}>
+    <Suspense
+      fallback={<div className="bg-white rounded-30 basis-91.25 h-[230px] animate-pulse" />}
+    >
       <LifeTimeStreamsInner />
     </Suspense>
   );

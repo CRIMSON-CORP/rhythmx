@@ -22,7 +22,7 @@ function CompletProfileCard() {
       <div className="flex flex-col gap-1 text-white">
         <h2 className="text-white font-medium leading-tight">Let&apos;s blow things up 💣</h2>
         <p className="text-xs">Start with setting up your account</p>
-        <Link href="/profile" className="flex items-center gap-2 text-xs">
+        <Link href="/settings/account" className="flex items-center gap-2 text-xs">
           <span>Complete Profile</span>
           <ArrowUpRight size={16} className="text-default" />
         </Link>

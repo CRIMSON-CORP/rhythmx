@@ -32,8 +32,8 @@ export const api = {
   put<T>(url: string, payload: Record<string, unknown>) {
     return this.fetch(url, "PUT", payload) as Promise<T>;
   },
-  delete<T>(url: string) {
-    return this.fetch(url, "DELETE") as Promise<T>;
+  delete<T>(url: string, payload?: Record<string, unknown>) {
+    return this.fetch(url, "DELETE", payload) as Promise<T>;
   },
 
   async fetch(url: string, method: REST_API_VERBS, payload?: Record<string, unknown>) {
@@ -46,6 +46,7 @@ export const api = {
         "content-type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
       },
+      ...(typeof window !== "undefined" && { userAgent: window.navigator.userAgent }),
     };
 
     // Fix: Prevent GET requests from having a body

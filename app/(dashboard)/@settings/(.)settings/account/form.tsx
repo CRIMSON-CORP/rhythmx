@@ -66,6 +66,7 @@ function Form(props: FormErrors) {
         });
 
         isDirty.current = false;
+        // updateTag("user");
         router.refresh();
         goeyToast.success("Profile Updated!");
       } catch (error: unknown) {
