@@ -1,10 +1,8 @@
-import ReleaseCards from "@/components/realease-cards";
-import ReleaseCard from "@/components/release-card";
-import { releases } from "@/data/releases";
+import InfiniteReleases from "@/components/infinite-releases";
 import { ArrowUpRight, Disc } from "lucide-react";
 import Link from "next/link";
 
-function MyRelease() {
+function MyRelease({ releases }: { releases: Release[] }) {
   return (
     <section className="flex flex-col gap-8">
       <header className="container flex items-center justify-between gap-3">
@@ -17,21 +15,7 @@ function MyRelease() {
           <ArrowUpRight size={16} />
         </Link>
       </header>
-      <ReleaseCards scrollable>
-        {releases.map((release) => (
-          <ReleaseCard
-            key={release.id}
-            id={release.id}
-            name={release.name}
-            href={release.href}
-            imageSrc={release.imageSrc}
-            sources={release.sources}
-            engagements={release.engagements}
-            title={release.title}
-            type={release.type}
-          />
-        ))}
-      </ReleaseCards>
+      <InfiniteReleases initialReleases={releases} scrollable />
     </section>
   );
 }
