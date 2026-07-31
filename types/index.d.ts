@@ -168,3 +168,148 @@ interface TimeZone {
   slug: string;
   label: string;
 }
+
+type ReleaseType = "single" | "ep" | "album" | "compilation";
+type ReleaseStatus =
+  | "draft"
+  | "pending_review"
+  | "approved"
+  | "rejected"
+  | "distributed"
+  | "on_hold"
+  | "taken_down";
+
+interface Release {
+  /**
+   * @description  the release's ID. Use it for every other call, e.g. /api/releases/{reference}
+   */
+  reference: string;
+  /**
+   * @description the release name
+   */
+  title: string;
+  type: ReleaseType;
+  status: ReleaseStatus;
+  distribution_status: string;
+  /**
+   * @description  full link to the artwork, or null if they haven't uploaded one. Please handle the null.
+   */
+  cover_url: string;
+  /**
+   * @description  text. Sub-genre can be null.
+   */
+  genre: string;
+  /**
+   * @description  text. Sub-genre can be null.
+   */
+  sub_genre: string;
+  is_explicit: boolean;
+  is_fast_track: boolean;
+  /**
+   * @description like 2026-08-14. created_at — when they made it.
+   */
+  release_date: string;
+  created_at: string;
+  artists: Artist[];
+  /**
+   * @description Total number of songs on the release
+   */
+  tracks_total: number;
+  /**
+   * @description how many stores it was sent to (there are 33 to choose from, so 12 means "sent to 12 stores")
+   */
+  platforms_total: number;
+  /**
+   * @description total plays across all its songs, all time. Plays, not money.
+   */
+  total_streams: number;
+  platforms: ReleasePlatform[];
+}
+
+interface ArtistRelease {
+  /**
+   * @description  main or featured
+   */
+  role: "main" | "featured";
+  /**
+   * @description the artist's name
+   */
+  name: string;
+  /**
+   * @description  a number, or null if the name was typed in rather than picked from their roster
+   */
+  artist_id: number | null;
+  /**
+   * @description  the artist's spotify url
+   */
+  spotify_url: string | null;
+  /**
+   * @description  the artist's apple music url
+   */
+  apple_music_url: string | null;
+  /**
+   * @description  use image_url for the artist photo
+   */
+  image_url: string | null;
+}
+
+interface ReleasePlatform {
+  platform_id: string;
+  name: string;
+  logo_url: string;
+  status: "live" | "sent" | "pending";
+}
+
+interface NotificationPreferences {
+  unusual_activity: boolean;
+  new_releases: boolean;
+  updates_announcements: boolean;
+  new_features: boolean;
+}
+
+interface ReleaseDetail {
+  reference: string;
+  title: string;
+  type: ReleaseType;
+  status: ReleaseStatus;
+  distribution_status: string;
+  cover_url: string;
+  genre: string;
+  sub_genre: string;
+  is_explicit: boolean;
+  is_fast_track: boolean;
+  release_date: string;
+  created_at: string;
+  version: string;
+  language: string;
+  upc: string;
+  release_time: string;
+  original_release_date: string;
+  copyright_year: string;
+  copyright_holder: string;
+  updated_at: string;
+  artists: Artist[];
+  tracks: Track[];
+  platforms: ReleasePlatform[];
+  links: [];
+  status_log: [];
+}
+
+interface RoyaltySplit {
+  split_type: "owner" | "collaborator";
+  amount: number;
+  email: string | null;
+  recipient_name: string | null;
+}
+
+interface Track {
+  reference: string;
+  order: number;
+  title: string;
+  duration: number | null;
+  isrc: string | null;
+  version: string | null;
+  is_explicit: boolean;
+  audio_url: string;
+  royalty_splits: RoyaltySplit[];
+}

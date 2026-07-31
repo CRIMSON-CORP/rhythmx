@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface InfiniteReleasesProps {
-  initialReleases?: ReleaseCardProps[];
+  initialReleases?: Release[];
   scrollable?: boolean;
   pageSize?: number;
 }
@@ -18,7 +18,7 @@ export default function InfiniteReleases({
   scrollable = false,
   pageSize = 10,
 }: InfiniteReleasesProps) {
-  const [releases, setReleases] = useState<ReleaseCardProps[]>(initialReleases);
+  const [releases, setReleases] = useState<Release[]>(initialReleases);
   const [page, setPage] = useState<number>(initialReleases.length > 0 ? 2 : 1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -29,10 +29,10 @@ export default function InfiniteReleases({
     if (isLoading || !hasMore) return;
     setIsLoading(true);
     try {
-      const response = await api.get<ReleaseCardProps[]>(
+      const response = await api.get<{ releases: Release[] }>(
         `${API_ROUTES.RELEASES.MY}?page=${page}&size=${pageSize}`,
       );
-      const items = Array.isArray(response) ? response : [];
+      const items = Array.isArray(response.releases) ? response.releases : [];
 
       if (items.length < pageSize) {
         setHasMore(false);
@@ -81,17 +81,7 @@ export default function InfiniteReleases({
   return (
     <ReleaseCards scrollable={scrollable}>
       {releases.map((release) => (
-        <ReleaseCard
-          key={release.id}
-          id={release.id}
-          name={release.name}
-          href={release.href}
-          imageSrc={release.imageSrc}
-          sources={release.sources}
-          engagements={release.engagements}
-          title={release.title}
-          type={release.type}
-        />
+        <ReleaseCard key={release.reference} {...release} />
       ))}
       {hasMore && (
         <div
