@@ -21,9 +21,10 @@ export const API_ROUTES = {
   },
   USER: {
     ME: "/api/me",
+    LOCALE: "/api/me/locale",
     AVATAR: "/api/me/avatar",
-    REGISTER_PUSH_NOTIFICATION_TOKEN: "/api/me/fcm-tokens",
-    NOTIFICTION_PREFERENCES: "/api/me/notification-preferences",
+    PUSH_NOTIFICATION_TOKEN: "/api/me/fcm-tokens",
+    NOTIFICATION_PREFERENCES: "/api/me/notification-preferences",
     ACCOUNT_DELETION: "/api/me/account-deletion",
     DEVICES: "/api/me/devices",
     DEVICE_SIGN_OUT: "/api/me/devices",

@@ -1,11 +1,15 @@
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
-import { NotificationSwitchRow } from "./notification-switch-row";
-
 import AllowPushNotifications from "./allow-push-notifications";
+import { API_ROUTES } from "@/lib/api-routes";
+import { api } from "@/lib/api";
+import { Switch } from "@/components/ui/switch";
+import { toggleNotificationPreference } from "./actions";
 
-export default function NotificationSettingsPage() {
+export default async function NotificationSettingsPage() {
+  const { preferences, push_enabled } = await api.get<{
+    preferences: NotificationPreferences;
+    push_enabled: boolean;
+  }>(API_ROUTES.USER.NOTIFICATION_PREFERENCES);
+
   return (
     <div className="flex flex-col">
       <p className="text-grey font-medium p-4 md:p-6">
@@ -17,19 +21,54 @@ export default function NotificationSettingsPage() {
         <div className="bg-white p-5 rounded-2xl flex flex-col gap-4">
           <h3 className="text-sm font-bold text-default">Email Alerts</h3>
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-4 pt-3">
               <span className="text-sm text-default font-medium">
                 Email me whenever encounter unusual activity
               </span>
-              <Switch defaultChecked={true} />
+              <form
+                action={toggleNotificationPreference.bind(
+                  null,
+                  "unusual_activity",
+                  !preferences?.unusual_activity,
+                )}
+              >
+                <div className="relative cursor-pointer flex items-center">
+                  <Switch
+                    checked={Boolean(preferences?.unusual_activity)}
+                    className="pointer-events-none"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute inset-0 cursor-pointer opacity-0"
+                    aria-label="Email me whenever encounter unusual activity"
+                  />
+                </div>
+              </form>
             </div>
-            <NotificationSwitchRow
-              label="Email me about my new releases"
-              category="new_releases"
-              channel="email"
-              defaultChecked={true}
-              className="pt-3"
-            />
+            <div className="flex items-center justify-between gap-4 pt-3">
+              <span className="text-sm text-default font-medium">
+                Email me about my new releases
+              </span>
+              <form
+                action={toggleNotificationPreference.bind(
+                  null,
+                  "new_releases",
+                  !preferences?.new_releases,
+                )}
+              >
+                <div className="relative cursor-pointer flex items-center">
+                  <Switch
+                    checked={Boolean(preferences?.new_releases)}
+                    className="pointer-events-none"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute inset-0 cursor-pointer opacity-0"
+                    aria-label="Email me about my new releases"
+                  />
+                </div>
+              </form>
+            </div>
           </div>
         </div>
 
@@ -37,17 +76,53 @@ export default function NotificationSettingsPage() {
         <div className="bg-white p-5 rounded-2xl flex flex-col gap-4">
           <h3 className="text-sm font-bold text-default">News Alerts</h3>
           <div className="flex flex-col gap-3">
-            <NotificationSwitchRow
-              label="Notify me of important updates and announcements"
-              category="updates_announcements"
-              channel="email"
-              defaultChecked={false}
-            />
-            <div className="flex items-center justify-between gap-4 pt-3">
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-sm text-default font-medium">
+                Notify me of important updates and announcements
+              </span>
+              <form
+                action={toggleNotificationPreference.bind(
+                  null,
+                  "updates_announcements",
+                  !preferences?.updates_announcements,
+                )}
+              >
+                <div className="relative cursor-pointer flex items-center">
+                  <Switch
+                    checked={Boolean(preferences?.updates_announcements)}
+                    className="pointer-events-none"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute inset-0 cursor-pointer opacity-0"
+                    aria-label="Notify me of important updates and announcements"
+                  />
+                </div>
+              </form>
+            </div>
+            <div className="flex items-center justify-between gap-4">
               <span className="text-sm text-default font-medium">
                 Email me about new features and updates
               </span>
-              <Switch defaultChecked={true} />
+              <form
+                action={toggleNotificationPreference.bind(
+                  null,
+                  "new_features",
+                  !preferences?.new_features,
+                )}
+              >
+                <div className="relative cursor-pointer flex items-center">
+                  <Switch
+                    checked={Boolean(preferences?.new_features)}
+                    className="pointer-events-none"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute inset-0 cursor-pointer opacity-0"
+                    aria-label="Email me about new features and updates"
+                  />
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -59,7 +134,7 @@ export default function NotificationSettingsPage() {
             <p className="font-medium">Receive instant push notification directly on your device</p>
           </div>
 
-          <AllowPushNotifications />
+          <AllowPushNotifications pushNotificationSubscribed={push_enabled} />
         </div>
       </div>
     </div>

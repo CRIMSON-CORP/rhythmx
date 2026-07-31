@@ -3,7 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
+import { goeyToast } from "goey-toast";
 import { Bell, BellOff, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 const firebaseConfig = {
@@ -16,14 +18,15 @@ const firebaseConfig = {
   measurementId: "G-8T1EQ2LP65",
 };
 
-function AllowPushNotifications() {
-  const [isSubscribed, setIsSubscribed] = useState(() => {
-    if (typeof window !== "undefined" && "Notification" in window) {
-      return Notification.permission === "granted";
-    }
-    return false;
-  });
+function AllowPushNotifications({
+  pushNotificationSubscribed,
+}: {
+  pushNotificationSubscribed: boolean;
+}) {
+  const [isSubscribed, setIsSubscribed] = useState(pushNotificationSubscribed);
   const [isPending, startTransition] = useTransition();
+
+  const router = useRouter();
 
   const getFirebaseMessaging = async () => {
     const { initializeApp } = await import("@firebase/app");
@@ -45,7 +48,8 @@ function AllowPushNotifications() {
           try {
             currentToken = await getToken(messaging);
           } catch (e) {
-            console.warn("Could not retrieve current FCM token for deletion:", e);
+            console.log(e);
+            goeyToast.error("Could not retrieve current FCM token for deletion:");
           }
 
           if (currentToken) {
@@ -56,32 +60,31 @@ function AllowPushNotifications() {
             }
 
             // Call API delete endpoint with token
-            await api.delete(
-              `${API_ROUTES.USER.REGISTER_PUSH_NOTIFICATION_TOKEN}?token=${encodeURIComponent(currentToken)}`,
-            );
+            await api.delete(`${API_ROUTES.USER.PUSH_NOTIFICATION_TOKEN}`, {
+              token: encodeURIComponent(currentToken),
+            });
           } else {
-            await api.delete(API_ROUTES.USER.REGISTER_PUSH_NOTIFICATION_TOKEN);
+            await api.delete(API_ROUTES.USER.PUSH_NOTIFICATION_TOKEN);
           }
 
+          router.refresh();
           setIsSubscribed(false);
         } else {
           // ALLOW / SUBSCRIBE FLOW
           if (!("Notification" in window)) {
-            alert("Notification API is not supported in this browser.");
+            goeyToast.error("Notification API is not supported in this browser.");
             return;
           }
 
           const permission = await Notification.requestPermission();
           if (permission !== "granted") {
-            alert("Notification permission was denied.");
+            goeyToast.error("Notification permission was denied.");
             setIsSubscribed(false);
             return;
           }
 
           if ("serviceWorker" in navigator) {
-            await navigator.serviceWorker
-              .register("/service/firebase-messaging-sw.js")
-              .catch(() => {});
+            await navigator.serviceWorker.register("/firebase-messaging-sw.js").catch(() => {});
           }
 
           let currentToken: string | undefined;
@@ -92,12 +95,12 @@ function AllowPushNotifications() {
           }
 
           if (currentToken) {
-            await api.post(API_ROUTES.USER.REGISTER_PUSH_NOTIFICATION_TOKEN, {
+            await api.post(API_ROUTES.USER.PUSH_NOTIFICATION_TOKEN, {
               token: currentToken,
             });
+            router.refresh();
+            setIsSubscribed(true);
           }
-
-          setIsSubscribed(true);
         }
       } catch (error) {
         console.error("[Push Notification Toggle Error]:", error);
