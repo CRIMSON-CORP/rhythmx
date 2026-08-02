@@ -2,6 +2,7 @@ import { getSession, signOut } from "next-auth/react";
 import { API_ROUTES } from "./api-routes";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { goeyToast } from "goey-toast";
+import { CONSTANTS } from "./constants";
 
 const BACKEND_API_URL =
   process.env.NEXT_PUBLIC_BACKEND_API_URL ||
@@ -134,8 +135,8 @@ export const api = {
     if (!data.status) {
       if (data.errors) throw data.errors;
       if (typeof window !== "undefined") {
-        goeyToast.error(data.message);
-        return;
+        goeyToast.error(data.message, { id: CONSTANTS.GLOBAL_ERROR_TOAST_ID });
+        throw new Error(data.message);
       }
     }
     return data.data;

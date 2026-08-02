@@ -57,3 +57,11 @@ interface AnalysisOverViewResponse {
   };
   earnings_history: EarningHistory[];
 }
+
+interface EarningsResponse {
+  reference: string;
+  currency: string;
+  total_earnings: number;
+  total_streams: number;
+  earnings: Earning[];
+}

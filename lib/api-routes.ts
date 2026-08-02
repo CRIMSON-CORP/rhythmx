@@ -33,6 +33,8 @@ export const API_ROUTES = {
   RELEASES: {
     MY: "/api/releases",
     TAKEDOWN: (reference: string) => `/api/releases/${reference}/takedown`,
+    EARNINGS: (reference: string) => `/api/releases/${reference}/earnings`,
+    DRAFT: (reference: string) => `/api/releases/draft/${reference}`,
   },
   ANALYTICS: {
     OVERVIEW: "/api/analytics/overview",

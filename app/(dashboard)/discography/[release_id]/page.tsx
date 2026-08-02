@@ -2,17 +2,19 @@ import Icon from "@/components/icon";
 import { formatCount } from "@/lib/count-formatter";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowUp, Edit, Music, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowUp, DollarSign, Edit, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import DeleteRelease from "./delete-release";
+import PlayTrack from "./play-track";
 
 async function Release({ params }: { params: Promise<{ release_id: string }> }) {
   const { release_id } = await params;
-  const { release } = await api.get<{ release: ReleaseDetail }>(
-    `${API_ROUTES.RELEASES.MY}/${release_id}`,
-  );
+  const [{ release }, earnings] = await Promise.all([
+    api.get<{ release: ReleaseDetail }>(`${API_ROUTES.RELEASES.MY}/${release_id}`),
+    api.get<EarningsResponse>(`${API_ROUTES.RELEASES.EARNINGS(release_id)}`),
+  ]);
 
   return (
     <div className="flex flex-col gap-8 container pb-6">
@@ -32,7 +34,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
           </div>
           <div className="bg-white flex items-center gap-2.5 px-5 py-4 rounded-full font-medium">
             <span className="text-sm text-border-default-secondary">All Platform plays</span>
-            <span className="font-semibold">{formatCount(10203)}</span>
+            <span className="font-semibold">{formatCount(release.all_platform_plays)}</span>
             <ArrowUp size={32} className="text-positive-tertiary" />
           </div>
         </div>
@@ -62,14 +64,15 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
             </div>
             <div className="flex flex-col gap-3">
               <h2 className="font-heading text-2xl font-semibold">{release.title}</h2>
-              <p className="text-border-default-secondary leading-relaxed font-medium">
+              {/* TODO: To add description when backend is redy to provide it */}
+              {/* <p className="text-border-default-secondary leading-relaxed font-medium">
                 &quot;You have to be really open, I think,&quot; Mabel tells Apple Music about the
                 personal nature of her songwriting. &quot;All the songs people really relate to,
                 that&apos;s because you&apos;re being human and saying, &apos;Look-this is the real!
                 &quot; Born in 1996 in Spain, Mabel Alabama-Pearl McVey-daughter of Swedish artist
                 Neneh Cherry and English producer Cameron McVey-has a knack for taking the intimate
                 and relatable and turning it into spectacular, pumped-up{" "}
-              </p>
+              </p> */}
             </div>
           </div>
           <div className="flex flex-col gap-4 border-t border-default-default pt-4">
@@ -108,7 +111,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
                   <div className="size-10.5 bg-brand-purple/12 rounded-full flex items-center justify-center flex-none">
                     <Icon name="music" size={26.25} className="text-brand-purple" />
                   </div>
-                  <div className="flex flex-col break-all">
+                  <div className="flex flex-col grow break-all">
                     <span className="font-medium break-after-all">{track.title}</span>
                     <span className="text-[11px] text-border-default-secondary">
                       {track.is_uploaded ? "Uploaded" : "Not Uploaded"}
@@ -120,13 +123,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
                   >
                     Edit Track
                   </Link>
-                  <button className="rounded-full group/btn cursor-pointer">
-                    <Icon
-                      name="play"
-                      size={16}
-                      className="text-brand-orange group-hover/btn:scale-110 transition-transform"
-                    />
-                  </button>
+                  <PlayTrack source={track.audio_url} />
                 </li>
               ))}
             </ul>
@@ -139,25 +136,28 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
             <h2 className="font-medium text-border-default-secondary">Earnings History</h2>
             <div className="flex items-center gap-1">
               <span className="text-sm text-border-default-secondary">Total Earnings</span>
-              <span className="font-medium">$2,384.00</span>
+              <span className="font-medium">
+                {earnings.currency}
+                {earnings.total_earnings}
+              </span>
               <Icon name="arrow-up" size={16} className="text-positive-tertiary" />
             </div>
           </header>
           <div className="grow relative overflow-auto pr-2">
             <ul className="flex flex-col gap-4 overflow-auto absolute inset-0">
-              {DUMMY_EARNINGS.map((earning, index) => (
+              {earnings.earnings.map((earning, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between gap-4 p-4 rounded-xl hover:bg-page-background/50 transition-colors"
                 >
                   <div className="size-8 bg-brand-purple/12 rounded-full flex items-center justify-center text-brand-purple flex-none">
-                    <Icon name="dollar" size={20} />
+                    <DollarSign size={20} />
                   </div>
                   <div className="flex flex-col grow gap-0.5">
                     <span className="text-sm font-medium text-default truncate">
                       {earning.platform}
                     </span>
-                    <span className="text-xs text-grey">{earning.detail}</span>
+                    <span className="text-xs text-grey">{earning.track}</span>
                   </div>
                   <div className="flex items-center gap-1 font-medium text-sm">
                     <Icon name="arrow-up" size={12} className="text-positive-tertiary rotate-180" />

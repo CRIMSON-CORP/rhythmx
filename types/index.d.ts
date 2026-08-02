@@ -179,6 +179,14 @@ type ReleaseStatus =
   | "on_hold"
   | "taken_down";
 
+type DistributionStatus =
+  | "not_sent"
+  | "processing"
+  | "live"
+  | "failed"
+  | "takedown_requested"
+  | "takedown_completed";
+
 interface Release {
   /**
    * @description  the release's ID. Use it for every other call, e.g. /api/releases/{reference}
@@ -190,7 +198,7 @@ interface Release {
   title: string;
   type: ReleaseType;
   status: ReleaseStatus;
-  distribution_status: string;
+  distribution_status: DistributionStatus;
   /**
    * @description  full link to the artwork, or null if they haven't uploaded one. Please handle the null.
    */
@@ -257,7 +265,7 @@ interface ReleasePlatform {
   platform_id: string;
   name: string;
   logo_url: string;
-  status: "live" | "sent" | "pending";
+  status: "live" | "sent" | "pending" | "failed";
 }
 
 interface NotificationPreferences {
@@ -288,6 +296,7 @@ interface ReleaseDetail {
   copyright_year: string;
   copyright_holder: string;
   updated_at: string;
+  all_platform_plays: number;
   artists: Artist[];
   tracks: Track[];
   platforms: ReleasePlatform[];
@@ -312,4 +321,12 @@ interface Track {
   is_explicit: boolean;
   audio_url: string;
   royalty_splits: RoyaltySplit[];
+}
+
+interface Earning {
+  platform: string;
+  icon: string;
+  type: string;
+  track: string;
+  amount: number;
 }
