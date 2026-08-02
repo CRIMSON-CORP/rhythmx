@@ -6,19 +6,7 @@ import { ArrowLeft, ArrowUp, Edit, Music, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
-
-const DUMMY_EARNINGS = [
-  { platform: "Apple Music", detail: "Single: Sugar", amount: "+ $0.32" },
-  { platform: "Spotify", detail: "Album: Waves", amount: "+ $0.45" },
-  { platform: "Amazon Music", detail: "EP: Echoes", amount: "+ $0.29" },
-  { platform: "Tidal", detail: "Playlist: Vibes", amount: "+ $0.50" },
-  { platform: "YouTube Music", detail: "Single: Dreams", amount: "+ $0.35" },
-  { platform: "Deezer", detail: "Album: Journeys", amount: "+ $0.40" },
-  { platform: "SoundCloud", detail: "Mixtape: Beats", amount: "+ $0.20" },
-  { platform: "Pandora", detail: "Station: Chill Vibes", amount: "+ $0.55" },
-  { platform: "iHeartRadio", detail: "Show: Morning Mix", amount: "+ $0.30" },
-  { platform: "Tidal", detail: "Album: New Horizon", amount: "+ $0.60" },
-];
+import DeleteRelease from "./delete-release";
 
 async function Release({ params }: { params: Promise<{ release_id: string }> }) {
   const { release_id } = await params;
@@ -53,10 +41,7 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
             <Edit size={16} />
             <span>Edit Release</span>
           </Button>
-          <Button variant="white">
-            <Trash2 size={16} />
-            <span>Delete Release</span>
-          </Button>
+          <DeleteRelease release_id={release.reference} release_status={release.status} />
         </div>
       </header>
 
