@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Icon from "./icon";
 import { formatCount } from "@/lib/count-formatter";
 import Link from "next/link";
+import { Eye, Play } from "lucide-react";
 
 function ReleaseCard({
   reference,
@@ -16,14 +16,14 @@ function ReleaseCard({
   return (
     <Link
       href={`/discography/${reference}`}
-      className="w-full aspect-square rounded-30 overflow-hidden relative flex flex-col justify-between gap-5 text-white isolate snap-center"
+      className="w-full aspect-square rounded-30 overflow-hidden relative flex flex-col justify-between gap-5 text-white isolate snap-center bg-black/5"
     >
       {cover_url && (
         <Image src={cover_url} alt={title} fill className="-z-10 object-cover" loading="lazy" />
       )}
       <header className="flex justify-end p-4">
         <div className="flex items-center gap-0.5 px-2.5 py-1 rounded-full bg-[#F2F2F7]/10 backdrop-blur-lg">
-          <Icon name={type === "album" ? "play" : "eye"} size={16} />
+          {type === "album" ? <Play size={16} /> : <Eye size={16} />}
           <span className="font-heading text-xs font-medium">{formatCount(total_streams)}</span>
         </div>
       </header>
