@@ -37,7 +37,8 @@ function Page() {
       }
 
       if (res.ok) {
-        window.location.href = "/";
+        const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl") || "/";
+        window.location.href = callbackUrl || "/";
       } else if (res.error) {
         if (res.status === 401) {
           setErrors({ form: "Invalid email or Password" });
