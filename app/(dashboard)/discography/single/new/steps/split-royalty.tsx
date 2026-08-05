@@ -136,7 +136,7 @@ function SplitRoyalty() {
             <tbody>
               <tr>
                 <td className="py-3.5 text-xs text-border-default-secondary">Release Title</td>
-                <td className="py-3.5 text-sm font-medium text-default">{form.release_title}</td>
+                <td className="py-3.5 text-sm font-medium text-default">{form.title}</td>
               </tr>
               <tr>
                 <td className="py-3.5 text-xs text-border-default-secondary">Artist Name</td>
@@ -147,7 +147,7 @@ function SplitRoyalty() {
               <tr>
                 <td className="py-3.5 text-xs text-border-default-secondary">Genre</td>
                 <td className="py-3.5 text-sm font-medium text-default">
-                  {form.primary_genre} {form.secondary_genre}
+                  {form.genre} {form.sub_genre}
                 </td>
               </tr>
             </tbody>

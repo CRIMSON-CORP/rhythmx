@@ -5,22 +5,26 @@ import ReleaseDetalsPage from "@/app/(dashboard)/discography/single/new/steps/re
 import ReleaseSummary from "@/app/(dashboard)/discography/single/new/steps/release-summary";
 import ReleaseTracks from "@/app/(dashboard)/discography/single/new/steps/release-tracks";
 import SplitRoyalty from "@/app/(dashboard)/discography/single/new/steps/split-royalty";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+import { goeyToast } from "goey-toast";
 import { AlignLeft, Calendar, Disc, DollarSign, Info, Layers, Star } from "lucide-react";
 import { create } from "zustand";
 
 export interface ReleaseDetailsForm {
-  release_title: string;
+  title: string;
   release_description: string;
-  primary_genre: string;
-  secondary_genre: string;
-  version_title: string;
+  type: string;
+  genre: string;
+  sub_genre: string;
+  version: string;
   producers: string;
   record_label: string;
   copyright_holder: string;
   production_copyright_year: string;
   copyright_year: string;
   language: string;
-  barcode: string;
+  upc: string;
   original_release_date: string;
   artwork: File | null;
   main_artists: Artist[];
@@ -40,9 +44,15 @@ interface NewReleaseStoreProps {
   form: ReleaseDetailsForm;
   setForm: (form: Partial<ReleaseDetailsForm>) => void;
 
+  isLoading: boolean;
+  release_id: string;
+
   next: () => void;
   previous: () => void;
   setStep: (step: number) => void;
+
+  sendDraftRelease: (release_id?: string) => Promise<void>;
+  getReleaseDataFromState: () => Record<string, string>;
 }
 
 export const newReleaseStoreTitles = [
@@ -98,21 +108,24 @@ export const newReleaseStoreTitles = [
   },
 ];
 
-const useNewReleaseStore = create<NewReleaseStoreProps>((set) => ({
+const useNewReleaseStore = create<NewReleaseStoreProps>((set, get) => ({
   currentStep: 0,
+  isLoading: false,
+  release_id: "",
   form: {
-    release_title: "",
+    title: "",
     release_description: "",
-    primary_genre: "",
-    secondary_genre: "",
-    version_title: "Original Version",
+    type: "",
+    genre: "",
+    sub_genre: "",
+    version: "",
     producers: "",
     record_label: "",
     copyright_holder: "",
-    production_copyright_year: "2025",
-    copyright_year: "2025",
+    production_copyright_year: "",
+    copyright_year: "",
     language: "",
-    barcode: "",
+    upc: "",
     original_release_date: "",
     artwork: null,
     main_artists: [],
@@ -133,6 +146,76 @@ const useNewReleaseStore = create<NewReleaseStoreProps>((set) => ({
   next: () => set((state) => ({ currentStep: state.currentStep + 1 })),
   previous: () => set((state) => ({ currentStep: state.currentStep - 1 })),
   setStep: (step) => set({ currentStep: step }),
+  setRealeseId: (release_id: string) => {
+    set({ release_id });
+  },
+  getReleaseDataFromState() {
+    const form = get().form;
+    const payload = {
+      title: form.title,
+      description: form.release_description,
+      type: form.type,
+      primary_genre: form.genre,
+      secondary_genre: form.sub_genre,
+      version: form.version,
+      producer: form.producers,
+      label: form.record_label,
+      copyright_holder: form.copyright_holder,
+      production_copyright_year: form.production_copyright_year,
+      copyright_year: form.copyright_year,
+      language: form.language,
+      barcode: form.upc,
+      original_release_date: form.original_release_date,
+    };
+    return payload;
+  },
+
+  sendDraftRelease: async () => {
+    const { release_id } = get();
+    set({ isLoading: true });
+    const upload_Relase_toast_id = "upload_release";
+    const upload_artwork_toast_id = "upload_artwork";
+    try {
+      goeyToast.info(release_id ? "Updating Release.." : "Creating Release...", {
+        id: upload_Relase_toast_id,
+      });
+      const data = await api[release_id ? "patch" : "post"]<{ reference: string }>(
+        API_ROUTES.RELEASES.CREATE_DRAFT + (release_id ? `/${release_id}` : ""),
+        get().getReleaseDataFromState(),
+      );
+      goeyToast.dismiss(upload_Relase_toast_id);
+      goeyToast.success(release_id ? "Relase Updated" : "Release Created");
+      set({ release_id: data.reference });
+      const { artwork } = get().form;
+      const _release_id = data.reference || release_id;
+      if (artwork && _release_id) {
+        try {
+          goeyToast.info("Uploading Artwork...", { id: upload_artwork_toast_id });
+          const formData = new FormData();
+          formData.set("artwork", artwork);
+          await api.postFormData({
+            url: API_ROUTES.RELEASES.UPLOAD_ARTWORK(_release_id),
+            formData,
+          });
+          goeyToast.dismiss(upload_artwork_toast_id);
+          goeyToast.success("Artwork Uploaded Successfully");
+        } catch (error) {
+          get().setForm({
+            artwork: null,
+            artwork_url: "",
+          });
+          throw new Error((error as { artwork: string }).artwork);
+        }
+      }
+      get().next();
+    } catch (error) {
+      goeyToast.dismiss(upload_artwork_toast_id);
+      goeyToast.dismiss(upload_Relase_toast_id);
+      goeyToast.error((error as Error).message);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 }));
 
 export default useNewReleaseStore;

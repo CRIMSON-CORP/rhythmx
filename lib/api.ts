@@ -80,7 +80,7 @@ export const api = {
       // Refresh failed -> Force Logout
       if (refreshResponse.status === 401) {
         if (typeof window !== "undefined") {
-          signOut({ callbackUrl: "/login" });
+          signOut();
         } else {
           const { redirect } = await import("next/navigation");
           redirect("/api/auth/logout");
@@ -173,7 +173,7 @@ export const api = {
               data: response.data,
             });
           } else {
-            reject(new Error(response.message));
+            reject(response.errors || new Error(response.message));
           }
         } catch (err) {
           reject(err);

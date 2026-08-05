@@ -1,32 +1,135 @@
 "use client";
-import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
-import useNewReleaseStore from "@/store/new-release-store";
-import React, { useRef, useState } from "react";
+import useNewReleaseStore, { type ReleaseDetailsForm } from "@/store/new-release-store";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
-import { releaseGenre } from "@/data/release-genre";
-import { releaseLanguage } from "@/data/release-language-dropdown";
 import { cn } from "@/lib/utils";
 import { goeyToast } from "goey-toast";
-import { ArrowRight, Calendar as CalendarIcon, Folder } from "lucide-react";
+import { ArrowRight, Folder } from "lucide-react";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+
+const SELECT_TRIGGER_CLASS =
+  "w-full h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange bg-transparent transition-colors";
+
+const release_types: { slug: ReleaseType; name: string }[] = [
+  { slug: "single", name: "Single" },
+  { slug: "album", name: "Album" },
+  { slug: "ep", name: "EP" },
+  { slug: "compilation", name: "Compilation" },
+];
+
+/**
+ * Radix mounts every SelectItem into a detached DocumentFragment while closed,
+ * so the whole item tree re-renders on each parent render. Memoizing here keeps
+ * keystrokes elsewhere in the form from touching these lists at all.
+ */
+const GenreSelect = memo(function GenreSelect({
+  value,
+  placeholder,
+  genres,
+  onValueChange,
+}: {
+  value: string;
+  placeholder: string;
+  genres: GenresResponse["genres"];
+  onValueChange: (value: string) => void;
+}) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className={SELECT_TRIGGER_CLASS}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {genres.map((genre) => (
+            <React.Fragment key={genre.slug}>
+              <SelectLabel>{genre.name}</SelectLabel>
+              {genre.sub_genres.map((subGenre) => (
+                <SelectItem key={subGenre.slug} value={subGenre.slug}>
+                  {subGenre.name}
+                </SelectItem>
+              ))}
+            </React.Fragment>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+});
+
+const LanguageSelect = memo(function LanguageSelect({
+  value,
+  languages,
+  onValueChange,
+}: {
+  value: string;
+  languages: Language[];
+  onValueChange: (value: string) => void;
+}) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className={SELECT_TRIGGER_CLASS}>
+        <SelectValue placeholder="Select language" />
+      </SelectTrigger>
+      <SelectContent>
+        {languages.map((l) => (
+          <SelectItem key={l.slug} value={l.slug}>
+            {l.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+});
 
 function ReleaseDetalsPage() {
-  const { form, setForm, next } = useNewReleaseStore();
+  const form = useNewReleaseStore((state) => state.form);
+  const setForm = useNewReleaseStore((state) => state.setForm);
+  const sendDraftRelease = useNewReleaseStore((state) => state.sendDraftRelease);
+  const isLoading = useNewReleaseStore((state) => state.isLoading);
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(form.artwork_url || null);
+  const [genres, setGenres] = useState<GenresResponse["genres"]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    async function fetchMetaData() {
+      try {
+        const [{ genres }, { languages }] = await Promise.all([
+          api.get<GenresResponse>(API_ROUTES.META.GENRES),
+          api.get<LanguagesResponse>(API_ROUTES.META.LANGUAGES),
+        ]);
+        setGenres(genres);
+        setLanguages(languages);
+      } catch (error) {
+        console.error("Failed to fetch genres:", error);
+        goeyToast.error((error as Error).message);
+      }
+    }
+    fetchMetaData();
+  }, []);
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -49,20 +152,9 @@ function ReleaseDetalsPage() {
   };
 
   const handleUploadArtwork = (file: File) => {
-    goeyToast.success("Uploading Cover Artwork...", {
-      description: "Please wait while we upload your cover art",
-      duration: 1500,
-    });
-
-    setTimeout(() => {
-      const url = URL.createObjectURL(file);
-      setForm({ artwork: file, artwork_url: url });
-      setPreviewUrl(url);
-      goeyToast.success("Artwork Uploaded", {
-        description: "Cover artwork has been uploaded successfully",
-        duration: 1000,
-      });
-    }, 1500);
+    const url = URL.createObjectURL(file);
+    setForm({ artwork: file, artwork_url: url });
+    setPreviewUrl(url);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -82,17 +174,36 @@ function ReleaseDetalsPage() {
     }
   };
 
-  const handleInputChange = (key: keyof typeof form, value: string | boolean) => {
-    setForm({ [key]: value });
-  };
+  const handleInputChange = useCallback(
+    (key: keyof ReleaseDetailsForm, value: string | boolean) => {
+      startTransition(() => {
+        setForm({ [key]: value });
+      });
+    },
+    [setForm, startTransition],
+  );
+
+  // Stable identities so the memoized selects don't re-render on every keystroke.
+  const handleGenreChange = useCallback(
+    (value: string) => handleInputChange("genre", value),
+    [handleInputChange],
+  );
+  const handleSubGenreChange = useCallback(
+    (value: string) => handleInputChange("sub_genre", value),
+    [handleInputChange],
+  );
+  const handleLanguageChange = useCallback(
+    (value: string) => handleInputChange("language", value),
+    [handleInputChange],
+  );
 
   const isFormValid = !!(
-    form.release_title?.trim() &&
-    form.primary_genre &&
-    form.version_title?.trim() &&
+    form.title?.trim() &&
+    form.genre &&
+    form.version?.trim() &&
     form.producers?.trim() &&
     form.copyright_holder?.trim() &&
-    form.production_copyright_year &&
+    form.copyright_year &&
     form.copyright_year &&
     form.language &&
     form.original_release_date &&
@@ -101,7 +212,7 @@ function ReleaseDetalsPage() {
 
   const handleContinue = () => {
     if (isFormValid) {
-      next();
+      sendDraftRelease();
     } else {
       goeyToast.error("All Fields are required", {
         description: "Please fill in all fields to continue",
@@ -109,10 +220,10 @@ function ReleaseDetalsPage() {
     }
   };
 
-  const currentYear = new Date().getFullYear();
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[0.55fr_0.45fr] gap-8 items-stretch">
+    <div className="grid grid-cols-1 lg:grid-cols-[0.55fr_0.45fr] gap-8 pb-10 items-stretch">
       {/* Left Column: Form Fields Card */}
       <div className="bg-white rounded-30 p-4 md:p-10.5 flex flex-col gap-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -127,8 +238,8 @@ function ReleaseDetalsPage() {
               </span>
               <input
                 type="text"
-                value={form.release_title}
-                onChange={(e) => handleInputChange("release_title", e.target.value)}
+                value={form.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
                 placeholder="What's the title of this Single"
                 className="w-full rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-colors"
               />
@@ -148,50 +259,57 @@ function ReleaseDetalsPage() {
                   className="w-full resize-none text-sm text-default border-b border-default-default/20 focus:border-brand-orange transition-colors font-medium outline-none pb-2 placeholder:text-[#8E8E93]"
                 />
                 <div className="flex items-center gap-2 text-xs text-[#8E8E93]">
-                  <Icon name="info-square" size={18} />
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path
+                      d="M9 6.75H9.0075M8.25 9H9V12H9.75M9 2.25C14.4 2.25 15.75 3.6 15.75 9C15.75 14.4 14.4 15.75 9 15.75C3.6 15.75 2.25 14.4 2.25 9C2.25 3.6 3.6 2.25 9 2.25Z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   <span className="text-default-tertiary">Keep it detailed</span>
                 </div>
               </div>
             </div>
 
-            {/* Primary Genre */}
+            {/* Release Type */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-default">Primary Genre</label>
-              <Select
-                value={form.primary_genre}
-                onValueChange={(value) => handleInputChange("primary_genre", value)}
-              >
-                <SelectTrigger className="w-full h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange bg-transparent transition-colors">
-                  <SelectValue placeholder="Select a genre (Pop, Rock, Country etc.)" />
+              <label className="text-sm font-medium text-default">Release Type</label>
+              <Select value={form.type} onValueChange={(value) => handleInputChange("type", value)}>
+                <SelectTrigger className={SELECT_TRIGGER_CLASS}>
+                  <SelectValue placeholder="Select release type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {releaseGenre.map((g) => (
-                    <SelectItem key={g.value} value={g.value}>
-                      {g.label}
+                  {release_types.map((l) => (
+                    <SelectItem key={l.slug} value={l.slug}>
+                      {l.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Primary Genre */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-default">Primary Genre</label>
+              <GenreSelect
+                value={form.genre}
+                onValueChange={handleGenreChange}
+                genres={genres}
+                placeholder="Select a genre (Pop, Rock, Country etc.)"
+              />
+            </div>
+
             {/* Secondary Genre (Optional) */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-default">Secondary Genre (Optional)</label>
-              <Select
-                value={form.secondary_genre}
-                onValueChange={(value) => handleInputChange("secondary_genre", value)}
-              >
-                <SelectTrigger className="w-full h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange bg-transparent transition-colors">
-                  <SelectValue placeholder="Select a genre (Pop, Rock, Country etc.)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {releaseGenre.map((g) => (
-                    <SelectItem key={g.value} value={g.value}>
-                      {g.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <GenreSelect
+                value={form.sub_genre}
+                onValueChange={handleSubGenreChange}
+                genres={genres}
+                placeholder="Select a genre (Pop, Rock, Country etc.)"
+              />
             </div>
 
             {/* Version Title */}
@@ -199,8 +317,8 @@ function ReleaseDetalsPage() {
               <label className="text-sm font-medium text-default">Version Title</label>
               <input
                 type="text"
-                value={form.version_title}
-                onChange={(e) => handleInputChange("version_title", e.target.value)}
+                value={form.version}
+                onChange={(e) => handleInputChange("version", e.target.value)}
                 placeholder="Enter version title"
                 className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-colors"
               />
@@ -276,21 +394,11 @@ function ReleaseDetalsPage() {
             {/* Language */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-default">Language</label>
-              <Select
+              <LanguageSelect
                 value={form.language}
-                onValueChange={(value) => handleInputChange("language", value)}
-              >
-                <SelectTrigger className="w-full h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange bg-transparent transition-colors">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {releaseLanguage.map((l) => (
-                    <SelectItem key={l.value} value={l.value}>
-                      {l.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onValueChange={handleLanguageChange}
+                languages={languages}
+              />
             </div>
 
             {/* 13 digits BarCode */}
@@ -300,8 +408,8 @@ function ReleaseDetalsPage() {
               </label>
               <input
                 type="text"
-                value={form.barcode}
-                onChange={(e) => handleInputChange("barcode", e.target.value)}
+                value={form.upc}
+                onChange={(e) => handleInputChange("upc", e.target.value)}
                 placeholder="i.e 123456789012"
                 className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-all"
               />
@@ -310,39 +418,12 @@ function ReleaseDetalsPage() {
             {/* Original Release Date */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-default">Original Release Date</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-colors flex items-center justify-between text-left"
-                  >
-                    <span
-                      className={form.original_release_date ? "text-default" : "text-[#8E8E93]"}
-                    >
-                      {form.original_release_date
-                        ? format(new Date(form.original_release_date), "PPP")
-                        : "Pick a date"}
-                    </span>
-                    <CalendarIcon size={16} className="text-default/50" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={
-                      form.original_release_date ? new Date(form.original_release_date) : undefined
-                    }
-                    onSelect={(date) => {
-                      if (date) {
-                        const formatted = format(date, "yyyy-MM-dd");
-                        handleInputChange("original_release_date", formatted);
-                      } else {
-                        handleInputChange("original_release_date", "");
-                      }
-                    }}
-                  />
-                </PopoverContent>
-              </Popover>
+              <input
+                type="date"
+                value={form.original_release_date}
+                onChange={(e) => handleInputChange("original_release_date", e.target.value)}
+                className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-all"
+              />
             </div>
           </div>
         </div>
@@ -352,7 +433,7 @@ function ReleaseDetalsPage() {
           <p className="font-medium text-default text-center">
             Please review your release details before clicking &quot;continue&quot;
           </p>
-          <Button variant="orange" onClick={handleContinue} disabled={!isFormValid}>
+          <Button variant="orange" onClick={handleContinue} disabled={!isFormValid || isLoading}>
             <span>Continue</span>
             <ArrowRight size={16} />
           </Button>

@@ -65,3 +65,13 @@ interface EarningsResponse {
   total_streams: number;
   earnings: Earning[];
 }
+
+interface GenresResponse {
+  genres: (Genre & {
+    sub_genres: Genre[];
+  })[];
+}
+
+interface LanguagesResponse {
+  languages: Language[];
+}

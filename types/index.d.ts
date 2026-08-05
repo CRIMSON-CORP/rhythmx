@@ -330,3 +330,15 @@ interface Earning {
   track: string;
   amount: number;
 }
+
+interface Genre {
+  slug: string;
+  name: string;
+}
+
+interface Language {
+  slug: string;
+  name: string;
+  code: string;
+  is_metadata_language: boolean;
+}

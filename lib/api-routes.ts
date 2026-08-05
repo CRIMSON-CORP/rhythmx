@@ -32,6 +32,8 @@ export const API_ROUTES = {
   },
   RELEASES: {
     MY: "/api/releases",
+    CREATE_DRAFT: "/api/releases/draft",
+    UPLOAD_ARTWORK: (reference: string) => `/api/releases/draft/${reference}/artwork`,
     TAKEDOWN: (reference: string) => `/api/releases/${reference}/takedown`,
     EARNINGS: (reference: string) => `/api/releases/${reference}/earnings`,
     DRAFT: (reference: string) => `/api/releases/draft/${reference}`,
@@ -46,5 +48,7 @@ export const API_ROUTES = {
     COUNTRIES: "/api/meta/countries",
     BANKS: "/api/meta/banks",
     TIMEZONES: "/api/meta/timezones",
+    GENRES: "/api/meta/genres",
+    LANGUAGES: "/api/meta/languages",
   },
 };

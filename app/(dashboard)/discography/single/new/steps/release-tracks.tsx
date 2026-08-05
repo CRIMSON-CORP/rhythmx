@@ -202,7 +202,7 @@ function ReleaseTracks() {
         is_uploaded: false,
         upload_progress: 0,
         is_uploading: true,
-        primary_genre: form.primary_genre || "",
+        primary_genre: form.genre || "",
         language: form.language || "",
         preview_start_time: "00:00",
         main_artists: [],

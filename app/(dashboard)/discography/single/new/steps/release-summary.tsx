@@ -179,9 +179,7 @@ function ReleaseSummary() {
               Release Title
             </span>
             <div className="flex flex-col gap-1">
-              <span className="text-sm font-semibold text-default">
-                {form.release_title || "—"}
-              </span>
+              <span className="text-sm font-semibold text-default">{form.title || "—"}</span>
               <span className="text-[11px] text-border-default-secondary font-medium">Single</span>
             </div>
           </div>
@@ -192,9 +190,7 @@ function ReleaseSummary() {
               Genre
             </span>
             <span className="text-sm font-semibold text-default self-center">
-              {form.primary_genre
-                ? `${form.primary_genre}${form.secondary_genre ? `, ${form.secondary_genre}` : ""}`
-                : "—"}
+              {form.genre ? `${form.genre}${form.sub_genre ? `, ${form.sub_genre}` : ""}` : "—"}
             </span>
           </div>
 
@@ -204,7 +200,7 @@ function ReleaseSummary() {
               Version Title
             </span>
             <span className="text-sm font-semibold text-default self-center">
-              {form.version_title || "—"}
+              {form.version || "—"}
             </span>
           </div>
 
@@ -264,7 +260,7 @@ function ReleaseSummary() {
               13 digits BarCode (UPC/EAN)
             </span>
             <span className="text-sm font-semibold text-default self-center">
-              {form.barcode || "—"}
+              {form.upc || "—"}
             </span>
           </div>
         </div>
