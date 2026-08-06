@@ -76,9 +76,9 @@ function AddArtistPage() {
     <div className="grid grid-cols-1 lg:grid-cols-[0.55fr_0.45fr] gap-8 items-stretch pb-10">
       {/* Left Column: Accordion Form Card */}
       <div className="bg-white rounded-30 p-4 md:p-10 flex flex-col gap-8">
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 divide-y divide-default-default">
           {/* Main Artists Section */}
-          <div className="flex flex-col gap-4 border-b border-b-default-default/10 pb-6">
+          <div className="flex flex-col gap-4 border-b pb-6">
             <div className="flex flex-col gap-4 items-start w-full">
               <div className="flex flex-col items-start gap-3">
                 <p className="font-medium text-border-default-secondary">Main Artist</p>
@@ -98,7 +98,7 @@ function AddArtistPage() {
           </div>
 
           {/* Featured Artists Section */}
-          <div className="flex flex-col gap-4 border-b border-b-default-default/10 pb-6">
+          <div className="flex flex-col gap-4 border-b pb-6">
             <div className="flex flex-col gap-4 items-start w-full">
               <div className="flex flex-col items-start gap-3">
                 <p className="font-medium text-border-default-secondary">Feature Artist</p>
@@ -742,7 +742,7 @@ const SelectArtist = ({
             </Suspense>
           </div>
           {/* Floating Add artist outside button */}
-          <div className="absolute bottom-6 right-6 flex justify-end pointer-events-none">
+          <div className="absolute bottom-6 right-6 flex justify-end">
             <Button variant="outline" onClick={onAddArtistOutside} className="bg-white">
               Add artist outside
             </Button>
