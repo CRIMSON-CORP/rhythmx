@@ -15,7 +15,7 @@ function ReleaseCard({
   const hasMorePlatforms = platforms.length > 2;
   return (
     <Link
-      href={`/discography/${reference}`}
+      href={`/discography/release/${reference}`}
       className="w-full aspect-square rounded-30 overflow-hidden relative flex flex-col justify-between gap-5 text-white isolate snap-center bg-black/5"
     >
       {cover_url && (

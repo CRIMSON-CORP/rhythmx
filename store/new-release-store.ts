@@ -61,6 +61,7 @@ export const newReleaseStoreTitles = [
     subtitle: "Add all the necessary information for this release",
     tab_title: "Release Details",
     icon: Info,
+    path: "",
     Component: ReleaseDetalsPage,
   },
   {
@@ -68,6 +69,7 @@ export const newReleaseStoreTitles = [
     subtitle: "Assigned and manage the release artist",
     tab_title: "Artist",
     icon: Star,
+    path: "add-artists",
     Component: AddArtistPage,
   },
   {
@@ -75,6 +77,7 @@ export const newReleaseStoreTitles = [
     subtitle: "Add release tracks and track meta data",
     tab_title: "Tracks",
     icon: Disc,
+    path: "release-tracks",
     Component: ReleaseTracks,
   },
   {
@@ -82,6 +85,7 @@ export const newReleaseStoreTitles = [
     subtitle: "Select the platforms you would like to distribute to.",
     tab_title: "Platforms",
     icon: Layers,
+    path: "choose-platforms",
     Component: ChoosePlatform,
   },
   {
@@ -89,6 +93,7 @@ export const newReleaseStoreTitles = [
     subtitle: "Split revenue with collaborators and partners",
     tab_title: "Split Royalty",
     icon: DollarSign,
+    path: "split-royalty",
     Component: SplitRoyalty,
   },
   {
@@ -96,6 +101,7 @@ export const newReleaseStoreTitles = [
     subtitle: "Set your release date",
     tab_title: "Release Date",
     icon: Calendar,
+    path: "release-date",
     Component: ReleaseDate,
   },
   {
@@ -104,6 +110,7 @@ export const newReleaseStoreTitles = [
       "Publish your release, fill all the necessary information, upload tracks, album art cover and more.",
     tab_title: "Review & Submit",
     icon: AlignLeft,
+    path: "review",
     Component: ReleaseSummary,
   },
 ];

@@ -39,10 +39,12 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="white">
-            <Edit size={16} />
-            <span>Edit Release</span>
-          </Button>
+          <Link href={`/discography/release/draft/${release.reference}`}>
+            <Button variant="white">
+              <Edit size={16} />
+              <span>Edit Release</span>
+            </Button>
+          </Link>
           <DeleteRelease release_id={release.reference} release_status={release.status} />
         </div>
       </header>

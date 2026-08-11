@@ -132,10 +132,13 @@ export const api = {
     }
 
     if (!data.status) {
-      if (data.errors) throw data.errors;
+      const newError = Object.assign(new Error(), {
+        errors: data.errors,
+        message: data.message,
+      });
       if (typeof window !== "undefined") {
         goeyToast.error(data.message, { id: CONSTANTS.GLOBAL_ERROR_TOAST_ID });
-        throw new Error(data.message);
+        throw newError;
       }
     }
     return data.data;

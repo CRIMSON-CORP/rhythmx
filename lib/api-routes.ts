@@ -38,6 +38,9 @@ export const API_ROUTES = {
     EARNINGS: (reference: string) => `/api/releases/${reference}/earnings`,
     DRAFT: (reference: string) => `/api/releases/draft/${reference}`,
   },
+  LABEL: {
+    ARTISTS: "/api/label/artists",
+  },
   ANALYTICS: {
     OVERVIEW: "/api/analytics/overview",
   },
