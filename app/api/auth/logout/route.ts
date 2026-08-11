@@ -22,5 +22,5 @@ export async function GET(request: Request) {
   }
 
   // Redirect silently to your custom login page
-  return NextResponse.redirect(new URL("/login", request.url));
+  return NextResponse.redirect(new URL("/auth/login", request.url));
 }
