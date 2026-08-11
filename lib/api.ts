@@ -47,7 +47,6 @@ export const api = {
         "content-type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
       },
-      ...(typeof window !== "undefined" && { userAgent: window.navigator.userAgent }),
     };
 
     // Fix: Prevent GET requests from having a body

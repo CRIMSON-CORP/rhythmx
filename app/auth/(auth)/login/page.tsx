@@ -30,7 +30,12 @@ function Page() {
     setLoading(true);
 
     try {
-      const res = await signIn("credentials", { email, password, redirect: false });
+      const res = await signIn("credentials", {
+        email,
+        password,
+        userAgent: navigator.userAgent,
+        redirect: false,
+      });
       if (!res) {
         setErrors({ form: "Login failed. Please try again." });
         return;

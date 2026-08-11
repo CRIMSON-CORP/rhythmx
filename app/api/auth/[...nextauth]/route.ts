@@ -21,6 +21,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email", placeholder: "user@example.com" },
         password: { label: "Password", type: "password" },
         otp: { label: "OTP", type: "text" },
+        userAgent: { label: "User Agent", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email) {
@@ -28,10 +29,20 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          let userAgent: string | undefined = credentials.userAgent || undefined;
+          if (!userAgent) {
+            try {
+              const { headers } = await import("next/headers");
+              const reqHeaders = await headers();
+              userAgent = reqHeaders.get("user-agent") || undefined;
+            } catch {
+              // not available
+            }
+          }
           const endpoint = credentials.otp ? API_ROUTES.AUTH.VERIFY : API_ROUTES.AUTH.LOGIN;
           const payload = credentials.otp
-            ? { email: credentials.email, otp: credentials.otp }
-            : { email: credentials.email, password: credentials.password };
+            ? { email: credentials.email, otp: credentials.otp, userAgent }
+            : { email: credentials.email, password: credentials.password, userAgent };
 
           const data = await api.post<VerifyResponse>(endpoint, payload);
 
@@ -85,9 +96,18 @@ export const authOptions: NextAuthOptions = {
         console.log("[NextAuth Google Sign-In] Provider ID token:", idToken);
 
         try {
+          let userAgent: string | undefined;
+          try {
+            const { headers } = await import("next/headers");
+            const reqHeaders = await headers();
+            userAgent = reqHeaders.get("user-agent") || undefined;
+          } catch {
+            // not available
+          }
           const responseData = await api.post<VerifyResponse>(API_ROUTES.AUTH.SOCIAL, {
             provider: "google",
             provider_token: idToken,
+            userAgent,
           });
 
           console.log("[BACKEND GOOGLE AUTH RESPONSE]:", JSON.stringify(responseData, null, 2));

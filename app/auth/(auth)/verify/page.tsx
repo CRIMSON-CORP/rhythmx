@@ -39,6 +39,7 @@ function VerifyForm() {
       const res = await signIn("credentials", {
         email,
         otp,
+        userAgent: navigator.userAgent,
         redirect: false,
         callbackUrl: "/auth/create-account",
       });
