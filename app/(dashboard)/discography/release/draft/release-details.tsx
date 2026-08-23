@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import React, {
   memo,
   useActionState,
@@ -20,11 +19,12 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { goeyToast } from "goey-toast";
-import { ArrowRight, Folder, Loader2 } from "lucide-react";
+import { Folder } from "lucide-react";
 import { FieldError } from "@/components/ui/field";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { useRouter } from "next/navigation";
+import ContinueButton from "./ContinueButton";
 
 const SELECT_TRIGGER_CLASS =
   "w-full h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange bg-transparent transition-colors";
@@ -463,24 +463,7 @@ function ReleaseDetalsPageComponent(params: ReleaseDetailsProps) {
           <p className="font-medium text-default text-center">
             Please review your release details before clicking &quot;continue&quot;
           </p>
-          <Button
-            variant="orange"
-            type="submit"
-            disabled={pending}
-            className="group-has-invalid/form:opacity-50 group-not-has-invalid/form:opacity-100"
-          >
-            {pending ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                <span>Uploading...</span>
-              </>
-            ) : (
-              <>
-                <span>Continue</span>
-                <ArrowRight size={16} />
-              </>
-            )}
-          </Button>
+          <ContinueButton pending={pending} />
         </div>
       </div>
 
