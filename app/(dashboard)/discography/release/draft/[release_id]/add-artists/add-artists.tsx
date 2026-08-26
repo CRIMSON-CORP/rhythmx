@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, Suspense, use } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
-import useNewReleaseStore from "@/store/new-release-store";
 import { goeyToast } from "goey-toast";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -17,39 +16,43 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "radix-ui";
-import { artists } from "@/data/artists";
+import { artists as defaultRosterArtists } from "@/data/artists";
 import { ArrowRight, ArrowUpRight, ChevronRight, List, Plus, Search, Star, X } from "lucide-react";
 
-// Simple query cache to store the delay promises so React Suspense does not loop infinitely
-const promiseCache = new Map<string, Promise<Artist[]>>();
-
-function getArtistsPromise(query: string) {
-  const cacheKey = query.trim().toLowerCase();
-  if (!promiseCache.has(cacheKey)) {
-    const promise = new Promise<Artist[]>((resolve) => {
-      setTimeout(() => {
-        const filtered = artists.filter(
-          (a) =>
-            a.name.toLowerCase().includes(cacheKey) || a.location.toLowerCase().includes(cacheKey),
-        );
-        resolve(filtered);
-      }, 1500);
-    });
-    promiseCache.set(cacheKey, promise);
-  }
-  return promiseCache.get(cacheKey)!;
+function mapArtistReleaseToArtist(item: ArtistRelease): Artist {
+  return {
+    id: item.artist_id ? String(item.artist_id) : `rel_${item.name}`,
+    name: item.name,
+    location: "Record Label Artist",
+    image: item.image_url || "",
+  };
 }
 
-function AddArtistsPage() {
-  const { form, setForm, next } = useNewReleaseStore();
+function AddArtistsPage({
+  main = [],
+  featured = [],
+  producer_credits = [],
+}: {
+  main: ArtistRelease[];
+  featured: ArtistRelease[];
+  producer_credits: ArtistRelease[];
+}) {
+  const [mainArtists, setMainArtists] = useState<Artist[]>(() =>
+    (main || []).map(mapArtistReleaseToArtist),
+  );
+  const [featuredArtists, setFeaturedArtists] = useState<Artist[]>(() =>
+    (featured || []).map(mapArtistReleaseToArtist),
+  );
+  const [producerCredits, setProducerCredits] = useState<Artist[]>(() =>
+    (producer_credits || []).map(mapArtistReleaseToArtist),
+  );
+
   const [activeSection, setActiveSection] = useState<"main" | "featured" | "producer">("main");
 
-  const canContinue = form.main_artists && form.main_artists.length > 0;
+  const canContinue = mainArtists.length > 0;
 
   const handleContinue = () => {
-    if (canContinue) {
-      next();
-    } else {
+    if (!canContinue) {
       goeyToast.error("Main Artist Required", {
         description: "Please add at least one main artist to continue",
       });
@@ -58,19 +61,17 @@ function AddArtistsPage() {
 
   const handleRemoveArtist = (artistId: string, type: "main" | "featured" | "producer") => {
     if (type === "main") {
-      setForm({ main_artists: form.main_artists.filter((a) => a.id !== artistId) });
+      setMainArtists((prev) => prev.filter((a) => a.id !== artistId));
     } else if (type === "featured") {
-      setForm({ featured_artists: form.featured_artists.filter((a) => a.id !== artistId) });
+      setFeaturedArtists((prev) => prev.filter((a) => a.id !== artistId));
     } else {
-      setForm({ producer_credits: form.producer_credits.filter((a) => a.id !== artistId) });
+      setProducerCredits((prev) => prev.filter((a) => a.id !== artistId));
     }
     goeyToast.success("Artist removed successfully");
   };
 
-  const totalAdded =
-    (form.main_artists?.length || 0) +
-    (form.featured_artists?.length || 0) +
-    (form.producer_credits?.length || 0);
+  const totalAdded = mainArtists.length + featuredArtists.length + producerCredits.length;
+  const allAddedArtists = [...mainArtists, ...featuredArtists, ...producerCredits];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[0.55fr_0.45fr] gap-8 items-stretch pb-10">
@@ -93,7 +94,13 @@ function AddArtistsPage() {
                   </Button>
                 )}
               </div>
-              {activeSection === "main" && <ArtistAdder sectionType="main" />}
+              {activeSection === "main" && (
+                <ArtistAdder
+                  sectionType="main"
+                  allAddedArtists={allAddedArtists}
+                  onAddArtist={(artist) => setMainArtists((prev) => [...prev, artist])}
+                />
+              )}
             </div>
           </div>
 
@@ -109,7 +116,13 @@ function AddArtistsPage() {
                   </Button>
                 )}
               </div>
-              {activeSection === "featured" && <ArtistAdder sectionType="featured" />}
+              {activeSection === "featured" && (
+                <ArtistAdder
+                  sectionType="featured"
+                  allAddedArtists={allAddedArtists}
+                  onAddArtist={(artist) => setFeaturedArtists((prev) => [...prev, artist])}
+                />
+              )}
             </div>
           </div>
 
@@ -127,7 +140,13 @@ function AddArtistsPage() {
                   </Button>
                 )}
               </div>
-              {activeSection === "producer" && <ArtistAdder sectionType="producer" />}
+              {activeSection === "producer" && (
+                <ArtistAdder
+                  sectionType="producer"
+                  allAddedArtists={allAddedArtists}
+                  onAddArtist={(artist) => setProducerCredits((prev) => [...prev, artist])}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -175,14 +194,14 @@ function AddArtistsPage() {
 
             <div className="flex flex-col gap-6 overflow-y-auto max-h-137.5 no-scrollbar">
               {/* Main Artists List */}
-              {form.main_artists && form.main_artists.length > 0 && (
+              {mainArtists.length > 0 && (
                 <div className="flex flex-col gap-2">
                   <header className="flex items-center justify-between gap-4 font-medium text-border-default-secondary text-xs px-2">
                     <span>Main Artists</span>
-                    <span>{form.main_artists.length} Added</span>
+                    <span>{mainArtists.length} Added</span>
                   </header>
                   <ul className="flex flex-col divide-y divide-default-default/5 bg-page-background/20 rounded-20">
-                    {form.main_artists.map((artist) => (
+                    {mainArtists.map((artist) => (
                       <li key={artist.id} className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           {artist.image ? (
@@ -222,14 +241,14 @@ function AddArtistsPage() {
               )}
 
               {/* Featured Artists List */}
-              {form.featured_artists && form.featured_artists.length > 0 && (
+              {featuredArtists.length > 0 && (
                 <div className="flex flex-col gap-2">
                   <header className="flex items-center justify-between gap-4 font-medium text-border-default-secondary text-xs px-2">
                     <span>Featured Artists</span>
-                    <span>{form.featured_artists.length} Added</span>
+                    <span>{featuredArtists.length} Added</span>
                   </header>
                   <ul className="flex flex-col divide-y divide-default-default/5 bg-page-background/20 rounded-20">
-                    {form.featured_artists.map((artist) => (
+                    {featuredArtists.map((artist) => (
                       <li key={artist.id} className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           {artist.image ? (
@@ -269,14 +288,14 @@ function AddArtistsPage() {
               )}
 
               {/* Producer & Engineer Credits List */}
-              {form.producer_credits && form.producer_credits.length > 0 && (
+              {producerCredits.length > 0 && (
                 <div className="flex flex-col gap-2">
                   <header className="flex items-center justify-between gap-4 font-medium text-border-default-secondary text-xs px-2">
                     <span>Producers & Engineers</span>
-                    <span>{form.producer_credits.length} Added</span>
+                    <span>{producerCredits.length} Added</span>
                   </header>
                   <ul className="flex flex-col divide-y divide-default-default/5 bg-page-background/20 rounded-20">
-                    {form.producer_credits.map((artist) => (
+                    {producerCredits.map((artist) => (
                       <li key={artist.id} className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           {artist.image ? (
@@ -365,8 +384,15 @@ const AppleMusicLogo = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const ArtistAdder = ({ sectionType }: { sectionType: "main" | "featured" | "producer" }) => {
-  const { form, setForm } = useNewReleaseStore();
+const ArtistAdder = ({
+  sectionType,
+  allAddedArtists,
+  onAddArtist,
+}: {
+  sectionType: "main" | "featured" | "producer";
+  allAddedArtists: Artist[];
+  onAddArtist: (artist: Artist) => void;
+}) => {
   const [artistName, setArtistName] = useState("");
   const [customInputEnabled, setCustomInputEnabled] = useState(false);
   const [isSelectModalOpen, setIsSelectModalOpen] = useState(false);
@@ -388,22 +414,7 @@ const ArtistAdder = ({ sectionType }: { sectionType: "main" | "featured" | "prod
       image: "",
     };
 
-    const currentList =
-      sectionType === "main"
-        ? form.main_artists
-        : sectionType === "featured"
-          ? form.featured_artists
-          : form.producer_credits;
-
-    const updated = [...(currentList || []), newArtist];
-
-    if (sectionType === "main") {
-      setForm({ main_artists: updated });
-    } else if (sectionType === "featured") {
-      setForm({ featured_artists: updated });
-    } else {
-      setForm({ producer_credits: updated });
-    }
+    onAddArtist(newArtist);
 
     // Reset fields
     setArtistName("");
@@ -414,23 +425,7 @@ const ArtistAdder = ({ sectionType }: { sectionType: "main" | "featured" | "prod
   };
 
   const handleSelectArtist = (artist: Artist) => {
-    const currentList =
-      sectionType === "main"
-        ? form.main_artists
-        : sectionType === "featured"
-          ? form.featured_artists
-          : form.producer_credits;
-
-    const updated = [...(currentList || []), artist];
-
-    if (sectionType === "main") {
-      setForm({ main_artists: updated });
-    } else if (sectionType === "featured") {
-      setForm({ featured_artists: updated });
-    } else {
-      setForm({ producer_credits: updated });
-    }
-
+    onAddArtist(artist);
     setIsSelectModalOpen(false);
     goeyToast.success(`${artist.name} selected successfully`);
   };
@@ -473,6 +468,7 @@ const ArtistAdder = ({ sectionType }: { sectionType: "main" | "featured" | "prod
           <SelectArtist
             open={isSelectModalOpen}
             onOpenChange={setIsSelectModalOpen}
+            allAddedArtists={allAddedArtists}
             onSelectArtist={handleSelectArtist}
             onAddArtistOutside={() => {
               setIsSelectModalOpen(false);
@@ -553,57 +549,20 @@ const ArtistAdder = ({ sectionType }: { sectionType: "main" | "featured" | "prod
   );
 };
 
-function GridSkeleton() {
-  return (
-    <div className="grid grid-cols-5 gap-y-8 gap-x-6 px-8 py-6">
-      {Array.from({ length: 15 }).map((_, i) => (
-        <div key={i} className="flex flex-col items-center gap-3 animate-pulse">
-          <div className="size-20 bg-default-default/10 rounded-full" />
-          <div className="h-4 w-16 bg-default-default/10 rounded-sm" />
-          <div className="h-3.5 w-12 bg-default-default/10 rounded-sm" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-x-12 gap-y-8 px-8 py-6">
-      {Array.from({ length: 10 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 animate-pulse">
-          <div className="size-16 bg-default-default/10 rounded-full" />
-          <div className="flex flex-col gap-2">
-            <div className="h-4 w-24 bg-default-default/10 rounded-sm" />
-            <div className="h-3.5 w-16 bg-default-default/10 rounded-sm" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function ArtistList({
   viewMode,
   searchQuery,
+  allAddedArtists,
   onSelectArtist,
 }: {
   viewMode: string;
   searchQuery: string;
+  allAddedArtists: Artist[];
   onSelectArtist: (artist: Artist) => void;
 }) {
-  const { form } = useNewReleaseStore();
-  const allArtists = use(getArtistsPromise(searchQuery));
-
-  const allAdded = [
-    ...(form.main_artists || []),
-    ...(form.featured_artists || []),
-    ...(form.producer_credits || []),
-  ];
-
-  const filtered = allArtists.filter(
+  const filtered = defaultRosterArtists.filter(
     (a) =>
-      !allAdded.some((added) => added.id === a.id) &&
+      !allAddedArtists.some((added) => added.id === a.id) &&
       (a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.location.toLowerCase().includes(searchQuery.toLowerCase())),
   );
@@ -668,11 +627,13 @@ function ArtistList({
 const SelectArtist = ({
   open,
   onOpenChange,
+  allAddedArtists,
   onSelectArtist,
   onAddArtistOutside,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  allAddedArtists: Artist[];
   onSelectArtist: (artist: Artist) => void;
   onAddArtistOutside: () => void;
 }) => {
@@ -733,13 +694,12 @@ const SelectArtist = ({
 
         <div className="relative">
           <div className="max-h-120 min-h-87.5 overflow-y-auto relative pb-20 no-scrollbar">
-            <Suspense fallback={viewMode === "grid" ? <GridSkeleton /> : <ListSkeleton />}>
-              <ArtistList
-                viewMode={viewMode}
-                searchQuery={searchQuery}
-                onSelectArtist={onSelectArtist}
-              />
-            </Suspense>
+            <ArtistList
+              viewMode={viewMode}
+              searchQuery={searchQuery}
+              allAddedArtists={allAddedArtists}
+              onSelectArtist={onSelectArtist}
+            />
           </div>
           {/* Floating Add artist outside button */}
           <div className="absolute bottom-6 right-6 flex justify-end">
