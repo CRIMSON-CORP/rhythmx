@@ -28,7 +28,7 @@ export function InvitesInvitesTrigger() {
   return (
     <Invites>
       <Button>
-        <span className="text-sm leading-none">Invite Artist</span>
+        <span className="text-sm leading-none">Add Artist</span>
         <Plus size={16} />
       </Button>
     </Invites>
@@ -64,13 +64,22 @@ function Invites({ children }: { children: ReactNode }) {
             className="mx-auto scale-150"
           />
           <h3 className="text-center text-default font-medium text-base">Send Invite to artist</h3>
-          <form
-            action=""
-            className="bg-white rounded-2xl overflow-hidden flex items-stretch outline outline-default-default"
-          >
-            <input type="text" placeholder="Email, comma to seperate" className="grow p-4" />
-            <button className="px-7 py-4 bg-brand-blue text-white">Invite</button>
-          </form>
+          <div className="flex items-stretch gap-2.5">
+            <form
+              action=""
+              className="bg-white rounded-2xl overflow-hidden flex items-stretch outline outline-default-default grow"
+            >
+              <input
+                type="text"
+                placeholder="Email, comma to seperate"
+                className="grow p-4 leading-none"
+              />
+              <button className="px-7 py-4 bg-brand-blue text-white">Invite</button>
+            </form>
+            <Button className="leading-none">
+              <Plus size={20} />
+            </Button>
+          </div>
           <div className="flex flex-col gap-2.5">
             <p className="font-medium text-xs">Pending Invites</p>
             <ul className="divide-y divide-default-default max-h-96 overflow-y-auto">

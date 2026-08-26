@@ -81,6 +81,21 @@ interface Track {
   royalty_splits?: { name: string; percentage: number }[];
 }
 
+interface ReleaseTrack {
+  reference: string;
+  title: string;
+  order: string;
+  language: string;
+  isrc: string;
+  version: string;
+  lyrics: string;
+  audio_url: string;
+  duration: string;
+  is_explicit: boolean;
+  has_advisory: boolean;
+  uploaded_at: string;
+}
+
 interface Permission {
   id: string;
   name: string;
@@ -341,4 +356,14 @@ interface Language {
   name: string;
   code: string;
   is_metadata_language: boolean;
+}
+
+interface Platform {
+  id: number;
+  slug: string;
+  name: string;
+  logo_url: string;
+  supports_videos: boolean;
+  delivery_lead_days: number;
+  takedown_lead_days: number;
 }

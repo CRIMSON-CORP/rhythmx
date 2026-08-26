@@ -37,6 +37,8 @@ export const API_ROUTES = {
     TAKEDOWN: (reference: string) => `/api/releases/${reference}/takedown`,
     EARNINGS: (reference: string) => `/api/releases/${reference}/earnings`,
     DRAFT: (reference: string) => `/api/releases/draft/${reference}`,
+    ARTISTS: (reference: string) => `/api/releases/draft/${reference}/artists`,
+    TRACKS: (reference: string) => `/api/releases/draft/${reference}/tracks`,
     PLATFORMS: (reference: string) => `/api/releases/draft/${reference}/platforms`,
   },
   LABEL: {
