@@ -37,6 +37,7 @@ export const API_ROUTES = {
     TAKEDOWN: (reference: string) => `/api/releases/${reference}/takedown`,
     EARNINGS: (reference: string) => `/api/releases/${reference}/earnings`,
     DRAFT: (reference: string) => `/api/releases/draft/${reference}`,
+    PLATFORMS: (reference: string) => `/api/releases/draft/${reference}/platforms`,
   },
   LABEL: {
     ARTISTS: "/api/label/artists",
@@ -53,5 +54,6 @@ export const API_ROUTES = {
     TIMEZONES: "/api/meta/timezones",
     GENRES: "/api/meta/genres",
     LANGUAGES: "/api/meta/languages",
+    PLATFORMS: "/api/meta/platforms",
   },
 };
