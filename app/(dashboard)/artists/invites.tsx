@@ -1,4 +1,5 @@
 "use client";
+import CreateArtistFlow from "@/components/CreateArtistFlow";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +12,7 @@ import {
 import { Clock, Link, Plus, User, X } from "lucide-react";
 import Image from "next/image";
 import { VisuallyHidden } from "radix-ui";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 export function PendingInvitesTrigger() {
   return (
@@ -74,11 +75,10 @@ function Invites({ children }: { children: ReactNode }) {
                 placeholder="Email, comma to seperate"
                 className="grow p-4 leading-none"
               />
-              <button className="px-7 py-4 bg-brand-blue text-white">Invite</button>
+              <button className="px-7 py-3 bg-brand-blue text-white">Invite</button>
             </form>
-            <Button className="leading-none">
-              <Plus size={20} />
-            </Button>
+
+            <CreateArtist />
           </div>
           <div className="flex flex-col gap-2.5">
             <p className="font-medium text-xs">Pending Invites</p>
@@ -106,3 +106,19 @@ function Invites({ children }: { children: ReactNode }) {
 }
 
 export default Invites;
+
+function CreateArtist() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <CreateArtistFlow
+      open={open}
+      onOpenChange={setOpen}
+      trigger={
+        <Button className="leading-none">
+          <Plus size={20} />
+        </Button>
+      }
+    />
+  );
+}
