@@ -127,7 +127,7 @@ async function submitDraftRelease(previousState: State, formData: FormData): Pro
       message: "Draft saved successfully",
       status: "success",
       reference,
-      redirectUrl: `/discography/release/draft/${reference}/add-artists?from=${release_id ? "old" : "new"}`,
+      redirectUrl: `/discography/release/draft/${reference}/release-tracks?from=${release_id ? "old" : "new"}`,
     };
   } catch (error) {
     console.log(error);

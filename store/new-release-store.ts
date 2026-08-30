@@ -1,4 +1,3 @@
-import AddArtistPage from "@/app/(dashboard)/discography/single/new/steps/add-artist";
 import ChoosePlatform from "@/app/(dashboard)/discography/single/new/steps/choose-platform";
 import ReleaseDate from "@/app/(dashboard)/discography/single/new/steps/release-date";
 import ReleaseDetalsPage from "@/app/(dashboard)/discography/single/new/steps/release-detals";
@@ -8,7 +7,7 @@ import SplitRoyalty from "@/app/(dashboard)/discography/single/new/steps/split-r
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { goeyToast } from "goey-toast";
-import { AlignLeft, Calendar, Disc, DollarSign, Info, Layers, Star } from "lucide-react";
+import { AlignLeft, Calendar, Disc, DollarSign, Info, Layers } from "lucide-react";
 import { create } from "zustand";
 
 export interface ReleaseDetailsForm {
@@ -64,14 +63,14 @@ export const newReleaseStoreTitles = [
     path: "",
     Component: ReleaseDetalsPage,
   },
-  {
-    title: "Add Artist",
-    subtitle: "Assigned and manage the release artist",
-    tab_title: "Artist",
-    icon: Star,
-    path: "add-artists",
-    Component: AddArtistPage,
-  },
+  // {
+  //   title: "Add Artist",
+  //   subtitle: "Assigned and manage the release artist",
+  //   tab_title: "Artist",
+  //   icon: Star,
+  //   path: "add-artists",
+  //   Component: AddArtistPage,
+  // },
   {
     title: "Release Tracks",
     subtitle: "Add release tracks and track meta data",
