@@ -72,6 +72,7 @@
   --color-default-tertiary: var(--default-tertiary);
   --color-neutral-default: var(--neutral-default);
   --color-danger-default: #ec221f;
+  --color-positive-default: #02542d;
   --color-positive-tertiary: #14ae5c;
   --color-positive-secondary: #02542d;
   --radius-sm: calc(var(--radius) * 0.6);

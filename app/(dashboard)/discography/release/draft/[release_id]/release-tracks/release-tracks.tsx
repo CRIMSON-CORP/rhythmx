@@ -2,8 +2,10 @@
 
 import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
-import useNewReleaseStore from "@/store/new-release-store";
-import React, { useRef, useState, Suspense, use } from "react";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+import { useRouter } from "next/navigation";
+import React, { useRef, useState, useEffect, useMemo, Suspense, use } from "react";
 import {
   Dialog,
   DialogClose,
@@ -26,24 +28,29 @@ import {
 } from "@/components/ui/select";
 import { VisuallyHidden } from "radix-ui";
 import { artists } from "@/data/artists";
-import { releaseGenre } from "@/data/release-genre";
-import { releaseLanguage } from "@/data/release-language-dropdown";
+import { nanoid } from "nanoid";
 import {
   ArrowRight,
+  Award,
   Check,
   ChevronRight,
   Folder,
+  Headphones,
   List,
+  Loader2,
   Music,
+  PenLine,
   Plus,
   Search,
+  Star,
   Trash2,
+  User,
   X,
 } from "lucide-react";
 
 const promiseCache = new Map<string, Promise<Artist[]>>();
 
-function getArtistsPromise(query: string) {
+function getArtistsPromise(query: string): Promise<Artist[]> {
   const cacheKey = query.trim().toLowerCase();
   if (!promiseCache.has(cacheKey)) {
     const promise = new Promise<Artist[]>((resolve) => {
@@ -60,39 +67,45 @@ function getArtistsPromise(query: string) {
   return promiseCache.get(cacheKey)!;
 }
 
-const getAudioDuration = (file: File): Promise<string> => {
-  return new Promise((resolve) => {
-    const objectUrl = URL.createObjectURL(file);
-    const audio = new Audio(objectUrl);
+interface UploadingTrack {
+  id: string;
+  file: File;
+  name: string;
+  progress: number;
+  status: "uploading" | "error";
+  errorMessage?: string;
+}
 
-    const timeout = setTimeout(() => {
-      resolve("3:30");
-    }, 2000);
+interface ReleaseTracksProps {
+  releaseReference: string;
+  tracks: ReleaseTrack[];
+  meta?: {
+    genres: (Genre & { sub_genres: Genre[] })[];
+    languages: Language[];
+  };
+}
 
-    audio.addEventListener("loadedmetadata", () => {
-      clearTimeout(timeout);
-      const minutes = Math.floor(audio.duration / 60);
-      const seconds = Math.floor(audio.duration % 60);
-      const formatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-      URL.revokeObjectURL(objectUrl);
-      resolve(formatted);
-    });
+function formatDuration(durationInSeconds: number | null | undefined): string {
+  if (!durationInSeconds || isNaN(durationInSeconds)) return "0:00";
+  const minutes = Math.floor(durationInSeconds / 60);
+  const seconds = Math.floor(durationInSeconds % 60);
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
 
-    audio.addEventListener("error", () => {
-      clearTimeout(timeout);
-      URL.revokeObjectURL(objectUrl);
-      resolve("3:30");
-    });
-  });
-};
+function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: ReleaseTracksProps) {
+  const router = useRouter();
+  const [tracks, setTracks] = useState<ReleaseTrack[]>(initialTracks || []);
+  const [uploadingQueue, setUploadingQueue] = useState<UploadingTrack[]>([]);
+  const [deletingTrackRefs, setDeletingTrackRefs] = useState<Set<string>>(new Set());
+  const [editingTrackRef, setEditingTrackRef] = useState<string | null>(null);
 
-function ReleaseTracks(props: { tracks: ReleaseTrack[] }) {
-  const [tracks, setTracks] = useState<ReleaseTrack[]>(props.tracks);
-  const { form, setForm, next } = useNewReleaseStore();
   const [isDraggingAudio, setIsDraggingAudio] = useState(false);
-  const [editingTrackId, setEditingTrackId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounterAudio = useRef(0);
+
+  useEffect(() => {
+    setTracks(initialTracks || []);
+  }, [initialTracks]);
 
   const handleAudioDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -129,41 +142,73 @@ function ReleaseTracks(props: { tracks: ReleaseTrack[] }) {
     if (files && files.length > 0) {
       handleAudioFiles(files);
     }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
-  const simulateAudioUpload = (trackId: string) => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.floor(Math.random() * 15) + 8;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
+  const uploadSingleFile = async (file: File) => {
+    const uploadId = nanoid();
 
-        // Update track status to uploaded
-        setForm({
-          tracks: (useNewReleaseStore.getState().form.tracks || []).map((t) =>
-            t.id === trackId
-              ? { ...t, upload_progress: 100, is_uploaded: true, is_uploading: false }
-              : t,
-          ),
-        });
+    const newUploadItem: UploadingTrack = {
+      id: uploadId,
+      file,
+      name: file.name,
+      progress: 0,
+      status: "uploading",
+    };
+
+    setUploadingQueue((prev) => [...prev, newUploadItem]);
+
+    const formData = new FormData();
+    formData.append("audio", file);
+
+    try {
+      const response = await api.postFormData({
+        url: API_ROUTES.RELEASES.TRACKS.ADD(releaseReference),
+        formData,
+        onUploadProgress: (percent) => {
+          setUploadingQueue((prev) =>
+            prev.map((item) =>
+              item.id === uploadId
+                ? { ...item, progress: Math.min(Math.round(percent), 99) }
+                : item,
+            ),
+          );
+        },
+      });
+
+      const uploadedTrack = (response.data?.track || response.data) as ReleaseTrack;
+      if (uploadedTrack && uploadedTrack.reference) {
+        setTracks((prev) => [...prev, uploadedTrack]);
+        setUploadingQueue((prev) => prev.filter((item) => item.id !== uploadId));
         goeyToast.success("Upload Completed", {
-          description: "Track has been uploaded successfully",
-          duration: 1000,
+          description: `"${uploadedTrack.title || file.name}" was uploaded successfully.`,
         });
       } else {
-        // Update track progress
-        setForm({
-          tracks: (useNewReleaseStore.getState().form.tracks || []).map((t) =>
-            t.id === trackId ? { ...t, upload_progress: progress } : t,
-          ),
-        });
+        throw new Error("Invalid response from server");
       }
-    }, 400);
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Network error or upload failed";
+
+      setUploadingQueue((prev) =>
+        prev.map((item) =>
+          item.id === uploadId ? { ...item, status: "error", errorMessage: errorMsg } : item,
+        ),
+      );
+      goeyToast.error("Upload Failed", {
+        description: `Failed to upload "${file.name}": ${errorMsg}`,
+      });
+    }
   };
 
-  const handleAudioFiles = async (files: FileList) => {
-    const newTracksList: Track[] = [...(form.tracks || [])];
+  const handleAudioFiles = (files: FileList) => {
+    const validFiles: File[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -172,110 +217,106 @@ function ReleaseTracks(props: { tracks: ReleaseTrack[] }) {
         file.name.endsWith(".mp3") ||
         file.name.endsWith(".wav") ||
         file.name.endsWith(".aac") ||
+        file.name.endsWith(".flac") ||
         file.name.endsWith(".m4a");
 
       if (!isAudio) {
         goeyToast.error("Invalid File Type", {
-          description: `"${file.name}" is not a supported audio file format.`,
+          description: `"${file.name}" is not a supported audio format (MP3, WAV, FLAC, AAC).`,
         });
         continue;
       }
 
-      const id = "track_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
-      const track_title = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
-
-      let track_duration = "3:30";
-      try {
-        track_duration = await getAudioDuration(file);
-      } catch (e) {
-        console.error("Duration extraction failed:", e);
+      if (file.size > 200 * 1024 * 1024) {
+        goeyToast.error("File Too Large", {
+          description: `"${file.name}" exceeds the maximum allowed size of 200MB.`,
+        });
+        continue;
       }
 
-      const newTrack: Track = {
-        id,
-        track_title,
-        track_duration,
-        track_file: file,
-        track_audio_preview: URL.createObjectURL(file),
-        track_remote_url: null,
-        is_uploaded: false,
-        upload_progress: 0,
-        is_uploading: true,
-        primary_genre: form.genre || "",
-        language: form.language || "",
-        preview_start_time: "00:00",
-        main_artists: [],
-        featured_artists: [],
-        producer_credits: [],
-        lyrics: "",
-        master_rights_owner: "",
-        record_label: form.record_label || "",
-        parental_advisory: false,
-        already_online: false,
-        licensing_document: false,
-      };
-
-      newTracksList.push(newTrack);
-      simulateAudioUpload(id);
+      validFiles.push(file);
     }
 
-    setForm({ tracks: newTracksList });
-  };
+    if (validFiles.length === 0) return;
 
-  const handleStartEdit = (track: Track) => {
-    setEditingTrackId(track.id);
-  };
-
-  const handleSaveTrackDetails = (updatedTrack: Track) => {
-    setForm({
-      tracks: tracks.map((t) => (t.id === updatedTrack.id ? updatedTrack : t)),
+    validFiles.forEach((file) => {
+      uploadSingleFile(file);
     });
+  };
+
+  const handleCancelUpload = (uploadId: string) => {
+    setUploadingQueue((prev) => prev.filter((item) => item.id !== uploadId));
+  };
+
+  const handleRetryUpload = (item: UploadingTrack) => {
+    setUploadingQueue((prev) => prev.filter((q) => q.id !== item.id));
+    uploadSingleFile(item.file);
+  };
+
+  const handleStartEdit = (track: ReleaseTrack) => {
+    setEditingTrackRef(track.reference);
+  };
+
+  const handleSaveTrackDetails = (updatedTrack: ReleaseTrack) => {
+    setTracks((prev) =>
+      prev.map((t) => (t.reference === updatedTrack.reference ? updatedTrack : t)),
+    );
     goeyToast.success("Track details saved!");
-    setEditingTrackId(null);
+    setEditingTrackRef(null);
   };
 
-  const handleDeleteTrack = (trackId: string, e: React.MouseEvent) => {
+  const handleDeleteTrack = async (track: ReleaseTrack, e: React.MouseEvent) => {
     e.stopPropagation();
-    const trackToDelete = tracks.find((t) => t.id === trackId);
-    if (trackToDelete?.track_audio_preview) {
-      URL.revokeObjectURL(trackToDelete.track_audio_preview);
+    if (deletingTrackRefs.has(track.reference)) return;
+
+    setDeletingTrackRefs((prev) => new Set(prev).add(track.reference));
+
+    try {
+      await api.delete(API_ROUTES.RELEASES.TRACKS.DELETE(releaseReference, track.reference));
+      setTracks((prev) => prev.filter((t) => t.reference !== track.reference));
+      if (editingTrackRef === track.reference) {
+        setEditingTrackRef(null);
+      }
+      goeyToast.success("Track removed");
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Failed to delete track";
+      goeyToast.error("Delete Failed", { description: errorMsg });
+    } finally {
+      setDeletingTrackRefs((prev) => {
+        const next = new Set(prev);
+        next.delete(track.reference);
+        return next;
+      });
     }
-    setForm({
-      tracks: tracks.filter((t) => t.id !== trackId),
-    });
-    if (editingTrackId === trackId) {
-      setEditingTrackId(null);
-    }
-    goeyToast.success("Track removed");
   };
 
-  const isTracksValid = tracks.length > 0 && tracks.every((track) => track.is_uploaded);
-  const isStepValid = isTracksValid;
+  const isStepValid = tracks.length > 0 && uploadingQueue.length === 0;
 
   const handleContinue = () => {
-    if (isStepValid) {
-      next();
-    } else {
-      if (tracks.length === 0) {
-        goeyToast.error("Tracks Required", {
-          description: "Please upload at least one audio track to continue",
-        });
-      } else if (!tracks.every((track) => track.is_uploaded)) {
-        goeyToast.error("Upload in Progress", {
-          description: "Please wait for all tracks to finish uploading",
-        });
-      } else {
-        goeyToast.error("All Fields are required", {
-          description: "Please fill in all release details to continue",
-        });
-      }
+    if (uploadingQueue.length > 0) {
+      goeyToast.error("Upload in Progress", {
+        description: "Please wait for all audio files to finish uploading before continuing.",
+      });
+      return;
     }
+    if (tracks.length === 0) {
+      goeyToast.error("Tracks Required", {
+        description: "Please upload at least one audio track to continue.",
+      });
+      return;
+    }
+    router.push(`/discography/release/draft/${releaseReference}/choose-platforms`);
   };
 
-  const editingTrack = tracks.find((t) => t.id === editingTrackId) || null;
+  const editingTrack = tracks.find((t) => t.reference === editingTrackRef) || null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[0.55fr_0.45fr] gap-8 items-stretch pb-10">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch pb-10">
       {/* Left Column: Form Fields Card */}
       <div className="flex flex-col gap-4">
         <div
@@ -305,7 +346,7 @@ function ReleaseTracks(props: { tracks: ReleaseTrack[] }) {
           <input
             type="file"
             id="audio-input"
-            accept="audio/*,.mp3,.wav,.aac,.m4a"
+            accept="audio/*,.mp3,.wav,.aac,.flac,.m4a"
             className="hidden"
             ref={fileInputRef}
             onChange={handleAudioFileChange}
@@ -315,7 +356,7 @@ function ReleaseTracks(props: { tracks: ReleaseTrack[] }) {
 
         <p className="font-medium text-border-default-secondary">Tracks Added</p>
         <div className="flex flex-col bg-white rounded-30 overflow-hidden divide-y divide-default-default">
-          {tracks.length === 0 ? (
+          {tracks.length === 0 && uploadingQueue.length === 0 ? (
             <div className="p-8 text-center text-border-default-secondary font-medium text-sm">
               No tracks uploaded yet.
             </div>
@@ -323,12 +364,22 @@ function ReleaseTracks(props: { tracks: ReleaseTrack[] }) {
             <ul className="flex flex-col divide-y divide-default-default">
               {tracks.map((track, index) => (
                 <TrackItem
-                  key={track.id}
+                  key={track.reference}
                   track={track}
                   index={index}
-                  isSelected={editingTrackId === track.id}
+                  isSelected={editingTrackRef === track.reference}
+                  isDeleting={deletingTrackRefs.has(track.reference)}
                   onEdit={() => handleStartEdit(track)}
-                  onDelete={(e) => handleDeleteTrack(track.id, e)}
+                  onDelete={(e) => handleDeleteTrack(track, e)}
+                />
+              ))}
+              {uploadingQueue.map((item, queueIdx) => (
+                <UploadingTrackItem
+                  key={item.id}
+                  item={item}
+                  index={tracks.length + queueIdx}
+                  onCancel={() => handleCancelUpload(item.id)}
+                  onRetry={() => handleRetryUpload(item)}
                 />
               ))}
             </ul>
@@ -356,16 +407,17 @@ function ReleaseTracks(props: { tracks: ReleaseTrack[] }) {
 
       {/* Right Column: Track Edit Panel or Placeholder */}
       <div className="relative isolate bg-white rounded-30 min-h-125 overflow-hidden">
-        <div className="absolute w-full top-0 left right-0 h-1/3 bg-linear-to-r from-[#9747FF]/50 to-[#0066FF]/50 -z-10 opacity-25 blur-3xl"></div>
+        <div className="absolute w-full top-0 left right-0 h-1/3 max-h-68.5 bg-linear-to-r from-[#9747FF]/50 to-[#0066FF]/50 -z-10 opacity-25 blur-3xl"></div>
         {editingTrack ? (
           <TrackEditPanel
             track={editingTrack}
-            trackIndex={tracks.findIndex((t) => t.id === editingTrackId)}
+            trackIndex={tracks.findIndex((t) => t.reference === editingTrackRef)}
+            meta={meta}
             onSave={handleSaveTrackDetails}
             onDelete={() => {
-              if (editingTrackId) {
+              if (editingTrackRef) {
                 const dummyEvent = { stopPropagation: () => {} } as React.MouseEvent;
-                handleDeleteTrack(editingTrackId, dummyEvent);
+                handleDeleteTrack(editingTrack, dummyEvent);
               }
             }}
           />
@@ -392,16 +444,18 @@ function TrackItem({
   track,
   index,
   isSelected,
+  isDeleting,
   onEdit,
   onDelete,
 }: {
-  track: Track;
+  track: ReleaseTrack;
   index: number;
   isSelected: boolean;
+  isDeleting: boolean;
   onEdit: () => void;
   onDelete: (e: React.MouseEvent) => void;
 }) {
-  const { track_title, is_uploaded, upload_progress, is_uploading } = track;
+  const displayTitle = track.title || "Untitled";
 
   return (
     <li
@@ -410,59 +464,139 @@ function TrackItem({
         isSelected ? "bg-page-background" : "bg-white hover:bg-page-background/30",
       )}
     >
-      {/* Simulated progress indicator */}
-      {is_uploading && (
-        <div
-          style={{
-            width: `${upload_progress}%`,
-            transition: "width 0.3s ease-out",
-          }}
-          className="absolute top-0 left-0 h-full bg-[#CFF7D3] opacity-60 z-0 pointer-events-none"
-        ></div>
-      )}
-
-      {/* Content wrapper to raise it above absolute progress indicator */}
       <div className="relative z-10 flex items-center gap-4 w-full">
+        {/* Index circle */}
         <div className="size-10 rounded-full bg-page-background flex items-center justify-center font-medium text-default flex-none">
           {index + 1}
         </div>
-        <div
-          className={cn(
-            "size-10.5 rounded-full bg-brand-purple/12 flex items-center justify-center flex-none",
-            is_uploading ? "bg-white" : "bg-brand-purple/12",
-          )}
-        >
-          <Music size={24} className={is_uploading ? "text-brand-orange" : "text-brand-purple"} />
+
+        {/* Music icon */}
+        <div className="size-10.5 rounded-full bg-brand-purple/12 flex items-center justify-center flex-none">
+          <Music size={24} className="text-brand-purple" />
         </div>
+
+        {/* Title and status */}
         <div className="flex flex-col grow break-all min-w-0">
-          <span className="font-medium text-sm text-default truncate">{track_title}</span>
+          <span className="font-medium text-sm text-default truncate">{displayTitle}</span>
           <span className="text-[11px] text-border-default-secondary font-medium leading-none mt-1">
-            {is_uploaded
-              ? "Uploaded"
-              : is_uploading
-                ? `Uploading... ${upload_progress}%`
-                : "Processing..."}
+            Uploaded {track.duration ? `• ${formatDuration(track.duration)}` : ""}
           </span>
         </div>
+
+        {/* Action buttons */}
         <div className="flex items-center gap-3 flex-none">
-          {is_uploaded ? (
-            <Button
-              variant="outline"
-              onClick={onEdit}
-              className={cn(
-                "rounded-full px-4 py-3 h-auto transition-colors",
-                isSelected
-                  ? "bg-default text-white border-transparent hover:bg-default/80"
-                  : "bg-transparent text-default border-default-default/20 hover:bg-default-default/5",
-              )}
-              size="sm"
-            >
-              Edit Track
-            </Button>
-          ) : null}
+          <Button
+            variant="outline"
+            onClick={onEdit}
+            className={cn(
+              "rounded-full px-4 py-2 h-auto text-xs transition-colors",
+              isSelected
+                ? "bg-default text-white border-transparent hover:bg-default/80"
+                : "bg-transparent text-default border-default-default/20 hover:bg-default-default/5",
+            )}
+            size="sm"
+          >
+            Edit Track
+          </Button>
+
           <button
             onClick={onDelete}
-            className="rounded-full group/btn cursor-pointer hover:bg-page-background transition-colors"
+            disabled={isDeleting}
+            className="p-1 rounded-full group/btn cursor-pointer hover:bg-page-background transition-colors disabled:opacity-50"
+            title="Delete track"
+          >
+            {isDeleting ? (
+              <Loader2 size={16} className="text-[#EC221F] animate-spin" />
+            ) : (
+              <Trash2
+                size={16}
+                className="text-[#EC221F] group-hover/btn:scale-110 transition-transform"
+              />
+            )}
+          </button>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function UploadingTrackItem({
+  item,
+  index,
+  onCancel,
+  onRetry,
+}: {
+  item: UploadingTrack;
+  index: number;
+  onCancel: () => void;
+  onRetry?: () => void;
+}) {
+  const isError = item.status === "error";
+
+  return (
+    <li className="relative flex items-center gap-4 px-6 py-4.5 bg-white overflow-hidden transition-colors">
+      {/* Background progress indicator matching design */}
+      {!isError && (
+        <div
+          style={{
+            width: `${item.progress}%`,
+            transition: "width 0.25s ease-out",
+          }}
+          className="absolute top-0 left-0 h-full bg-[#D4F7D9] pointer-events-none"
+        />
+      )}
+
+      {/* Content wrapper */}
+      <div className="relative z-10 flex items-center gap-4 w-full">
+        {/* Index circle */}
+        <div
+          className={cn(
+            "size-10 rounded-full flex items-center justify-center font-medium flex-none",
+            isError ? "bg-red-50 text-danger-default" : "bg-[#EBFFEE] text-positive-default",
+          )}
+        >
+          {index + 1}
+        </div>
+
+        {/* Music icon */}
+        <div
+          className={cn(
+            "size-10.5 rounded-full flex items-center justify-center flex-none",
+            isError ? "bg-red-50" : "bg-white",
+          )}
+        >
+          <Music size={24} className={isError ? "text-danger-default" : "text-brand-orange"} />
+        </div>
+
+        {/* Title and progress status */}
+        <div className="flex flex-col grow break-all min-w-0">
+          <span className="font-medium text-sm text-default truncate">{item.name}</span>
+          <span
+            className={cn(
+              "text-[11px] font-medium leading-none mt-1",
+              isError ? "text-danger-default" : "text-positive-default",
+            )}
+          >
+            {isError
+              ? item.errorMessage || "Upload failed"
+              : `uploading... ${Math.round(item.progress)}%`}
+          </span>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-3 flex-none">
+          {isError && onRetry && (
+            <button
+              onClick={onRetry}
+              className="text-xs text-brand-orange hover:underline font-medium"
+            >
+              Retry
+            </button>
+          )}
+          <button
+            onClick={onCancel}
+            className="p-1 rounded-full group/btn cursor-pointer hover:bg-page-background transition-colors"
+            title={isError ? "Remove from list" : "Cancel upload"}
           >
             <Trash2
               size={16}
@@ -475,246 +609,500 @@ function TrackItem({
   );
 }
 
+function formatRole(role: string): string {
+  const normalized = role.toLowerCase().trim();
+  if (normalized === "featured" || normalized === "featured-artist" || normalized === "feature")
+    return "Feature";
+  if (normalized === "primary-artist" || normalized === "primary") return "Primary Artist";
+  if (normalized === "main-artist" || normalized === "main_artist") return "Main Primary Artist";
+  if (normalized === "art-director" || normalized === "art_director") return "Art Director";
+  if (normalized === "composer-lyricist") return "Composer & Lyricist";
+  return role
+    .split(/[-_]/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function ContributorRow({
+  person,
+  roleLabel,
+  avatarShape = "circle",
+  onRemove,
+}: {
+  person: ReleaseTrackPerson;
+  roleLabel?: string;
+  avatarShape?: "square" | "circle";
+  onRemove: () => void;
+}) {
+  const displayRole =
+    roleLabel ||
+    (person.roles && person.roles.length > 0
+      ? person.roles.map((r) => formatRole(r)).join(", ")
+      : "Contributor");
+
+  return (
+    <div className="flex flex-col gap-2 pt-1">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {person.image_url ? (
+            <Image
+              src={person.image_url}
+              alt={person.display_name}
+              width={38}
+              height={38}
+              className={cn(
+                "size-9.5 object-cover shrink-0 border border-default-default/10",
+                avatarShape === "square" ? "rounded-xl" : "rounded-full",
+              )}
+            />
+          ) : (
+            <div
+              className={cn(
+                "size-9.5 bg-neutral-200/70 flex items-center justify-center shrink-0 text-neutral-400",
+                avatarShape === "square" ? "rounded-xl" : "rounded-full",
+              )}
+            >
+              <User size={18} />
+            </div>
+          )}
+          <div className="flex flex-col min-w-0">
+            <span className="font-semibold text-sm text-default truncate">
+              {person.display_name}
+            </span>
+            <span className="text-xs text-border-default-secondary truncate">{displayRole}</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="rounded-full border border-default-default/35 bg-white hover:bg-page-background text-default px-4 py-1 text-xs font-medium cursor-pointer transition-colors shadow-2xs"
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function TrackEditPanel({
   track,
   trackIndex,
+  meta,
   onSave,
   onDelete,
 }: {
-  track: Track;
+  track: ReleaseTrack;
   trackIndex: number;
-  onSave: (updatedTrack: Track) => void;
+  meta?: {
+    genres: (Genre & { sub_genres: Genre[] })[];
+    languages: Language[];
+  };
+  onSave: (updatedTrack: ReleaseTrack) => void;
   onDelete: () => void;
 }) {
-  const [localForm, setLocalForm] = useState<Track>({ ...track });
+  const [localForm, setLocalForm] = useState<ReleaseTrack>({ ...track });
 
-  const handleInputChange = (key: keyof Track, value: string | boolean | Artist[]) => {
+  useEffect(() => {
+    setLocalForm({ ...track });
+  }, [track]);
+
+  const activeMainGenre = useMemo(
+    () => meta?.genres?.find((g) => g.slug === localForm.primary_genre),
+    [meta?.genres, localForm.primary_genre],
+  );
+
+  const handleInputChange = (key: keyof ReleaseTrack, value: unknown) => {
     setLocalForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleAddArtist = (
-    section: "main" | "featured" | "producer" | "writer",
-    artist: Artist,
-  ) => {
-    const currentList =
-      section === "main"
-        ? localForm.main_artists || []
-        : section === "featured"
-          ? localForm.featured_artists || []
-          : section === "writer"
-            ? localForm.writers || []
-            : localForm.producer_credits || [];
-
-    if (currentList.some((a) => a.id === artist.id)) return;
-
-    const updatedList = [...currentList, artist];
-    handleInputChange(
-      section === "main"
-        ? "main_artists"
-        : section === "featured"
-          ? "featured_artists"
-          : section === "writer"
-            ? "writers"
-            : "producer_credits",
-      updatedList,
-    );
+  const handlePrimaryGenreChange = (newSlug: string) => {
+    setLocalForm((prev) => ({
+      ...prev,
+      primary_genre: newSlug,
+      secondary_genre: null,
+    }));
   };
 
-  const handleRemoveArtist = (
-    section: "main" | "featured" | "producer" | "writer",
-    artistId: string,
-  ) => {
-    const currentList =
-      section === "main"
-        ? localForm.main_artists || []
-        : section === "featured"
-          ? localForm.featured_artists || []
-          : section === "writer"
-            ? localForm.writers || []
-            : localForm.producer_credits || [];
-
-    const updatedList = currentList.filter((a) => a.id !== artistId);
-    handleInputChange(
-      section === "main"
-        ? "main_artists"
-        : section === "featured"
-          ? "featured_artists"
-          : section === "writer"
-            ? "writers"
-            : "producer_credits",
-      updatedList,
-    );
+  const handleRemovePerson = (personRef: string) => {
+    setLocalForm((prev) => ({
+      ...prev,
+      people: prev.people?.filter((p) => p.reference !== personRef) || [],
+    }));
   };
+
+  const mainArtists = localForm.people?.filter((p) => p.is_main_artist) || [];
+
+  const producerEngineers =
+    localForm.people?.filter(
+      (p) =>
+        !p.is_main_artist &&
+        p.roles?.some(
+          (r) =>
+            r.toLowerCase().includes("producer") ||
+            r.toLowerCase().includes("engineer") ||
+            r.toLowerCase().includes("director") ||
+            r.toLowerCase().includes("mixing") ||
+            r.toLowerCase().includes("mastering"),
+        ),
+    ) || [];
+
+  const writersPublishers =
+    localForm.people?.filter(
+      (p) =>
+        !p.is_main_artist &&
+        p.roles?.some(
+          (r) =>
+            r.toLowerCase().includes("writer") ||
+            r.toLowerCase().includes("composer") ||
+            r.toLowerCase().includes("author") ||
+            r.toLowerCase().includes("publisher") ||
+            r.toLowerCase().includes("lyricist"),
+        ),
+    ) || [];
+
+  const keyArtists =
+    localForm.people?.filter(
+      (p) =>
+        !p.is_main_artist &&
+        !producerEngineers.some((pe) => pe.reference === p.reference) &&
+        !writersPublishers.some((wp) => wp.reference === p.reference),
+    ) || [];
 
   return (
     <div className="rounded-30 p-6 md:p-8 flex flex-col gap-8 max-h-[85vh] overflow-y-auto no-scrollbar">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-default">Edit Track Meta Data</h3>
-        <button onClick={onDelete}>
+        <h3 className="text-xl font-medium text-default">Edit Track Meta Data</h3>
+        <button onClick={onDelete} title="Delete track" className="cursor-pointer">
           <Trash2 size={16} className="text-danger-default hover:scale-110 transition-transform" />
         </button>
       </div>
 
-      <div className="py-6 flex flex-col gap-3">
-        <h2 className="text-2xl font-bold font-heading text-default truncate">
-          {localForm.track_title || "Untitled"}
+      <div className="py-6 flex flex-col gap-2">
+        <h2 className="text-2xl font-semibold font-heading text-default truncate">
+          {localForm.title || "Untitled"}
         </h2>
         <p className="text-border-default-secondary font-medium truncate">
-          {localForm.track_file?.name || "Audio file"}
+          {localForm.audio_url
+            ? localForm.audio_url.split("/").pop()?.split("?")[0] || "Audio file"
+            : "Audio file"}
         </p>
       </div>
 
-      <div className="bg-white rounded-20">
+      <div className="bg-white rounded-30">
         {/* Track File Card */}
-        <div className="flex items-center gap-4 p-4 border-b border-b-default-default">
+        <div className="flex items-center gap-4 p-4 border-b border-b-default-default/15 bg-page-background/20">
           <div className="size-10.5 rounded-full bg-brand-purple/12 flex items-center justify-center flex-none">
-            <Music size={24} className="text-brand-purple" />
+            <Music size={26} className="text-brand-purple" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-medium truncate">
-              {localForm.track_title || "Tomorrows People"}
+            <span className="font-medium text-default truncate">
+              {localForm.title || "Tomorrow's People"}
             </span>
             <span className="text-xs text-border-default-secondary">Track {trackIndex + 1}</span>
           </div>
         </div>
 
-        <div className="px-6 py-4 flex flex-col gap-4 ">
+        <div className="px-6 py-5 flex flex-col gap-6">
           {/* Track Info */}
-          <h4 className="font-medium text-border-default-secondary">Track Info</h4>
+          <div className="flex flex-col gap-4">
+            <h4 className="font-medium text-border-default-secondary">Track Info</h4>
 
-          <div className="p-5 bg-page-background/70 rounded-20 flex flex-col gap-4">
-            {/* Track Title */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-medium text-default">Track Title</label>
-              <input
-                type="text"
-                value={localForm.track_title}
-                onChange={(e) => handleInputChange("track_title", e.target.value)}
-                placeholder="Enter track title"
-                className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm font-medium outline-none focus:border-brand-orange transition-colors"
-              />
-            </div>
+            <div className="p-4 bg-page-background/70 rounded-30 flex flex-col gap-4">
+              {/* Track Title */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-medium text-default">Track Title</label>
+                <input
+                  type="text"
+                  value={localForm.title || ""}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  placeholder="Enter track title"
+                  className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm leading-none font-medium outline-none focus:border-brand-orange transition-colors"
+                />
+              </div>
 
-            {/* Primary Genre */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-medium text-default">Primary Genre</label>
-              <Select
-                value={localForm.primary_genre || ""}
-                onValueChange={(value) => handleInputChange("primary_genre", value)}
-              >
-                <SelectTrigger className="w-full bg-white h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-colors">
-                  <SelectValue placeholder="Select a genre (Pop, Rock, Country etc.)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {releaseGenre.map((g) => (
-                    <SelectItem key={g.value} value={g.value}>
-                      {g.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              {/* Primary & Secondary Genre */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-medium text-default">Primary Genre</label>
+                  <Select
+                    value={localForm.primary_genre || ""}
+                    onValueChange={handlePrimaryGenreChange}
+                  >
+                    <SelectTrigger className="w-full bg-white h-auto rounded-xl border border-default-default px-4 py-3 text-sm leading-none text-default font-medium outline-none focus:border-brand-orange transition-colors">
+                      <SelectValue placeholder="Select a genre (Pop, Rock, Country etc.)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {meta?.genres?.map((g) => (
+                        <SelectItem key={g.slug} value={g.slug}>
+                          {g.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* Track Language */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-medium text-default">Track Language</label>
-              <Select
-                value={localForm.language || ""}
-                onValueChange={(value) => handleInputChange("language", value)}
-              >
-                <SelectTrigger className="w-full bg-white h-auto rounded-xl border border-default-default px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-colors">
-                  <SelectValue placeholder="Select language (English, French, Spanish etc.)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {releaseLanguage.map((l) => (
-                    <SelectItem key={l.value} value={l.value}>
-                      {l.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-medium text-default">Secondary Genre</label>
+                  <Select
+                    value={localForm.secondary_genre || ""}
+                    onValueChange={(val) => handleInputChange("secondary_genre", val)}
+                    disabled={!activeMainGenre || !activeMainGenre.sub_genres?.length}
+                  >
+                    <SelectTrigger className="w-full bg-white h-auto rounded-xl border border-default-default px-4 py-3 text-sm leading-none text-default font-medium outline-none focus:border-brand-orange transition-colors disabled:bg-page-background/50 disabled:text-border-default-secondary">
+                      <SelectValue
+                        placeholder={
+                          activeMainGenre
+                            ? activeMainGenre.sub_genres?.length
+                              ? "Select a genre (Pop, Rock, Country etc.)"
+                              : "No sub-genres available"
+                            : "Select primary genre first"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activeMainGenre?.sub_genres?.map((sub) => (
+                        <SelectItem key={sub.slug} value={sub.slug}>
+                          {sub.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-            {/* Preview Clip Start Time */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-medium text-default">
-                Preview/Clip Start Time (mm:ss)
-              </label>
-              <input
-                type="text"
-                value={localForm.preview_start_time || "00:00"}
-                onChange={(e) => handleInputChange("preview_start_time", e.target.value)}
-                placeholder="00:00"
-                className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm font-medium outline-none focus:border-brand-orange transition-colors"
-              />
+              {/* Track Language */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-medium text-default">Track Language</label>
+                <Select
+                  value={localForm.language || ""}
+                  onValueChange={(val) => handleInputChange("language", val)}
+                >
+                  <SelectTrigger className="w-full bg-white h-auto rounded-xl border border-default-default px-4 py-3 text-sm leading-none text-default font-medium outline-none focus:border-brand-orange transition-colors">
+                    <SelectValue placeholder="Select language (English, French, Spanish etc.)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {meta?.languages?.map((lang) => (
+                      <SelectItem key={lang.slug} value={lang.slug}>
+                        {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Preview Clip Start Time */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-medium text-default">
+                  Preview/Clip Start Time (mm:ss)
+                </label>
+                <input
+                  type="text"
+                  value={localForm.preview_clip || ""}
+                  onChange={(e) => handleInputChange("preview_clip", e.target.value)}
+                  placeholder="00:00"
+                  className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm leading-none font-medium outline-none focus:border-brand-orange transition-colors"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Track Artists */}
-          <h4 className="font-medium text-border-default-secondary">Track Artist</h4>
-          <div className="p-5 bg-page-background/70 rounded-20 flex flex-col gap-4">
-            {/* Track Main Artist */}
-            <TrackArtistAdder
-              sectionType="main"
-              addedArtists={localForm.main_artists || []}
-              onAddArtist={(artist) => handleAddArtist("main", artist)}
-              onRemoveArtist={(id) => handleRemoveArtist("main", id)}
-            />
+          {/* Track Artist Section */}
+          <div className="flex flex-col gap-4">
+            <h4 className="font-medium text-border-default-secondary">Track Artist</h4>
 
-            {/* Feature Artist */}
-            <TrackArtistAdder
-              sectionType="featured"
-              addedArtists={localForm.featured_artists || []}
-              onAddArtist={(artist) => handleAddArtist("featured", artist)}
-              onRemoveArtist={(id) => handleRemoveArtist("featured", id)}
-            />
+            {/* 1. Main Primary Artist */}
+            <div className="p-4 bg-page-background/70 rounded-30 flex flex-col gap-4">
+              <h5 className="font-medium text-border-default-secondary">Main Primary Artist</h5>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-page-background/70 border border-default-default">
+                <div className="flex items-center gap-3">
+                  <div className="size-10.5 rounded-10 bg-brand-purple/12 flex items-center justify-center flex-none">
+                    <Star size={26.25} className="text-[#6500E9]" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <h6 className="font-medium text-sm text-default">Add main primary artist</h6>
+                    <p className="text-xs font-medium text-border-default-secondary">
+                      This is the name your music appears under on Spotify, Apple Music and other
+                      stores.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-none">
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="rounded-xl px-4 py-3 text-xs font-medium bg-[#6500E9] hover:bg-brand-purple/90 text-white flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <span>Select your artist</span>
+                    <Plus size={24} />
+                  </Button>
+                </div>
+              </div>
 
-            {/* Producer & Engineer Credit */}
-            <TrackArtistAdder
-              sectionType="producer"
-              addedArtists={localForm.producer_credits || []}
-              onAddArtist={(artist) => handleAddArtist("producer", artist)}
-              onRemoveArtist={(id) => handleRemoveArtist("producer", id)}
-            />
-            {/* Producer & Engineer Credit */}
-            <TrackArtistAdder
-              sectionType="writer"
-              addedArtists={localForm.producer_credits || []}
-              onAddArtist={(artist) => handleAddArtist("writer", artist)}
-              onRemoveArtist={(id) => handleRemoveArtist("writer", id)}
-            />
+              {mainArtists.map((person) => (
+                <ContributorRow
+                  key={person.reference}
+                  person={person}
+                  roleLabel="Main Primary Artist"
+                  avatarShape="square"
+                  onRemove={() => handleRemovePerson(person.reference)}
+                />
+              ))}
+            </div>
+
+            {/* 2. Key Artists */}
+            <div className="p-4 bg-page-background/70 rounded-30 flex flex-col gap-4">
+              <h5 className="font-medium text-border-default-secondary">Key Artists</h5>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-page-background/70 border border-default-default">
+                <div className="flex items-center gap-3">
+                  <div className="size-10.5 rounded-10 bg-[#FFE8D9] flex items-center justify-center flex-none">
+                    <Award size={26.25} className="text-[#FF5B00]" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <h6 className="font-medium text-sm text-default">Add key artists</h6>
+                    <p className="text-xs font-medium text-border-default-secondary">
+                      Select key artists from your record label or add key artists outside your
+                      record label.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-none">
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="rounded-xl px-4 py-3 text-xs font-medium bg-[#6500E9] hover:bg-brand-purple/90 text-white flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <span>Select your artist</span>
+                    <Plus size={24} />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl px-4 py-3 text-xs font-medium outline outline-neutral-default text-default hover:bg-page-background flex items-center gap-2.5 cursor-pointer"
+                  >
+                    <span>Add non-label artist</span>
+                    <Plus size={24} />
+                  </Button>
+                </div>
+              </div>
+
+              {keyArtists.map((person) => (
+                <ContributorRow
+                  key={person.reference}
+                  person={person}
+                  avatarShape="circle"
+                  onRemove={() => handleRemovePerson(person.reference)}
+                />
+              ))}
+            </div>
+
+            {/* 3. Producer & Engineer Credits */}
+            <div className="p-4 bg-page-background/70 rounded-30 flex flex-col gap-4">
+              <h5 className="font-medium text-border-default-secondary">
+                Producer & Engineer Credits
+              </h5>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-page-background/70 border border-default-default">
+                <div className="flex items-center gap-3">
+                  <div className="size-10.5 rounded-10 bg-[#DBECFE] flex items-center justify-center flex-none">
+                    <Headphones size={26.25} className="text-[#1E75FF]" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <h6 className="font-medium text-sm text-default">
+                      Add producer and engineer credit
+                    </h6>
+                    <p className="text-xs font-medium text-border-default-secondary">
+                      Include producer and engineer credit for this release
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl px-4 py-3 text-xs font-medium outline outline-neutral-default text-default hover:bg-page-background flex items-center gap-2.5 cursor-pointer flex-none"
+                >
+                  <span>Add</span>
+                  <Plus size={24} />
+                </Button>
+              </div>
+
+              {producerEngineers.map((person) => (
+                <ContributorRow
+                  key={person.reference}
+                  person={person}
+                  avatarShape="circle"
+                  onRemove={() => handleRemovePerson(person.reference)}
+                />
+              ))}
+            </div>
+
+            {/* 4. Writers & Publishers */}
+            <div className="p-4 bg-page-background/70 rounded-30 flex flex-col gap-4">
+              <h5 className="font-medium text-border-default-secondary">Writers & Publishers</h5>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-page-background/70 border border-default-default">
+                <div className="flex items-center gap-3">
+                  <div className="size-10.5 rounded-10 bg-brand-purple/12 flex items-center justify-center flex-none">
+                    <PenLine size={26.25} className="text-black" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <h6 className="font-medium text-sm text-default">Add writers and publishers</h6>
+                    <p className="text-xs font-medium text-border-default-secondary">
+                      Include the writer or the publisher for this track
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl px-4 py-3 text-xs font-medium outline outline-neutral-default text-default hover:bg-page-background flex items-center gap-2.5 cursor-pointer flex-none"
+                >
+                  <span>Add</span>
+                  <Plus size={24} />
+                </Button>
+              </div>
+
+              {writersPublishers.map((person) => (
+                <ContributorRow
+                  key={person.reference}
+                  person={person}
+                  avatarShape="circle"
+                  onRemove={() => handleRemovePerson(person.reference)}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Track Lyrics */}
-          <div className="flex flex-col gap-4 border-b border-default-default/10">
-            <h4 className="font-medium text-xs text-default">Track Lyrics (Optional)</h4>
-            <div className="flex flex-col gap-2 rounded-xl border border-default-default p-4 text-sm font-medium">
+          <div className="flex flex-col gap-2">
+            <h4 className="font-medium text-default text-xs">Track Lyrics (Optional)</h4>
+            <div className="flex flex-col gap-2 rounded-md border border-default-default bg-white p-4">
               <textarea
                 value={localForm.lyrics || ""}
-                rows={4}
+                rows={3}
                 placeholder="Write or paste track lyrics here"
                 onChange={(e) => handleInputChange("lyrics", e.target.value)}
-                className="w-full resize-none text-sm text-default border-b border-default-default/20 focus:border-brand-orange transition-colors font-medium outline-none pb-2 placeholder:text-[#8E8E93]"
+                className="w-full resize-none text-sm text-default border-b border-default-default/15 focus:border-brand-orange transition-colors font-medium outline-none pb-3 placeholder:text-[#8E8E93]"
               />
-              <div className="flex items-center gap-2 text-xs text-[#8E8E93] mt-2">
-                <Icon name="info-square" size={18} />
+              <div className="flex items-center gap-2 text-xs text-[#8E8E93] pt-1">
+                <Icon name="info-square" size={16} />
                 <span>lyrics are not publicly visible</span>
               </div>
             </div>
           </div>
 
           {/* Rights & Label */}
-          <div className="flex flex-col gap-4 border-b border-default-default/10">
+          <div className="flex flex-col gap-4">
             {/* © - Master Rights Owner */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium text-default">© - Master Rights Owner</label>
               <input
                 type="text"
-                value={localForm.master_rights_owner || ""}
-                onChange={(e) => handleInputChange("master_rights_owner", e.target.value)}
+                value={localForm.master_owner || ""}
+                onChange={(e) => handleInputChange("master_owner", e.target.value)}
                 placeholder="Enter track right owner"
-                className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm font-medium outline-none focus:border-brand-orange transition-colors"
+                className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm leading-none font-medium outline-none focus:border-brand-orange transition-colors"
               />
             </div>
 
@@ -723,80 +1111,81 @@ function TrackEditPanel({
               <label className="text-xs font-medium text-default">Music Label</label>
               <input
                 type="text"
-                value={localForm.record_label || ""}
-                onChange={(e) => handleInputChange("record_label", e.target.value)}
+                value={localForm.label || ""}
+                onChange={(e) => handleInputChange("label", e.target.value)}
                 placeholder="Enter record label"
-                className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm font-medium outline-none focus:border-brand-orange transition-colors"
+                className="w-full bg-white rounded-xl border border-default-default px-4 py-3 text-sm leading-none font-medium outline-none focus:border-brand-orange transition-colors"
               />
             </div>
           </div>
 
           {/* Checkboxes / Switches */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3.5 pt-1">
             {/* Parental Advisory */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-between sm:justify-start gap-3">
               <span className="font-medium text-sm text-default">
-                Does this track require a Parental Advisory?
+                Does this track require a Parental Advisory ?
               </span>
               <button
-                onClick={() => handleInputChange("parental_advisory", !localForm.parental_advisory)}
+                type="button"
+                onClick={() => handleInputChange("has_advisory", !localForm.has_advisory)}
                 className={cn(
-                  "size-4.5 rounded-full outline outline-default-default flex items-center justify-center transition-colors",
-                  localForm.parental_advisory
-                    ? "bg-brand-blue outline-brand-blue text-white"
-                    : "bg-transparent text-transparent hover:bg-page-background/50",
+                  "size-5 rounded-full flex items-center justify-center transition-colors cursor-pointer",
+                  localForm.has_advisory
+                    ? "bg-[#0066FF] text-white"
+                    : "border border-default-default/60 text-transparent hover:border-default-default",
                 )}
               >
-                <Check size={14} className="stroke-[2.5]" />
+                <Check size={12} className="stroke-[3]" />
               </button>
             </div>
 
             {/* Already Online */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-between sm:justify-start gap-3">
               <span className="font-medium text-sm text-default">
-                Is this track already online?
+                Is this track already online ?
               </span>
               <button
-                onClick={() => handleInputChange("already_online", !localForm.already_online)}
+                type="button"
+                onClick={() => handleInputChange("is_online", !localForm.is_online)}
                 className={cn(
-                  "size-4.5 rounded-full outline outline-default-default flex items-center justify-center transition-colors",
-                  localForm.already_online
-                    ? "bg-brand-blue outline-brand-blue text-white"
-                    : "bg-transparent text-transparent hover:bg-page-background/50",
+                  "size-5 rounded-full flex items-center justify-center transition-colors cursor-pointer",
+                  localForm.is_online
+                    ? "bg-[#0066FF] text-white"
+                    : "border border-default-default/60 text-transparent hover:border-default-default",
                 )}
               >
-                <Check size={14} className="stroke-[2.5]" />
+                <Check size={12} className="stroke-[3]" />
               </button>
             </div>
 
             {/* Licensing Document */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-between sm:justify-start gap-3">
               <span className="font-medium text-sm text-default">Add Licensing Document</span>
               <button
-                onClick={() =>
-                  handleInputChange("licensing_document", !localForm.licensing_document)
-                }
+                type="button"
+                onClick={() => handleInputChange("has_license", !localForm.has_license)}
                 className={cn(
-                  "size-4.5 rounded-full outline outline-default-default flex items-center justify-center transition-colors",
-                  localForm.licensing_document
-                    ? "bg-brand-blue outline-brand-blue text-white"
-                    : "bg-transparent text-transparent hover:bg-page-background/50",
+                  "size-5 rounded-full flex items-center justify-center transition-colors cursor-pointer",
+                  localForm.has_license
+                    ? "bg-[#0066FF] text-white"
+                    : "border border-default-default/60 text-transparent hover:border-default-default",
                 )}
               >
-                <Check size={14} className="stroke-[2.5]" />
+                <Check size={12} className="stroke-[3]" />
               </button>
             </div>
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-3">
             <Button
-              variant="blue"
+              type="button"
               onClick={() => onSave(localForm)}
-              className="w-fit rounded-full px-6 py-2.5 text-sm font-medium"
+              className="w-fit rounded-full px-5 py-2.5 text-xs font-medium bg-brand-blue hover:bg-brand-blue/80 text-white flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <span>Save</span>
-              <Check size={16} className="stroke-[2.5]" />
+              <Check size={24} />
             </Button>
           </div>
         </div>

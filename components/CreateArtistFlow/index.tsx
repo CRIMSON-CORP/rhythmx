@@ -269,8 +269,9 @@ function CreateArtistFlow({
 
             <Button
               type="button"
+              rounded={10}
               onClick={() => setView("new-artist-details")}
-              className="self-center rounded-full w-full max-w-63 bg-black hover:bg-black/90 text-white py-3 text-sm font-semibold cursor-pointer transition-all"
+              className="self-center w-full max-w-63 bg-black hover:bg-black/90 text-white py-3 text-sm font-semibold cursor-pointer transition-all"
             >
               Continue
             </Button>
@@ -341,8 +342,9 @@ function CreateArtistFlow({
 
             <Button
               type="button"
+              rounded={10}
               onClick={() => setView("new-artist-connect")}
-              className="self-center rounded-full w-full max-w-63 bg-black hover:bg-black/90 text-white py-3 text-sm font-semibold cursor-pointer transition-all"
+              className="self-center w-full max-w-63 bg-black hover:bg-black/90 text-white py-3 text-sm font-semibold cursor-pointer transition-all"
             >
               Continue
             </Button>
@@ -382,8 +384,9 @@ function CreateArtistFlow({
 
             <Button
               type="button"
+              rounded={10}
               onClick={() => setView("new-artist-success")}
-              className="self-center rounded-full w-full max-w-63 bg-black hover:bg-black/90 text-white py-3 text-sm font-semibold cursor-pointer transition-all"
+              className="self-center w-full max-w-63 bg-black hover:bg-black/90 text-white py-3 text-sm font-semibold cursor-pointer transition-all"
             >
               Create artist
             </Button>

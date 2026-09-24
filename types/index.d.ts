@@ -81,19 +81,45 @@ interface Track {
   royalty_splits?: { name: string; percentage: number }[];
 }
 
+interface ReleaseTrackPerson {
+  reference: string;
+  is_main_artist: boolean;
+  display_name: string;
+  artist_reference: string | null;
+  spotify_url: string | null;
+  apple_music_url: string | null;
+  image_url: string | null;
+  roles: string[];
+  publishing: string | null;
+  official_name: string | null;
+}
+
 interface ReleaseTrack {
   reference: string;
+  order: number;
   title: string;
-  order: string;
-  language: string;
-  isrc: string;
-  version: string;
-  lyrics: string;
-  audio_url: string;
-  duration: string;
+  title_confirmed: boolean;
+  language: string | null;
+  primary_genre: string | null;
+  secondary_genre: string | null;
+  label: string | null;
+  isrc: string | null;
+  version: string | null;
   is_explicit: boolean;
   has_advisory: boolean;
+  is_online: boolean;
+  lyrics: string | null;
+  preview_clip: string | null;
+  master_owner: string | null;
+  has_license: boolean;
+  license_url: string | null;
+  duration: number | null;
+  audio_url: string;
   uploaded_at: string;
+  people: ReleaseTrackPerson[];
+  people_count: number;
+  credits_count: number;
+  credits_revision: number;
 }
 
 interface Permission {

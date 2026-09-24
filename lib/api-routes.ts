@@ -38,7 +38,19 @@ export const API_ROUTES = {
     EARNINGS: (reference: string) => `/api/releases/${reference}/earnings`,
     DRAFT: (reference: string) => `/api/releases/draft/${reference}`,
     ARTISTS: (reference: string) => `/api/releases/draft/${reference}/artists`,
-    TRACKS: (reference: string) => `/api/releases/draft/${reference}/tracks`,
+    TRACKS: {
+      LIST: (reference: string) => `/api/releases/draft/${reference}/tracks`,
+      ADD: (reference: string) => `/api/releases/draft/${reference}/tracks`,
+      GET: (reference: string, trackRef: string) => `/api/releases/${reference}/tracks/${trackRef}`,
+      UPDATE: (reference: string, trackRef: string) =>
+        `/api/releases/draft/${reference}/tracks/${trackRef}`,
+      DELETE: (reference: string, trackRef: string) =>
+        `/api/releases/draft/${reference}/tracks/${trackRef}`,
+      UPLOAD_LICENSE: (reference: string, trackRef: string) =>
+        `/api/releases/draft/${reference}/tracks/${trackRef}/license`,
+      REMOVE_LICENSE: (reference: string, trackRef: string) =>
+        `/api/releases/draft/${reference}/tracks/${trackRef}/license`,
+    },
     PLATFORMS: (reference: string) => `/api/releases/draft/${reference}/platforms`,
   },
   LABEL: {
