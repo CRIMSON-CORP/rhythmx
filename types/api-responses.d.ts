@@ -75,3 +75,18 @@ interface GenresResponse {
 interface LanguagesResponse {
   languages: Language[];
 }
+
+interface ContributorRole {
+  slug: string;
+  name: string;
+}
+
+interface ContributorGroup {
+  group: string;
+  label: string;
+  roles: ContributorRole[];
+}
+
+interface ContributorsResponse {
+  groups: ContributorGroup[];
+}
