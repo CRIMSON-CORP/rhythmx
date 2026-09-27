@@ -55,6 +55,8 @@ export const API_ROUTES = {
   },
   LABEL: {
     ARTISTS: "/api/label/artists",
+    UPDATE_ARTIST_PROFILE: (reference: string) => `/api/label/artists/${reference}/profile`,
+    PHOTO: (reference: string) => `/api/label/artists/${reference}/photo`,
   },
   ANALYTICS: {
     OVERVIEW: "/api/analytics/overview",
@@ -69,5 +71,10 @@ export const API_ROUTES = {
     GENRES: "/api/meta/genres",
     LANGUAGES: "/api/meta/languages",
     PLATFORMS: "/api/meta/platforms",
+    CONTRIBUTORS: "/api/meta/contributors",
+  },
+  ARTIST_LOOKUP: {
+    SPOTIFY: (q: string) => `/api/artist-lookup/spotify?q=${encodeURIComponent(q)}`,
+    APPLE_MUSIC: (q: string) => `/api/artist-lookup/apple-music?q=${encodeURIComponent(q)}`,
   },
 };

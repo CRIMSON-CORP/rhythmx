@@ -83,15 +83,25 @@ interface Track {
 
 interface ReleaseTrackPerson {
   reference: string;
+  stage_name?: string;
+  first_name?: string;
+  last_name?: string;
+  genre?: string;
   is_main_artist: boolean;
+  country: string;
   display_name: string;
-  artist_reference: string | null;
   spotify_url: string | null;
   apple_music_url: string | null;
-  image_url: string | null;
+  image_url?: string | null;
+  avatar_url?: string;
   roles: string[];
-  publishing: string | null;
+  publishing?: string | null;
   official_name: string | null;
+  portrait_url?: string | null;
+  spotify_linked?: boolean;
+  spotify_url?: string | null;
+  apple_music_linked?: boolean;
+  apple_music_url?: string | null;
 }
 
 interface ReleaseTrack {
@@ -392,4 +402,18 @@ interface Platform {
   supports_videos: boolean;
   delivery_lead_days: number;
   takedown_lead_days: number;
+}
+
+interface IconProps {
+  size?: number | `${number}`;
+  color?: string;
+  className?: string;
+}
+
+interface ConnectedArtist {
+  id: string;
+  image_url?: string | null;
+  latest_release?: string | null;
+  name: string;
+  url?: string | null;
 }

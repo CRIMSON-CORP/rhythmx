@@ -24,34 +24,40 @@ export const api = {
   get<T>(url: string) {
     return this.fetch(url, "GET") as Promise<T>;
   },
-  post<T>(url: string, payload: Record<string, unknown>) {
+  post<T>(url: string, payload: Record<string, unknown> | FormData) {
     return this.fetch(url, "POST", payload) as Promise<T>;
   },
-  patch<T>(url: string, payload: Record<string, unknown>) {
+  patch<T>(url: string, payload: Record<string, unknown> | FormData) {
     return this.fetch(url, "PATCH", payload) as Promise<T>;
   },
-  put<T>(url: string, payload: Record<string, unknown>) {
+  put<T>(url: string, payload: Record<string, unknown> | FormData) {
     return this.fetch(url, "PUT", payload) as Promise<T>;
   },
-  delete<T>(url: string, payload?: Record<string, unknown>) {
+  delete<T>(url: string, payload?: Record<string, unknown> | FormData) {
     return this.fetch(url, "DELETE", payload) as Promise<T>;
   },
 
-  async fetch(url: string, method: REST_API_VERBS, payload?: Record<string, unknown>) {
+  async fetch(url: string, method: REST_API_VERBS, payload?: Record<string, unknown> | FormData) {
     const session = await getUserSession();
     const token = session?.access_token;
+    const isFormData = typeof FormData !== "undefined" && payload instanceof FormData;
+
+    const headers: Record<string, string> = {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    };
+
+    if (!isFormData) {
+      headers["content-type"] = "application/json";
+    }
 
     const options: RequestInit = {
       method,
-      headers: {
-        "content-type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
+      headers,
     };
 
     // Fix: Prevent GET requests from having a body
     if (payload && method !== "GET") {
-      options.body = JSON.stringify(payload);
+      options.body = isFormData ? payload : JSON.stringify(payload);
     }
 
     try {

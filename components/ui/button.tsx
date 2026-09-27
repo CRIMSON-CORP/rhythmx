@@ -13,6 +13,7 @@ const buttonVariants = cva(
         outline:
           "bg-transparent outline outline-black hover:bg-white aria-expanded:bg-white aria-expanded:text-black dark:outline-white dark:hover:bg-input/50",
         white: "bg-white text-black hover:bg-page-background",
+        "white-outline": "bg-white text-black outline outline-black hover:bg-page-background",
         ghost:
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         blue: "bg-brand-blue text-white outline-blue hover:brightness-80",
@@ -24,7 +25,7 @@ const buttonVariants = cva(
       size: {
         default: "p-4",
         xs: "px-4 py-1.5 gap-1 text-xs in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "px-5 py-2.5 gap-1 text-sm in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
+        sm: "px-5 py-2.5 gap-1 text-xs in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
         xl: "px-6 py-5 gap-2 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         icon: "size-9",
         "icon-xs":
