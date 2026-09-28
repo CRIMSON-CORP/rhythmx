@@ -313,7 +313,7 @@ interface ArtistRelease {
 }
 
 interface ReleasePlatform {
-  platform_id: string;
+  platform_id: number;
   name: string;
   logo_url: string;
   status: "live" | "sent" | "pending" | "failed";

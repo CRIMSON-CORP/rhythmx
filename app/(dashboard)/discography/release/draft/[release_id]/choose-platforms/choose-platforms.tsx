@@ -14,11 +14,15 @@ import { useRouter } from "next/navigation";
 function ChoosePlatforms({
   release_id,
   releasePlatforms,
+  initialSelectedPlatformIds,
 }: {
   release_id: string;
   releasePlatforms: Platform[];
+  initialSelectedPlatformIds: number[];
 }) {
-  const [selectedPlatformIds, setSelectedPlatformIds] = useState<number[]>([]);
+  const [selectedPlatformIds, setSelectedPlatformIds] = useState<number[]>(
+    initialSelectedPlatformIds,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -107,51 +111,60 @@ function ChoosePlatforms({
         <div className="max-h-[50vh] overflow-y-auto p-1 flex flex-col gap-4 no-scrollbar">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-6">
-              {filteredDistribution.length === 0 && searchQuery ? (
-                <p className="text-sm font-medium text-border-default-secondary py-2">
-                  No distribution platforms match your search.
-                </p>
-              ) : (
-                filteredDistribution.map((platform) => (
-                  <div
-                    key={platform.id}
-                    onClick={() => togglePlatform(platform.id)}
-                    className={cn(
-                      "relative flex items-center justify-between outline outline-default-default min-h-29.25 bg-white rounded-20 p-10 cursor-pointer transition-all hover:scale-[1.01]",
-                      selectedPlatformIds.includes(platform.id) && "outline-brand-blue",
-                    )}
-                  >
-                    {platform.logo_url ? (
-                      <Image
-                        src={platform.logo_url}
-                        alt={platform.name}
-                        width={100}
-                        height={100}
-                        className="w-25 h-auto object-contain"
-                      />
-                    ) : (
-                      <span className="text-center font-bold text-default text-2xl">
-                        {platform.name}
-                      </span>
-                    )}
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        togglePlatform(platform.id);
-                      }}
+              <AnimatePresence initial={false}>
+                {filteredDistribution.length === 0 && searchQuery ? (
+                  <p className="text-sm font-medium text-border-default-secondary py-2">
+                    No distribution platforms match your search.
+                  </p>
+                ) : (
+                  filteredDistribution.map((platform) => (
+                    <motion.div
+                      key={platform.id + "-filter"}
+                      layout="position"
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0 }}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: "spring", damping: 20, stiffness: 200 }}
+                      layoutId={`platform-${platform.id}-filter`}
+                      onClick={() => togglePlatform(platform.id)}
                       className={cn(
-                        "size-5 absolute top-3 right-3 rounded-full outline outline-default-default flex items-center justify-center transition-colors",
-                        selectedPlatformIds.includes(platform.id)
-                          ? "bg-brand-blue outline-brand-blue text-white"
-                          : "bg-transparent text-transparent hover:bg-page-background/50",
+                        "relative flex items-center justify-between outline outline-default-default min-h-29.25 bg-white rounded-20 p-10 cursor-pointer",
+                        selectedPlatformIds.includes(platform.id) && "outline-brand-blue",
                       )}
                     >
-                      <Check size={14} />
-                    </button>
-                  </div>
-                ))
-              )}
+                      {platform.logo_url ? (
+                        <Image
+                          src={platform.logo_url}
+                          alt={platform.name}
+                          width={100}
+                          height={100}
+                          className="w-25 h-auto object-contain"
+                        />
+                      ) : (
+                        <span className="text-center font-bold text-default text-2xl">
+                          {platform.name}
+                        </span>
+                      )}
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePlatform(platform.id);
+                        }}
+                        className={cn(
+                          "size-5 absolute top-3 right-3 rounded-full outline outline-default-default flex items-center justify-center transition-colors",
+                          selectedPlatformIds.includes(platform.id)
+                            ? "bg-brand-blue outline-brand-blue text-white"
+                            : "bg-transparent text-transparent hover:bg-page-background/50",
+                        )}
+                      >
+                        <Check size={14} />
+                      </button>
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -188,14 +201,14 @@ function ChoosePlatforms({
 
                 return (
                   <motion.div
-                    key={platform.id}
+                    key={platform.id + "-selected"}
                     layout="position"
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0 }}
                     whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring" }}
-                    layoutId={`platform-${platform.id}`}
+                    transition={{ type: "spring", damping: 20, stiffness: 200 }}
+                    layoutId={`platform-${platform.id}-selected`}
                     onClick={() => togglePlatform(platform.id)}
                     className="relative flex items-center justify-center min-h-24 bg-white rounded-20 p-6 cursor-pointer"
                   >
