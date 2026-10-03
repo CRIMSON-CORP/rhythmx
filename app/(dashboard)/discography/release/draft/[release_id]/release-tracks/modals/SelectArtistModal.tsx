@@ -18,12 +18,14 @@ import { API_ROUTES } from "@/lib/api-routes";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import CreateArtistFlow, { type CreatedArtistData } from "@/components/CreateArtistFlow";
 import ConfirmArtistModal, { type SelectedArtistData } from "./ConfirmArtistModal";
+import { type ContributorRoleOption } from "../track-meta-fallbacks";
 
 interface SelectArtistModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title?: string;
   addedArtistIds?: string[];
+  roles?: ContributorRoleOption[];
   onConfirmArtist: (artist: SelectedArtistData) => void;
 }
 
@@ -32,6 +34,7 @@ export function SelectArtistModal({
   onOpenChange,
   title = "Select Artist",
   addedArtistIds = [],
+  roles = [],
   onConfirmArtist,
 }: SelectArtistModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,7 +77,7 @@ export function SelectArtistModal({
         name: a.stage_name || `${a.first_name || ""} ${a.last_name || ""}`.trim(),
         stage_name: a.stage_name,
         avatar_url: a.portrait_url || a.avatar_url,
-        subtitle: a.country || "Afrobeats",
+        subtitle: a.country_name,
         spotify_linked: a.spotify_linked,
         spotify_url: a.spotify_url,
         apple_music_linked: a.apple_music_linked,
@@ -265,6 +268,7 @@ export function SelectArtistModal({
           onOpenChange={(isOpen) => !isOpen && setSelectedForConfirmation(null)}
           title={title === "Select Main Artist" ? "Add Main Artist" : "Add Key Artist"}
           artist={selectedForConfirmation}
+          roles={roles}
           onConfirm={handleConfirmed}
           onArtistProfileUpdated={handleArtistProfileUpdated}
         />

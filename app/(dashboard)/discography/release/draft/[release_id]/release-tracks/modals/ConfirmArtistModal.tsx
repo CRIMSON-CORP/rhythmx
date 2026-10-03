@@ -19,6 +19,14 @@ import ConnectPlatformModal, { type ConnectedProfile } from "./ConnectPlatformMo
 import Spotify from "@/components/icons/spotify";
 import AppleMusicRoundedRectangle from "@/components/icons/apple-music-rounded-rectangle";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { type ContributorRoleOption } from "../track-meta-fallbacks";
 
 export interface SelectedArtistData {
   reference?: string;
@@ -32,6 +40,7 @@ export interface SelectedArtistData {
   apple_music_url?: string | null;
   spotify_id?: string;
   apple_music_id?: string;
+  role?: string;
 }
 
 interface ConfirmArtistModalProps {
@@ -39,6 +48,7 @@ interface ConfirmArtistModalProps {
   onOpenChange: (open: boolean) => void;
   title?: string;
   artist: SelectedArtistData | null;
+  roles?: ContributorRoleOption[];
   onConfirm: (artist: SelectedArtistData) => void;
   onArtistProfileUpdated?: (updatedArtist: SelectedArtistData) => void;
 }
@@ -48,9 +58,11 @@ export function ConfirmArtistModal({
   onOpenChange,
   title = "Add Main Artist",
   artist,
+  roles = [],
   onConfirm,
   onArtistProfileUpdated,
 }: ConfirmArtistModalProps) {
+  const [selectedRole, setSelectedRole] = useState("");
   const [spotifyConnection, setSpotifyConnection] = useState<ConnectedProfile | null>(null);
   const [appleConnection, setAppleConnection] = useState<ConnectedProfile | null>(null);
 
@@ -58,6 +70,7 @@ export function ConfirmArtistModal({
 
   useEffect(() => {
     if (artist) {
+      setSelectedRole(artist.role || "");
       const isSpotifyLinked = artist.spotify_linked || !!artist.spotify_url || !!artist.spotify_id;
       const isAppleLinked =
         artist.apple_music_linked || !!artist.apple_music_url || !!artist.apple_music_id;
@@ -140,8 +153,14 @@ export function ConfirmArtistModal({
   };
 
   const handleAddArtist = () => {
+    if (!selectedRole) {
+      goeyToast.error("Please select a role for this artist");
+      return;
+    }
+
     onConfirm({
       ...artist,
+      role: selectedRole,
       spotify_linked: !!spotifyConnection,
       spotify_url: spotifyConnection?.url || spotifyConnection?.id || null,
       spotify_id: spotifyConnection?.id,
@@ -197,6 +216,25 @@ export function ConfirmArtistModal({
                 {appleConnection && <AppleMusicRoundedRectangle size={26.25} />}
               </div>
             </div>
+
+            {/* Role Selection */}
+            {roles && roles.length > 0 && (
+              <div className="flex flex-col gap-2 pt-1">
+                <label className="text-xs font-medium text-default">Role *</label>
+                <Select value={selectedRole} onValueChange={setSelectedRole}>
+                  <SelectTrigger className="w-full bg-white h-auto rounded-xl border border-default-default px-4 py-3 text-sm leading-none text-default font-medium outline-none focus:border-brand-orange transition-colors">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((r) => (
+                      <SelectItem key={r.slug} value={r.slug}>
+                        {r.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="py-4 flex flex-col gap-6">
               {/* Spotify connection row */}

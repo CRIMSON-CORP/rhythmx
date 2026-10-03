@@ -88,13 +88,15 @@ interface ReleaseTrackPerson {
   last_name?: string;
   genre?: string;
   is_main_artist: boolean;
-  country: string;
+  country?: string;
+  country_name?: string;
   display_name: string;
   spotify_url: string | null;
   apple_music_url: string | null;
   image_url?: string | null;
   avatar_url?: string;
   roles: string[];
+  role?: string;
   publishing?: string | null;
   official_name: string | null;
   portrait_url?: string | null;
@@ -103,6 +105,34 @@ interface ReleaseTrackPerson {
   apple_music_linked?: boolean;
   apple_music_url?: string | null;
 }
+
+interface TrackCreditItem {
+  reference?: string;
+  artist_reference?: string | null;
+  is_main_artist?: boolean;
+  stage_name?: string | null;
+  official_name?: string | null;
+  name?: string;
+  role?: string;
+  genre?: string;
+  language?: string;
+  spotify_url?: string | null;
+  apple_music_url?: string | null;
+  spotify_id?: string;
+  apple_music_id?: string;
+  publishing?: string | null;
+  publishing_type?: string | null;
+  avatar_url?: string | null;
+  image_url?: string | null;
+  display_name?: string;
+}
+
+type TrackPeopleCredits = {
+  main: TrackCreditItem[];
+  key_artist: TrackCreditItem[];
+  engineer: TrackCreditItem[];
+  writer: TrackCreditItem[];
+};
 
 interface ReleaseTrack {
   reference: string;
@@ -126,7 +156,7 @@ interface ReleaseTrack {
   duration: number | null;
   audio_url: string;
   uploaded_at: string;
-  people: ReleaseTrackPerson[];
+  people?: TrackPeopleCredits;
   people_count: number;
   credits_count: number;
   credits_revision: number;

@@ -50,6 +50,8 @@ export const API_ROUTES = {
         `/api/releases/draft/${reference}/tracks/${trackRef}/license`,
       REMOVE_LICENSE: (reference: string, trackRef: string) =>
         `/api/releases/draft/${reference}/tracks/${trackRef}/license`,
+      CREDITS: (reference: string, trackRef: string) =>
+        `/api/releases/draft/${reference}/tracks/${trackRef}/credits`,
     },
     PLATFORMS: (reference: string) => `/api/releases/draft/${reference}/platforms`,
   },
@@ -72,6 +74,7 @@ export const API_ROUTES = {
     LANGUAGES: "/api/meta/languages",
     PLATFORMS: "/api/meta/platforms",
     CONTRIBUTORS: "/api/meta/contributors",
+    PUBLISHING_TYPES: "/api/meta/publishing-types",
   },
   ARTIST_LOOKUP: {
     SPOTIFY: (q: string) => `/api/artist-lookup/spotify?q=${encodeURIComponent(q)}`,

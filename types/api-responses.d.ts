@@ -90,3 +90,13 @@ interface ContributorGroup {
 interface ContributorsResponse {
   groups: ContributorGroup[];
 }
+
+interface PublishingType {
+  slug: string;
+  name: string;
+  requires_publisher: boolean;
+}
+
+interface PublishingTypesResponse {
+  publishing_types: PublishingType[];
+}

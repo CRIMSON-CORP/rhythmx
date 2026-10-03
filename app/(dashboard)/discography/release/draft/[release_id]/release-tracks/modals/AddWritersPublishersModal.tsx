@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Dialog,
   DialogClose,
@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { goeyToast } from "goey-toast";
-import { FALLBACK_PUBLISHING_TYPES, type ContributorRoleOption } from "../track-meta-fallbacks";
+import { type ContributorRoleOption } from "../track-meta-fallbacks";
 import { Button } from "@/components/ui/button";
 
 export interface WriterPublisherData {
@@ -32,7 +32,7 @@ interface AddWritersPublishersModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   roles?: ContributorRoleOption[];
-  publishingTypes?: Array<{ value: string; label: string }>;
+  publishingTypes?: PublishingType[];
   onAdd: (data: WriterPublisherData) => void;
 }
 
@@ -40,7 +40,7 @@ export function AddWritersPublishersModal({
   open,
   onOpenChange,
   roles = [],
-  publishingTypes = FALLBACK_PUBLISHING_TYPES,
+  publishingTypes,
   onAdd,
 }: AddWritersPublishersModalProps) {
   const [name, setName] = useState("");
@@ -53,8 +53,13 @@ export function AddWritersPublishersModal({
     setSelectedPublishingType("");
   };
 
+  const selectedPublishingTypeData = useMemo(
+    () => publishingTypes?.find((pt) => pt.slug === selectedPublishingType),
+    [selectedPublishingType, publishingTypes],
+  );
+
   const handleAdd = () => {
-    if (!name.trim()) {
+    if (selectedPublishingTypeData?.requires_publisher && !name.trim()) {
       goeyToast.error("Name Required", {
         description: "Please enter official name.",
       });
@@ -112,7 +117,12 @@ export function AddWritersPublishersModal({
         <div className="p-6 flex flex-col gap-4">
           {/* Name */}
           <div className="flex flex-col gap-2">
-            <label className="font-medium text-default">Name</label>
+            <label className="font-medium text-default">
+              Name{" "}
+              <span className="text-red-500">
+                {selectedPublishingTypeData?.requires_publisher ? "*" : ""}
+              </span>
+            </label>
             <input
               type="text"
               value={name}
@@ -147,9 +157,9 @@ export function AddWritersPublishersModal({
                 <SelectValue placeholder="Select publishing type" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {publishingTypes.map((pt) => (
-                  <SelectItem key={pt.value} value={pt.value}>
-                    {pt.label}
+                {publishingTypes?.map((pt) => (
+                  <SelectItem key={pt.slug} value={pt.slug}>
+                    {pt.name}
                   </SelectItem>
                 ))}
               </SelectContent>

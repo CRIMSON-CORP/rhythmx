@@ -61,8 +61,16 @@ interface ReleaseTracksProps {
     genres: (Genre & { sub_genres: Genre[] })[];
     languages: Language[];
     contributors?: ContributorGroup[];
+    publishingTypes: PublishingType[];
   };
 }
+
+const EMPTY_PEOPLE: TrackPeopleCredits = {
+  main: [],
+  key_artist: [],
+  engineer: [],
+  writer: [],
+};
 
 function formatDuration(durationInSeconds: number | null | undefined): string {
   if (!durationInSeconds || isNaN(durationInSeconds)) return "0:00";
@@ -73,48 +81,16 @@ function formatDuration(durationInSeconds: number | null | undefined): string {
 
 function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: ReleaseTracksProps) {
   const router = useRouter();
-  const [tracks, setTracks] = useState<ReleaseTrack[]>(initialTracks || []);
+  const [tracks, setTracks] = useState<ReleaseTrack[]>(() => initialTracks || []);
   const [uploadingQueue, setUploadingQueue] = useState<UploadingTrack[]>([]);
   const [deletingTrackRefs, setDeletingTrackRefs] = useState<Set<string>>(new Set());
   const [editingTrackRef, setEditingTrackRef] = useState<string | null>(null);
 
-  const [isDraggingAudio, setIsDraggingAudio] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dragCounterAudio = useRef(0);
 
   useEffect(() => {
     setTracks(initialTracks || []);
   }, [initialTracks]);
-
-  const handleAudioDragEnter = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragCounterAudio.current++;
-    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-      setIsDraggingAudio(true);
-    }
-  };
-
-  const handleAudioDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleAudioDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragCounterAudio.current--;
-    if (dragCounterAudio.current === 0) {
-      setIsDraggingAudio(false);
-    }
-  };
-
-  const handleAudioDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragCounterAudio.current = 0;
-    setIsDraggingAudio(false);
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      handleAudioFiles(files);
-    }
-  };
 
   const handleAudioFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -238,32 +214,40 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
 
   const handleSaveTrackDetails = async (updatedTrack: ReleaseTrack) => {
     try {
-      await api.patch(API_ROUTES.RELEASES.TRACKS.UPDATE(releaseReference, updatedTrack.reference), {
-        title: updatedTrack.title,
-        primary_genre: updatedTrack.primary_genre,
-        secondary_genre: updatedTrack.secondary_genre,
-        language: updatedTrack.language,
-        preview_clip: updatedTrack.preview_clip,
-        lyrics: updatedTrack.lyrics,
-        master_owner: updatedTrack.master_owner,
-        label: updatedTrack.label,
-        has_advisory: updatedTrack.has_advisory,
-        is_online: updatedTrack.is_online,
-        isrc: updatedTrack.isrc,
-        has_license: updatedTrack.has_license,
-        people: updatedTrack.people,
-      });
+      const creditsPayload = updatedTrack.people || EMPTY_PEOPLE;
+
+      await Promise.all([
+        api.patch(API_ROUTES.RELEASES.TRACKS.UPDATE(releaseReference, updatedTrack.reference), {
+          title: updatedTrack.title,
+          primary_genre: updatedTrack.primary_genre,
+          secondary_genre: updatedTrack.secondary_genre,
+          language: updatedTrack.language,
+          preview_clip: updatedTrack.preview_clip,
+          lyrics: updatedTrack.lyrics,
+          master_owner: updatedTrack.master_owner,
+          label: updatedTrack.label,
+          has_advisory: updatedTrack.has_advisory,
+          is_online: updatedTrack.is_online,
+          isrc: updatedTrack.isrc,
+          has_license: updatedTrack.has_license,
+        }),
+        api.put(
+          API_ROUTES.RELEASES.TRACKS.CREDITS(releaseReference, updatedTrack.reference),
+          creditsPayload,
+        ),
+      ]);
 
       setTracks((prev) =>
         prev.map((t) => (t.reference === updatedTrack.reference ? updatedTrack : t)),
       );
+      router.refresh();
       goeyToast.success("Track details saved!");
-      setEditingTrackRef(null);
     } catch (err: any) {
       console.error("Save track details failed:", err);
-      const errorsObj = (err?.errors && typeof err.errors === "object"
-        ? err.errors
-        : {}) as Record<string, string>;
+      const errorsObj = (err?.errors && typeof err.errors === "object" ? err.errors : {}) as Record<
+        string,
+        string
+      >;
       const errorKeys = Object.keys(errorsObj);
       const firstFieldError = errorKeys.length > 0 ? errorsObj[errorKeys[0]] : null;
 
@@ -278,34 +262,42 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
     }
   };
 
-  const handleDeleteTrack = async (track: ReleaseTrack, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDeleteTrack = (track: ReleaseTrack, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (deletingTrackRefs.has(track.reference)) return;
 
-    setDeletingTrackRefs((prev) => new Set(prev).add(track.reference));
+    goeyToast(`Delete "${track.title || "Untitled"}"?`, {
+      action: {
+        label: "Yes, Delete",
+        successLabel: "Track deleted",
+        onClick: async () => {
+          setDeletingTrackRefs((prev) => new Set(prev).add(track.reference));
 
-    try {
-      await api.delete(API_ROUTES.RELEASES.TRACKS.DELETE(releaseReference, track.reference));
-      setTracks((prev) => prev.filter((t) => t.reference !== track.reference));
-      if (editingTrackRef === track.reference) {
-        setEditingTrackRef(null);
-      }
-      goeyToast.success("Track removed");
-    } catch (err: unknown) {
-      const errorMsg =
-        err instanceof Error
-          ? err.message
-          : typeof err === "object" && err !== null && "message" in err
-            ? String((err as { message: unknown }).message)
-            : "Failed to delete track";
-      goeyToast.error("Delete Failed", { description: errorMsg });
-    } finally {
-      setDeletingTrackRefs((prev) => {
-        const next = new Set(prev);
-        next.delete(track.reference);
-        return next;
-      });
-    }
+          try {
+            await api.delete(API_ROUTES.RELEASES.TRACKS.DELETE(releaseReference, track.reference));
+            setTracks((prev) => prev.filter((t) => t.reference !== track.reference));
+            if (editingTrackRef === track.reference) {
+              setEditingTrackRef(null);
+            }
+          } catch (err: unknown) {
+            const errorMsg =
+              err instanceof Error
+                ? err.message
+                : typeof err === "object" && err !== null && "message" in err
+                  ? String((err as { message: unknown }).message)
+                  : "Failed to delete track";
+            goeyToast.error("Delete Failed", { description: errorMsg });
+            throw err;
+          } finally {
+            setDeletingTrackRefs((prev) => {
+              const next = new Set(prev);
+              next.delete(track.reference);
+              return next;
+            });
+          }
+        },
+      },
+    });
   };
 
   const isStepValid = tracks.length > 0 && uploadingQueue.length === 0;
@@ -332,21 +324,12 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch pb-10">
       {/* Left Column: Form Fields Card */}
       <div className="flex flex-col gap-4">
-        <div
-          onDragEnter={handleAudioDragEnter}
-          onDragOver={handleAudioDragOver}
-          onDragLeave={handleAudioDragLeave}
-          onDrop={handleAudioDrop}
-          className={cn(
-            "flex flex-col gap-8 px-5 py-17 bg-white rounded-30 justify-center items-center transition-all border-2 border-dashed border-transparent",
-            isDraggingAudio && "border-brand-orange bg-brand-orange/5",
-          )}
-        >
+        <div className="flex flex-col gap-8 px-5 py-17 bg-white rounded-30 justify-center items-center">
           <div className="flex items-center gap-8">
             <Image src="/images/headphone.png" alt="headphones" width={50} height={50} />
             <div className="flex flex-col gap-3 font-medium text-lg leading-none">
-              <p>Drag Audio file here</p>
-              <p>Mp3, ACC or Wav</p>
+              <p>Upload Audio File</p>
+              <p className="text-sm text-border-default-secondary">MP3, AAC or WAV</p>
             </div>
           </div>
           <label
@@ -429,9 +412,8 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
             meta={meta}
             onSave={handleSaveTrackDetails}
             onDelete={() => {
-              if (editingTrackRef) {
-                const dummyEvent = { stopPropagation: () => {} } as React.MouseEvent;
-                handleDeleteTrack(editingTrack, dummyEvent);
+              if (editingTrack) {
+                handleDeleteTrack(editingTrack);
               }
             }}
           />
@@ -643,19 +625,25 @@ function ContributorRow({
   avatarShape = "circle",
   onRemove,
 }: {
-  person: ReleaseTrackPerson;
+  person: TrackCreditItem | ReleaseTrackPerson;
   roleLabel?: string;
   avatarShape?: "square" | "circle";
   onRemove: () => void;
 }) {
   const displayRole =
     roleLabel ||
-    (person.roles && person.roles.length > 0
+    ("role" in person && person.role ? formatRole(person.role) : null) ||
+    ("roles" in person && Array.isArray(person.roles) && person.roles.length > 0
       ? person.roles.map((r) => formatRole(r)).join(", ")
       : "Contributor");
 
-  const displayName = person.display_name || person.official_name || "";
-  const avatarUrl = person.image_url;
+  const displayName =
+    person.display_name ||
+    person.stage_name ||
+    person.official_name ||
+    ("name" in person ? person.name : "") ||
+    "";
+  const avatarUrl = person.image_url || person.avatar_url;
 
   return (
     <div className="flex items-center justify-between gap-3 p-5">
@@ -666,6 +654,7 @@ function ContributorRow({
             alt={displayName}
             width={42}
             height={42}
+            unoptimized={typeof avatarUrl === "string" && avatarUrl.startsWith("http")}
             className={cn(
               "size-10.5 object-cover shrink-0",
               avatarShape === "square" ? "rounded-xl" : "rounded-full",
@@ -708,11 +697,15 @@ function TrackEditPanel({
     genres: (Genre & { sub_genres: Genre[] })[];
     languages: Language[];
     contributors?: ContributorGroup[];
+    publishingTypes: PublishingType[];
   };
   onSave: (updatedTrack: ReleaseTrack) => Promise<void> | void;
   onDelete: () => void;
 }) {
-  const [localForm, setLocalForm] = useState<ReleaseTrack>({ ...track });
+  const [localForm, setLocalForm] = useState<ReleaseTrack>(() => ({
+    ...track,
+    people: track.people || EMPTY_PEOPLE,
+  }));
   const [isSaving, setIsSaving] = useState(false);
 
   // Modal open states
@@ -725,7 +718,10 @@ function TrackEditPanel({
   const [uploadLicenseModalOpen, setUploadLicenseModalOpen] = useState(false);
 
   useEffect(() => {
-    setLocalForm({ ...track });
+    setLocalForm({
+      ...track,
+      people: track.people || EMPTY_PEOPLE,
+    });
   }, [track]);
 
   const keyArtistRoles = useMemo(
@@ -769,100 +765,135 @@ function TrackEditPanel({
     }));
   };
 
-  const handleRemovePerson = (personRef: string) => {
-    setLocalForm((prev) => ({
-      ...prev,
-      people: prev.people?.filter((p) => p.reference !== personRef) || [],
-    }));
+  const handleRemovePerson = (
+    category: "main" | "key_artist" | "engineer" | "writer",
+    personRef: string,
+  ) => {
+    setLocalForm((prev) => {
+      const cur = prev.people || EMPTY_PEOPLE;
+      const targetList = (cur[category] || []) as TrackCreditItem[];
+      return {
+        ...prev,
+        people: {
+          ...cur,
+          [category]: targetList.filter((p) => (p.reference || p.artist_reference) !== personRef),
+        },
+      };
+    });
   };
 
   const handleConfirmRosterArtist = (artistData: SelectedArtistData) => {
     const isMain = selectArtistContext === "main";
-    if (isMain && (localForm.people?.filter((p) => p.is_main_artist).length || 0) >= 3) {
-      goeyToast.error("Maximum of 3 main primary artists allowed");
+    const currentPeople = localForm.people || EMPTY_PEOPLE;
+
+    if (isMain && (currentPeople.main || []).length >= 1) {
+      goeyToast.error("Only one main primary artist allowed");
       return;
     }
-    const newPerson: ReleaseTrackPerson = {
-      reference: artistData.reference!,
-      is_main_artist: isMain,
-      country: artistData.subtitle || "",
-      display_name: artistData.stage_name || artistData.name,
+
+    const assignedRole = artistData.role || (isMain ? "primary-artist" : "featuring-artist");
+
+    const newPerson: TrackCreditItem = {
+      artist_reference: artistData.reference,
+      stage_name: artistData.stage_name || artistData.name,
       official_name: artistData.name,
+      avatar_url: artistData.avatar_url || null,
       image_url: artistData.avatar_url || null,
-      spotify_url: artistData.spotify_url || artistData.spotify_id || null,
-      apple_music_url: artistData.apple_music_url || artistData.apple_music_id || null,
-      roles: [isMain ? "Primary Artist" : "Featuring Artist"],
-      publishing: null,
+      spotify_url: artistData.spotify_id || artistData.spotify_url || null,
+      apple_music_url: artistData.apple_music_id || artistData.apple_music_url || null,
+      spotify_id: artistData.spotify_id,
+      apple_music_id: artistData.apple_music_id,
+      role: assignedRole,
+      is_main_artist: isMain,
     };
 
-    setLocalForm((prev) => ({
-      ...prev,
-      people: [...(prev.people || []), newPerson],
-    }));
+    setLocalForm((prev) => {
+      const cur = prev.people || EMPTY_PEOPLE;
+      const targetCategory = isMain ? "main" : "key_artist";
+      const existingList = (cur[targetCategory] || []) as TrackCreditItem[];
+      return {
+        ...prev,
+        people: {
+          ...cur,
+          [targetCategory]: [...existingList, newPerson],
+        },
+      };
+    });
 
-    goeyToast.success(
-      `${newPerson.display_name} added as ${isMain ? "Main Primary Artist" : "Key Artist"}`,
-    );
+    goeyToast.success(`${newPerson.stage_name} added as ${formatRole(assignedRole)}`);
   };
 
   const handleAddNonLabelArtist = (data: NonLabelArtistData) => {
-    const newPerson: ReleaseTrackPerson = {
+    const newPerson: TrackCreditItem = {
       reference: `person_${nanoid(8)}`,
-      is_main_artist: false,
-      display_name: data.stage_name,
+      stage_name: data.stage_name,
       official_name: data.stage_name,
-      country: "",
-      image_url: null,
+      genre: data.genre,
+      language: data.language,
+      role: data.role,
       spotify_url: data.spotify_id || null,
       apple_music_url: data.apple_music_id || null,
-      roles: [data.role],
-      publishing: null,
+      is_main_artist: false,
     };
 
-    setLocalForm((prev) => ({
-      ...prev,
-      people: [...(prev.people || []), newPerson],
-    }));
+    setLocalForm((prev) => {
+      const cur = prev.people || EMPTY_PEOPLE;
+      return {
+        ...prev,
+        people: {
+          ...cur,
+          key_artist: [...(cur.key_artist || []), newPerson],
+        },
+      };
+    });
   };
 
   const handleAddProducerEngineer = (data: ProducerEngineerData) => {
-    const newPerson: ReleaseTrackPerson = {
+    const newPerson: TrackCreditItem = {
       reference: `person_${nanoid(8)}`,
-      is_main_artist: false,
       display_name: data.name,
       official_name: data.name,
-      country: "",
-      image_url: null,
+      stage_name: data.name,
+      role: data.role,
       spotify_url: data.spotify_id || null,
       apple_music_url: data.apple_music_id || null,
-      roles: [data.role],
-      publishing: null,
+      spotify_id: data.spotify_id,
+      apple_music_id: data.apple_music_id,
     };
 
-    setLocalForm((prev) => ({
-      ...prev,
-      people: [...(prev.people || []), newPerson],
-    }));
+    setLocalForm((prev) => {
+      const cur = prev.people || EMPTY_PEOPLE;
+      return {
+        ...prev,
+        people: {
+          ...cur,
+          engineer: [...(cur.engineer || []), newPerson],
+        },
+      };
+    });
   };
 
   const handleAddWriterPublisher = (data: WriterPublisherData) => {
-    const newPerson: ReleaseTrackPerson = {
+    const newPerson: TrackCreditItem = {
       reference: `person_${nanoid(8)}`,
-      is_main_artist: false,
       display_name: data.name,
       official_name: data.name,
-      country: "",
-      image_url: null,
-      spotify_url: null,
-      apple_music_url: null,
-      roles: [data.role],
+      stage_name: data.name,
+      role: data.role,
       publishing: data.publishing_type,
+      publishing_type: data.publishing_type,
     };
 
-    setLocalForm((prev) => ({
-      ...prev,
-      people: [...(prev.people || []), newPerson],
-    }));
+    setLocalForm((prev) => {
+      const cur = prev.people || EMPTY_PEOPLE;
+      return {
+        ...prev,
+        people: {
+          ...cur,
+          writer: [...(cur.writer || []), newPerson],
+        },
+      };
+    });
   };
 
   const handleIsrcConfirm = (isrcCode: string) => {
@@ -881,46 +912,11 @@ function TrackEditPanel({
     }));
   };
 
-  const mainArtists = localForm.people?.filter((p) => p.is_main_artist) || [];
-
-  const producerEngineers =
-    localForm.people?.filter(
-      (p) =>
-        !p.is_main_artist &&
-        p.roles?.some(
-          (r) =>
-            r.toLowerCase().includes("producer") ||
-            r.toLowerCase().includes("engineer") ||
-            r.toLowerCase().includes("director") ||
-            r.toLowerCase().includes("mixing") ||
-            r.toLowerCase().includes("mastering") ||
-            r.toLowerCase().includes("artwork"),
-        ),
-    ) || [];
-
-  const writersPublishers =
-    localForm.people?.filter(
-      (p) =>
-        !p.is_main_artist &&
-        p.roles?.some(
-          (r) =>
-            r.toLowerCase().includes("writer") ||
-            r.toLowerCase().includes("composer") ||
-            r.toLowerCase().includes("author") ||
-            r.toLowerCase().includes("publisher") ||
-            r.toLowerCase().includes("lyricist") ||
-            r.toLowerCase().includes("adaptor") ||
-            r.toLowerCase().includes("arranger"),
-        ),
-    ) || [];
-
-  const keyArtists =
-    localForm.people?.filter(
-      (p) =>
-        !p.is_main_artist &&
-        !producerEngineers.some((pe) => pe.reference === p.reference) &&
-        !writersPublishers.some((wp) => wp.reference === p.reference),
-    ) || [];
+  const currentCredits = localForm.people || EMPTY_PEOPLE;
+  const mainArtists = currentCredits.main || [];
+  const keyArtists = currentCredits.key_artist || [];
+  const producerEngineers = currentCredits.engineer || [];
+  const writersPublishers = currentCredits.writer || [];
 
   return (
     <div className="rounded-30 p-6 md:p-8 flex flex-col gap-8">
@@ -1085,7 +1081,7 @@ function TrackEditPanel({
                   <Button
                     type="button"
                     size="sm"
-                    disabled={mainArtists.length >= 3}
+                    disabled={mainArtists.length >= 1}
                     onClick={() => {
                       setSelectArtistContext("main");
                       setSelectArtistModalOpen(true);
@@ -1098,13 +1094,14 @@ function TrackEditPanel({
                 </div>
               </div>
 
-              {mainArtists.map((person) => (
+              {mainArtists.map((person, index) => (
                 <ContributorRow
-                  key={person.reference}
+                  key={`main_${person.reference || person.artist_reference || index}`}
                   person={person}
-                  roleLabel="Main Primary Artist"
                   avatarShape="square"
-                  onRemove={() => handleRemovePerson(person.reference)}
+                  onRemove={() =>
+                    handleRemovePerson("main", person.reference || person.artist_reference || "")
+                  }
                 />
               ))}
             </div>
@@ -1151,12 +1148,17 @@ function TrackEditPanel({
                 </div>
               </div>
 
-              {keyArtists.map((person) => (
+              {keyArtists.map((person, index) => (
                 <ContributorRow
-                  key={person.reference}
+                  key={`key_${person.reference || person.artist_reference || index}`}
                   person={person}
                   avatarShape="circle"
-                  onRemove={() => handleRemovePerson(person.reference)}
+                  onRemove={() =>
+                    handleRemovePerson(
+                      "key_artist",
+                      person.reference || person.artist_reference || "",
+                    )
+                  }
                 />
               ))}
             </div>
@@ -1192,12 +1194,17 @@ function TrackEditPanel({
                 </Button>
               </div>
 
-              {producerEngineers.map((person) => (
+              {producerEngineers.map((person, index) => (
                 <ContributorRow
-                  key={person.reference}
+                  key={`engineer_${person.reference || person.artist_reference || index}`}
                   person={person}
                   avatarShape="circle"
-                  onRemove={() => handleRemovePerson(person.reference)}
+                  onRemove={() =>
+                    handleRemovePerson(
+                      "engineer",
+                      person.reference || person.artist_reference || "",
+                    )
+                  }
                 />
               ))}
             </div>
@@ -1229,12 +1236,14 @@ function TrackEditPanel({
                 </Button>
               </div>
 
-              {writersPublishers.map((person) => (
+              {writersPublishers.map((person, index) => (
                 <ContributorRow
-                  key={person.reference}
+                  key={`writer_${person.reference || person.artist_reference || index}`}
                   person={person}
                   avatarShape="circle"
-                  onRemove={() => handleRemovePerson(person.reference)}
+                  onRemove={() =>
+                    handleRemovePerson("writer", person.reference || person.artist_reference || "")
+                  }
                 />
               ))}
             </div>
@@ -1392,7 +1401,7 @@ function TrackEditPanel({
               {isSaving ? (
                 <>
                   <span>Saving...</span>
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={24} className="animate-spin" />
                 </>
               ) : (
                 <>
@@ -1410,7 +1419,10 @@ function TrackEditPanel({
         open={selectArtistModalOpen}
         onOpenChange={setSelectArtistModalOpen}
         title={selectArtistContext === "main" ? "Select Main Artist" : "Select Key Artist"}
-        addedArtistIds={(localForm.people || []).map((p) => p.reference)}
+        roles={keyArtistRoles}
+        addedArtistIds={[...mainArtists, ...keyArtists]
+          .map((p) => p.artist_reference || p.reference || "")
+          .filter(Boolean)}
         onConfirmArtist={handleConfirmRosterArtist}
       />
 
@@ -1434,6 +1446,7 @@ function TrackEditPanel({
         open={addWriterModalOpen}
         onOpenChange={setAddWriterModalOpen}
         roles={writerRoles}
+        publishingTypes={meta?.publishingTypes || []}
         onAdd={handleAddWriterPublisher}
       />
 
