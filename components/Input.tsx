@@ -8,7 +8,7 @@ import { InputHTMLAttributes } from "react";
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   type?: "text" | "email" | "number" | "password" | "date";
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   error?: string;
   prefilled?: boolean;
@@ -19,7 +19,7 @@ function Input({ type = "text", name, label, error, prefilled, ...props }: Input
 
   return (
     <Field>
-      <FieldLabel htmlFor={props.id || name}>{label}</FieldLabel>
+      {label && <FieldLabel htmlFor={props.id || name}>{label}</FieldLabel>}
       <InputGroup
         data-prefilled={prefilled}
         className="bg-white outline outline-[#D9D9D9] p-4 rounded-10 flex items-center gap-2 data-[prefilled=true]:outline-none data-[prefilled=true]:border-none data-[prefilled=true]:bg-[#EBFFEE]"

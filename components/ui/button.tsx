@@ -18,6 +18,7 @@ const buttonVariants = cva(
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         blue: "bg-brand-blue text-white outline-blue hover:brightness-80",
         orange: "bg-brand-orange rounded-full gap-2 text-white outline outline-black",
+        purple: "bg-brand-purple-2 rounded-full gap-2 text-white hover:bg-brand-purple",
         link: "text-primary underline-offset-4 hover:underline",
         destructive:
           "bg-[#E52E2E] hover:bg-[#E52E2E]/90 text-white hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
@@ -26,6 +27,7 @@ const buttonVariants = cva(
         default: "p-4",
         xs: "px-4 py-1.5 gap-1 text-xs in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "px-5 py-2.5 gap-1 text-xs in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
+        md: "px-5 py-3 gap-2.5 text-xs in-data-[slot=button-group]:rounded-md has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5",
         xl: "px-6 py-5 gap-2 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         icon: "size-9",
         "icon-xs":
