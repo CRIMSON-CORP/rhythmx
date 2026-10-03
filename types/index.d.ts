@@ -134,6 +134,23 @@ type TrackPeopleCredits = {
   writer: TrackCreditItem[];
 };
 
+interface TrackRoyaltySplit {
+  reference: string;
+  name: string;
+  email?: string | null;
+  percent: number;
+  role?: string;
+  recipient_type?: "artist" | "external" | string;
+  is_owner?: boolean;
+  status?: "accepted" | "pending" | "declined" | string;
+}
+
+interface TrackRoyalty {
+  mode: "unset" | "split" | "full" | string;
+  owner_percent: number;
+  splits: TrackRoyaltySplit[];
+}
+
 interface ReleaseTrack {
   reference: string;
   order: number;
@@ -160,6 +177,7 @@ interface ReleaseTrack {
   people_count: number;
   credits_count: number;
   credits_revision: number;
+  royalty?: TrackRoyalty;
 }
 
 interface Permission {
@@ -383,6 +401,7 @@ interface ReleaseDetail {
   platforms: ReleasePlatform[];
   links: [];
   status_log: [];
+  owns_full_royalty?: boolean;
 }
 
 interface RoyaltySplit {

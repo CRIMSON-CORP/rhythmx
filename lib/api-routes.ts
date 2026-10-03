@@ -54,6 +54,7 @@ export const API_ROUTES = {
         `/api/releases/draft/${reference}/tracks/${trackRef}/credits`,
     },
     PLATFORMS: (reference: string) => `/api/releases/draft/${reference}/platforms`,
+    ROYALTY: (reference: string) => `/api/releases/draft/${reference}/royalty`,
   },
   LABEL: {
     ARTISTS: "/api/label/artists",
