@@ -52,6 +52,8 @@ export const API_ROUTES = {
         `/api/releases/draft/${reference}/tracks/${trackRef}/license`,
       CREDITS: (reference: string, trackRef: string) =>
         `/api/releases/draft/${reference}/tracks/${trackRef}/credits`,
+      ROYALTY_SPLITS: (reference: string, trackRef: string) =>
+        `/api/releases/draft/${reference}/tracks/${trackRef}/royalty-splits`,
     },
     PLATFORMS: (reference: string) => `/api/releases/draft/${reference}/platforms`,
     ROYALTY: (reference: string) => `/api/releases/draft/${reference}/royalty`,

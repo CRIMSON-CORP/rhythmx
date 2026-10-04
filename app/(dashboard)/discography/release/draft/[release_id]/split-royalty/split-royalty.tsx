@@ -22,6 +22,25 @@ interface StagedCollaborator {
   avatar_url?: string;
 }
 
+function getErrorMessage(err: unknown, fallback: string): string {
+  if (typeof err === "object" && err !== null) {
+    const errorObj = err as {
+      message?: string;
+      errors?: Record<string, string | string[]>;
+    };
+    if (errorObj.errors && typeof errorObj.errors === "object") {
+      const firstKey = Object.keys(errorObj.errors)[0];
+      if (firstKey) {
+        const firstErr = errorObj.errors[firstKey];
+        if (Array.isArray(firstErr) && firstErr[0]) return firstErr[0];
+        if (typeof firstErr === "string") return firstErr;
+      }
+    }
+    if (errorObj.message) return errorObj.message;
+  }
+  return fallback;
+}
+
 interface SplitRoyaltyProps {
   releaseId?: string;
   releaseOwnsFullRoyalty?: boolean;
@@ -43,6 +62,7 @@ function SplitRoyalty({
 
   const [ownFullRoyalty, setOwnFullRoyalty] = useState<boolean>(releaseOwnsFullRoyalty || false);
   const [isTogglingRoyalty, setIsTogglingRoyalty] = useState<boolean>(false);
+  const [isUpdatingSplit, setIsUpdatingSplit] = useState<boolean>(false);
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
 
   // Staged collaborator (selected from roster modal, awaiting percentage submission via '+')
@@ -68,6 +88,11 @@ function SplitRoyalty({
     if (!selectedTrackId) return null;
     return tracks.find((t) => t.reference === selectedTrackId) || null;
   }, [tracks, selectedTrackId]);
+
+  // List of collaborator splits (filtering out owner)
+  const collaboratorSplits = useMemo(() => {
+    return (selectedTrack?.royalty?.splits || []).filter((s) => !s.is_owner);
+  }, [selectedTrack]);
 
   // Remaining percentage that can be allocated (from server owner_percent)
   const remainingPercent = selectedTrack?.royalty?.owner_percent ?? 100;
@@ -114,9 +139,37 @@ function SplitRoyalty({
     setStagedCollaborator(null);
   };
 
-  // Add staged collaborator into list
-  const handleAddStagedCollaborator = () => {
-    if (!selectedTrackId || !stagedCollaborator) return;
+  // Helper to map existing collaborator splits to PUT payload format
+  const getExistingSplitsPayload = () => {
+    return collaboratorSplits.map((s) => {
+      const item: {
+        reference?: string;
+        name: string;
+        percent: number;
+        email?: string;
+        artist_reference?: string;
+      } = {
+        name: s.name,
+        percent: s.percent,
+      };
+      if (s.reference) {
+        item.reference = s.reference;
+      }
+      if (s.artist_reference) {
+        item.artist_reference = s.artist_reference;
+      } else if (s.recipient_type === "artist" && s.reference) {
+        item.artist_reference = s.reference;
+      } else if (s.email) {
+        item.email = s.email;
+      }
+      return item;
+    });
+  };
+
+  // Add staged collaborator into list via PUT endpoint
+  const handleAddStagedCollaborator = async () => {
+    if (!releaseId || !selectedTrackId || !selectedTrack || !stagedCollaborator || isUpdatingSplit)
+      return;
 
     const percent = Number(stagedPercent) || 0;
     if (percent <= 0) {
@@ -133,19 +186,53 @@ function SplitRoyalty({
       return;
     }
 
-    // Temporary clear staged form until user provides add split endpoint
-    setStagedCollaborator(null);
-    setStagedPercent(50);
-    router.refresh();
-    goeyToast.success("Collaborator split added");
+    const existingSplits = getExistingSplitsPayload();
+    const newSplit = {
+      name: stagedCollaborator.name,
+      percent: Math.round(percent * 100) / 100,
+      artist_reference: stagedCollaborator.reference,
+    };
+
+    setIsUpdatingSplit(true);
+    try {
+      await api.put(API_ROUTES.RELEASES.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
+        splits: [...existingSplits, newSplit],
+      });
+
+      setStagedCollaborator(null);
+      setStagedPercent(50);
+      router.refresh();
+      goeyToast.success("Split added successfully");
+    } catch (err: unknown) {
+      console.error("Failed to add split:", err);
+      const errorMsg = getErrorMessage(err, "Please try again later.");
+      goeyToast.error("Failed to add split", { description: errorMsg });
+    } finally {
+      setIsUpdatingSplit(false);
+    }
   };
 
-  // Remove collaborator
-  const handleRemoveCollaborator = (_collabReference: string) => {
-    if (!selectedTrackId) return;
+  // Remove collaborator via PUT endpoint
+  const handleRemoveCollaborator = async (collabReference: string) => {
+    if (!releaseId || !selectedTrackId || !selectedTrack || isUpdatingSplit) return;
 
-    router.refresh();
-    goeyToast.success("Collaborator removed");
+    const updatedSplits = getExistingSplitsPayload().filter((s) => s.reference !== collabReference);
+
+    setIsUpdatingSplit(true);
+    try {
+      await api.put(API_ROUTES.RELEASES.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
+        splits: updatedSplits,
+      });
+
+      router.refresh();
+      goeyToast.success("Collaborator removed");
+    } catch (err: unknown) {
+      console.error("Failed to remove collaborator:", err);
+      const errorMsg = getErrorMessage(err, "Please try again later.");
+      goeyToast.error("Failed to remove collaborator", { description: errorMsg });
+    } finally {
+      setIsUpdatingSplit(false);
+    }
   };
 
   // Handle artist chosen from SelectCollaboratorModal
@@ -160,16 +247,34 @@ function SplitRoyalty({
   };
 
   // Handle invitation sent from InviteCollaboratorModal
-  const handleInviteSent = (_data: { name: string; email: string; percentage: number }) => {
-    if (!selectedTrackId) return;
+  const handleInviteSent = async (data: { name: string; email: string; percentage: number }) => {
+    if (!releaseId || !selectedTrackId || !selectedTrack) return;
 
-    router.refresh();
-    goeyToast.success("Invite sent successfully");
+    const existingSplits = getExistingSplitsPayload();
+    const newSplit = {
+      name: data.name,
+      percent: Math.round(data.percentage * 100) / 100,
+      email: data.email,
+    };
+
+    try {
+      await api.put(API_ROUTES.RELEASES.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
+        splits: [...existingSplits, newSplit],
+      });
+
+      router.refresh();
+      goeyToast.success("Invite sent successfully");
+    } catch (err: unknown) {
+      console.error("Failed to send split invite:", err);
+      const errorMsg = getErrorMessage(err, "Please try again later.");
+      goeyToast.error("Failed to send invite", { description: errorMsg });
+      throw err;
+    }
   };
 
   const handleContinue = () => {
     if (releaseId) {
-      router.push(`/discography/release/draft/${releaseId}/release-date`);
+      router.push(`/discography/release/draft/${releaseId}/pre-order`);
     }
   };
 
@@ -366,6 +471,7 @@ function SplitRoyalty({
                     size="md"
                     type="button"
                     variant="purple"
+                    disabled={isUpdatingSplit}
                     onClick={() => setIsSelectModalOpen(true)}
                   >
                     <span>Select collaborator</span>
@@ -376,6 +482,7 @@ function SplitRoyalty({
                   <Button
                     size="md"
                     type="button"
+                    disabled={isUpdatingSplit}
                     onClick={() => setIsInviteModalOpen(true)}
                     variant="white-outline"
                   >
@@ -420,6 +527,7 @@ function SplitRoyalty({
                         min={1}
                         max={remainingPercent || 100}
                         value={stagedPercent}
+                        disabled={isUpdatingSplit}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val === "") {
@@ -431,14 +539,18 @@ function SplitRoyalty({
                           setStagedPercent(Math.min(100, Math.max(0, num)));
                         }}
                         placeholder="50%"
-                        className="w-full h-11 rounded-20 border border-default-default/40 bg-white px-4 text-sm font-medium text-center text-default outline-none focus:border-brand-orange transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-border-default-secondary/60"
+                        className="w-full h-11 rounded-20 border border-default-default/40 bg-white px-4 text-sm font-medium text-center text-default outline-none focus:border-brand-orange transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-border-default-secondary/60 disabled:opacity-50"
                       />
                     </div>
 
                     <button
                       type="button"
+                      disabled={isUpdatingSplit}
                       onClick={handleAddStagedCollaborator}
-                      className="size-11 rounded-full border border-black/80 flex items-center justify-center text-black hover:bg-black/5 active:scale-95 transition-all cursor-pointer shrink-0"
+                      className={cn(
+                        "size-11 rounded-full border border-black/80 flex items-center justify-center text-black hover:bg-black/5 active:scale-95 transition-all cursor-pointer shrink-0",
+                        isUpdatingSplit && "opacity-50 cursor-not-allowed",
+                      )}
                       title="Add to split"
                     >
                       <Plus size={20} />
@@ -446,8 +558,9 @@ function SplitRoyalty({
 
                     <button
                       type="button"
+                      disabled={isUpdatingSplit}
                       onClick={() => setStagedCollaborator(null)}
-                      className="size-8 rounded-full text-border-default-secondary hover:text-black hover:bg-black/5 flex items-center justify-center transition-colors shrink-0"
+                      className="size-8 rounded-full text-border-default-secondary hover:text-black hover:bg-black/5 flex items-center justify-center transition-colors shrink-0 disabled:opacity-50"
                       title="Cancel"
                     >
                       <X size={16} />
@@ -457,19 +570,28 @@ function SplitRoyalty({
               )}
 
               {/* Collaborators List */}
-              {(selectedTrack.royalty?.splits?.length ?? 0) > 0 ? (
-                <div className="bg-white rounded-20 p-5 sm:p-6 border border-default-default/20 flex flex-col divide-y divide-default-default/15 shadow-xs">
-                  {selectedTrack.royalty?.splits?.map((collab) => (
+              {collaboratorSplits.length > 0 ? (
+                <div className="bg-white rounded-20 p-5 sm:p-6 border border-default-default flex flex-col divide-y divide-default-default">
+                  {collaboratorSplits.map((collab) => (
                     <div
                       key={collab.reference}
-                      className="flex items-center justify-between py-4 first:pt-0 last:pb-0 gap-4"
+                      className="flex items-center justify-between py-4 gap-4"
                     >
-                      <div className="flex items-center gap-3.5 min-w-0">
-                        <div className="size-10 rounded-full bg-[#9747FF]/10 flex items-center justify-center shrink-0">
-                          <User size={20} className="text-[#9747FF]" />
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="size-8 relative rounded-full bg-[#9747FF]/10 flex items-center justify-center shrink-0">
+                          {collab.avatar_url ? (
+                            <Image
+                              src={collab.avatar_url}
+                              alt={collab.name}
+                              fill
+                              className="object-cover rounded-full"
+                            />
+                          ) : (
+                            <User size={20} className="text-brand-purple-2" />
+                          )}
                         </div>
                         <div className="flex flex-col truncate">
-                          <span className="font-semibold text-sm text-black truncate">
+                          <span className="font-medium text-default truncate">
                             {collab.name}
                             {collab.status === "pending" ? " (Invite sent)" : ""}
                           </span>
@@ -482,8 +604,9 @@ function SplitRoyalty({
 
                       <Button
                         variant="outline"
+                        disabled={isUpdatingSplit}
                         onClick={() => handleRemoveCollaborator(collab.reference)}
-                        className="rounded-full px-5 py-2 h-auto text-xs font-medium border-black/80 text-black hover:bg-black/5 shrink-0 transition-colors"
+                        className="rounded-full px-5 py-2 h-auto text-xs font-medium border-black/80 text-black hover:bg-black/5 shrink-0 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Remove
                       </Button>
@@ -507,7 +630,11 @@ function SplitRoyalty({
       <SelectCollaboratorModal
         open={isSelectModalOpen}
         onOpenChange={setIsSelectModalOpen}
-        excludeIds={selectedTrack?.royalty?.splits?.map((c) => c.reference) || []}
+        excludeIds={
+          collaboratorSplits
+            .map((c) => c.artist_reference || c.reference)
+            .filter(Boolean) as string[]
+        }
         onSelectCollaborator={handleCollaboratorSelectedFromRoster}
       />
 

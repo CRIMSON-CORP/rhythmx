@@ -143,6 +143,8 @@ interface TrackRoyaltySplit {
   recipient_type?: "artist" | "external" | string;
   is_owner?: boolean;
   status?: "accepted" | "pending" | "declined" | string;
+  artist_reference?: string | null;
+  avatar_url?: string | null;
 }
 
 interface TrackRoyalty {

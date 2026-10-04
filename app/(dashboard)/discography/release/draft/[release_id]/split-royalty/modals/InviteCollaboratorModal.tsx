@@ -20,7 +20,7 @@ interface InviteCollaboratorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   maxPercentage?: number;
-  onSendInvite: (data: { name: string; email: string; percentage: number }) => void;
+  onSendInvite: (data: { name: string; email: string; percentage: number }) => Promise<void> | void;
 }
 
 export function InviteCollaboratorModal({
@@ -30,6 +30,7 @@ export function InviteCollaboratorModal({
   onSendInvite,
 }: InviteCollaboratorModalProps) {
   const [step, setStep] = useState<"form" | "success">("form");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [percentage, setPercentage] = useState<number | "">("");
@@ -57,8 +58,9 @@ export function InviteCollaboratorModal({
     }
   };
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (isSubmitting) return;
 
     if (!name.trim()) {
       goeyToast.error("Name Required", {
@@ -89,19 +91,25 @@ export function InviteCollaboratorModal({
       return;
     }
 
-    // Call parent to add collaborator into split list
-    onSendInvite({
-      name: name.trim(),
-      email: email.trim(),
-      percentage: percentNum,
-    });
+    setIsSubmitting(true);
+    try {
+      await onSendInvite({
+        name: name.trim(),
+        email: email.trim(),
+        percentage: percentNum,
+      });
 
-    // Save submitted data and transition to success step
-    setSubmittedData({
-      name: name.trim(),
-      email: email.trim(),
-    });
-    setStep("success");
+      // Save submitted data and transition to success step
+      setSubmittedData({
+        name: name.trim(),
+        email: email.trim(),
+      });
+      setStep("success");
+    } catch {
+      // Error handled by parent toast
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -122,10 +130,10 @@ export function InviteCollaboratorModal({
         </VisuallyHidden.Root>
 
         {/* Top glow background */}
-        <div className="absolute w-full top-0 left-0 right-0 h-40 bg-linear-to-r from-[#9747FF] to-[#FFC107] -z-10 opacity-20 blur-3xl pointer-events-none" />
+        <div className="absolute w-full top-0 left-0 right-0 h-40 bg-linear-to-r from-[#0080FF] to-[#9747FF] -z-10 opacity-20 blur-3xl pointer-events-none" />
 
         {/* Header */}
-        <header className="p-6 pb-0 flex items-center justify-between">
+        <header className="p-5 flex items-center justify-between">
           <span className="text-default text-sm font-medium">
             {step === "form" ? "Invite Collaborator" : ""}
           </span>
@@ -133,7 +141,7 @@ export function InviteCollaboratorModal({
             onClick={handleClose}
             className="p-2 rounded-full hover:bg-black/5 transition-colors cursor-pointer ml-auto"
           >
-            <X size={24} className="text-default" />
+            <X size={20} className="text-default" />
           </DialogClose>
         </header>
 
@@ -186,17 +194,17 @@ export function InviteCollaboratorModal({
 
             {/* Submit Button */}
             <div className="pt-2">
-              <Button size="sm" type="submit" variant="white-outline">
-                <span>Send invite</span>
+              <Button size="sm" type="submit" variant="white-outline" disabled={isSubmitting}>
+                <span>{isSubmitting ? "Sending..." : "Send invite"}</span>
                 <Send size={24} />
               </Button>
             </div>
           </form>
         ) : (
           /* Success Screen Body (Image provided) */
-          <div className="p-8 pt-4 pb-12 flex flex-col items-center justify-center text-center animate-in fade-in">
+          <div className="p-12 bg-white rounded-30 flex flex-col gap-8 items-center justify-center text-center animate-in fade-in">
             {/* 3D Checkmark Graphic */}
-            <div className="relative size-32 sm:size-36 mb-6">
+            <div className="relative sm:size-33">
               <Image
                 src="/images/checkmark.png"
                 alt="Invite sent"
@@ -206,26 +214,18 @@ export function InviteCollaboratorModal({
               />
             </div>
 
-            {/* Heading */}
-            <h3 className="text-xl sm:text-2xl font-heading font-semibold text-default mb-2.5">
-              Invite sent
-            </h3>
+            <div className="flex flex-col gap-4 items-center">
+              {/* Heading */}
+              <h3 className="text-lg font-medium">Invite sent</h3>
 
-            {/* Subtitle */}
-            <p className="text-sm text-border-default-secondary font-medium max-w-sm leading-relaxed mb-8">
-              You have successfully send royalty split invite to{" "}
-              <span className="text-default font-medium">
-                {submittedData?.name || "Davido"} ({submittedData?.email || "davido@gmail.com"})
-              </span>
-            </p>
-
+              {/* Subtitle */}
+              <p className="text-border-default-secondary font-medium max-w-sm leading-relaxed">
+                You have successfully send royalty split invite to {submittedData?.name || "Davido"}{" "}
+                ({submittedData?.email || "davido@gmail.com"})
+              </p>
+            </div>
             {/* Done Action Button */}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="rounded-full px-10 py-3 border-black text-default text-sm font-medium hover:bg-black/5 min-w-32"
-            >
+            <Button type="button" variant="outline" onClick={handleClose} className="px-14">
               Done
             </Button>
           </div>
