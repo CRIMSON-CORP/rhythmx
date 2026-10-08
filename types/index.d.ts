@@ -46,6 +46,7 @@ interface Artist {
   location: string;
   image: string;
   balance?: number;
+  role?: "main" | "featured" | string;
 }
 
 interface Team {

@@ -117,7 +117,7 @@ export const newReleaseStoreTitles = [
       "Publish your release, fill all the necessary information, upload tracks, album art cover and more.",
     tab_title: "Review & Submit",
     icon: AlignLeft,
-    path: "review",
+    path: "release-summary",
     Component: ReleaseSummary,
   },
 ];

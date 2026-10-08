@@ -17,17 +17,17 @@ import { goeyToast } from "goey-toast";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowRight, X } from "lucide-react";
 
 export function XpressDialog({
   xpressRelease,
   open: controlledOpen,
-  onOpenChange: controlledOnOpenChange,
+  onOpenChangeAction: controlledOnOpenChange,
 }: {
   xpressRelease: boolean;
   open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  onOpenChangeAction?: (open: boolean) => void;
 }) {
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = controlledOpen !== undefined ? controlledOpen : localOpen;
@@ -213,7 +213,7 @@ function ReleaseDate({
       });
 
       goeyToast.success("Release date saved successfully");
-      router.push(`/discography/release/draft/${releaseId}/review`);
+      router.push(`/discography/release/draft/${releaseId}/release-summary`);
     } catch (error) {
       console.error("Failed to save release date:", error);
       const errorMsg = (error as { message?: string })?.message || "Failed to save release date";
@@ -265,7 +265,7 @@ function ReleaseDate({
                 <XpressDialog
                   xpressRelease={xpressRelease}
                   open={isXpressDialogOpen}
-                  onOpenChange={setIsXpressDialogOpen}
+                  onOpenChangeAction={setIsXpressDialogOpen}
                 />
               </span>
               <Switch
