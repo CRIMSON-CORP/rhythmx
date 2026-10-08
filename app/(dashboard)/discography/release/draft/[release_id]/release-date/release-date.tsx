@@ -17,26 +17,55 @@ import { goeyToast } from "goey-toast";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, X } from "lucide-react";
+
+export interface FastTrackCheckoutData {
+  payment_link: string;
+  amount?: number;
+  amount_gbp?: number;
+  currency?: string;
+  gateway?: string;
+}
 
 export function XpressDialog({
   xpressRelease,
   open: controlledOpen,
   onOpenChangeAction: controlledOnOpenChange,
+  checkoutData,
+  onProceedToPayment,
+  onLearnMoreClick,
 }: {
   xpressRelease: boolean;
   open?: boolean;
   onOpenChangeAction?: (open: boolean) => void;
+  checkoutData?: FastTrackCheckoutData | null;
+  onProceedToPayment?: () => void;
+  onLearnMoreClick?: () => void;
 }) {
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = controlledOpen !== undefined ? controlledOpen : localOpen;
   const setIsOpen = controlledOnOpenChange !== undefined ? controlledOnOpenChange : setLocalOpen;
 
+  const displayPrice = useMemo(() => {
+    if (!checkoutData) return "$15.00";
+    if (checkoutData.amount_gbp && checkoutData.currency && checkoutData.amount) {
+      return `£${checkoutData.amount_gbp} (${checkoutData.currency} ${checkoutData.amount.toLocaleString()})`;
+    }
+    if (checkoutData.amount_gbp) {
+      return `£${checkoutData.amount_gbp}`;
+    }
+    return `${checkoutData.currency || "GBP"} ${checkoutData.amount || 5}`;
+  }, [checkoutData]);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="text-brand-orange hover:underline cursor-pointer font-medium ml-1 outline-none">
+        <button
+          type="button"
+          onClick={onLearnMoreClick}
+          className="text-brand-orange hover:underline cursor-pointer font-medium ml-1 outline-none"
+        >
           Learn More
         </button>
       </DialogTrigger>
@@ -48,7 +77,11 @@ export function XpressDialog({
 
         <DialogHeader className="flex flex-row items-center justify-between pb-2">
           <DialogTitle className="text-default font-medium text-base">
-            {xpressRelease ? "GO Xpress" : "Learn about Xpress Release"}
+            {checkoutData
+              ? "Xpress Release Checkout"
+              : xpressRelease
+                ? "GO Xpress"
+                : "Learn about Xpress Release"}
           </DialogTitle>
           <DialogClose>
             <X size={22} />
@@ -66,7 +99,26 @@ export function XpressDialog({
             />
           </div>
 
-          {xpressRelease ? (
+          {checkoutData ? (
+            <div className="flex flex-col items-center w-full text-center">
+              <div className="bg-[#FFF4E5] text-brand-orange font-semibold text-xs rounded-full px-4 py-1.5 uppercase tracking-wider">
+                Fast Track Checkout
+              </div>
+              <h3 className="text-2xl font-bold font-heading text-default mt-2">Xpress Release</h3>
+              <DialogDescription className="text-xs text-border-default-secondary leading-normal max-w-sm mt-1">
+                Get your release published on streaming platforms within 24-48 Hours.
+              </DialogDescription>
+              <div className="bg-page-background font-bold text-xl text-default rounded-full px-8 py-3.5 mt-3 w-full max-w-md">
+                {displayPrice}
+              </div>
+              <Button
+                onClick={onProceedToPayment}
+                className="w-full max-w-md rounded-full py-6 mt-6 text-sm font-semibold bg-brand-orange hover:bg-brand-orange/90 text-white border-0 cursor-pointer"
+              >
+                Proceed to Payment
+              </Button>
+            </div>
+          ) : xpressRelease ? (
             <>
               <div className="bg-[#EBFFEE] text-[#009951] font-semibold text-xs rounded-full px-4 py-1.5 uppercase tracking-wider">
                 Xpress Release is ON
@@ -153,6 +205,112 @@ function ReleaseDate({
   const [xpressRelease, setXpressRelease] = useState<boolean>(initialFastTrack ?? false);
   const [isXpressDialogOpen, setIsXpressDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFastTrackLoading, setIsFastTrackLoading] = useState<boolean>(false);
+  const [checkoutData, setCheckoutData] = useState<FastTrackCheckoutData | null>(null);
+
+  useEffect(() => {
+    if (initialFastTrack !== undefined) {
+      setXpressRelease(initialFastTrack);
+    }
+  }, [initialFastTrack]);
+
+  const handleToggleFastTrack = async (checked: boolean) => {
+    if (isFastTrackLoading) return;
+
+    if (checked) {
+      setIsFastTrackLoading(true);
+      try {
+        const res = await api.post<{
+          status: boolean;
+          message: string;
+          data?: {
+            is_fast_track?: boolean;
+            payment_link?: string;
+            amount?: number;
+            amount_gbp?: number;
+            currency?: string;
+            gateway?: string;
+          };
+        }>(API_ROUTES.RELEASES.FAST_TRACK(releaseId), {});
+
+        if (res.data?.is_fast_track) {
+          setXpressRelease(true);
+          setCheckoutData(null);
+          goeyToast.success(res.message || "Fast track added.");
+        } else if (res.data?.payment_link) {
+          setCheckoutData({
+            payment_link: res.data.payment_link,
+            amount: res.data.amount,
+            amount_gbp: res.data.amount_gbp,
+            currency: res.data.currency,
+            gateway: res.data.gateway,
+          });
+          setIsXpressDialogOpen(true);
+        } else {
+          setXpressRelease(true);
+          goeyToast.success(res.message || "Fast track added.");
+        }
+      } catch (err: unknown) {
+        console.error("Fast track request failed:", err);
+        const errorMsg =
+          (err as { message?: string })?.message || "Failed to activate fast track.";
+        goeyToast.error("Cannot activate Fast Track", { description: errorMsg });
+      } finally {
+        setIsFastTrackLoading(false);
+      }
+    } else {
+      setIsFastTrackLoading(true);
+      try {
+        const res = await api.delete<{ status: boolean; message: string }>(
+          API_ROUTES.RELEASES.FAST_TRACK(releaseId),
+        );
+        setXpressRelease(false);
+        setCheckoutData(null);
+        router.refresh();
+        goeyToast.success(res.message || "Fast track removed.");
+      } catch (err: unknown) {
+        console.error("Fast track deactivation failed:", err);
+        const errorMsg =
+          (err as { message?: string })?.message ||
+          "Fast track is paid for. Contact support to cancel it.";
+        setXpressRelease(true);
+        goeyToast.error("Cannot cancel Fast Track", { description: errorMsg });
+      } finally {
+        setIsFastTrackLoading(false);
+      }
+    }
+  };
+
+  const handleOpenLearnMore = () => {
+    setCheckoutData(null);
+    setIsXpressDialogOpen(true);
+  };
+
+  const handleProceedToPayment = () => {
+    if (!checkoutData?.payment_link) return;
+
+    window.open(checkoutData.payment_link, "_blank");
+    setIsXpressDialogOpen(false);
+
+    const handleWindowFocus = async () => {
+      window.removeEventListener("focus", handleWindowFocus);
+      try {
+        const res = await api.get<{ release: ReleaseDetail }>(
+          `${API_ROUTES.RELEASES.MY}/${releaseId}`,
+        );
+        if (res.release?.is_fast_track) {
+          setXpressRelease(true);
+          setCheckoutData(null);
+          router.refresh();
+          goeyToast.success("Fast track activated successfully!");
+        }
+      } catch (err) {
+        console.error("Failed to refresh release details:", err);
+      }
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+  };
 
   const today = useMemo(() => {
     const d = new Date();
@@ -266,16 +424,15 @@ function ReleaseDate({
                   xpressRelease={xpressRelease}
                   open={isXpressDialogOpen}
                   onOpenChangeAction={setIsXpressDialogOpen}
+                  checkoutData={checkoutData}
+                  onProceedToPayment={handleProceedToPayment}
+                  onLearnMoreClick={handleOpenLearnMore}
                 />
               </span>
               <Switch
                 checked={xpressRelease}
-                onCheckedChange={(checked) => {
-                  setXpressRelease(checked);
-                  if (checked) {
-                    setIsXpressDialogOpen(true);
-                  }
-                }}
+                disabled={isFastTrackLoading}
+                onCheckedChange={handleToggleFastTrack}
               />
             </div>
           </div>
