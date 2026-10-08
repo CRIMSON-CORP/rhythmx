@@ -185,7 +185,7 @@ function ReleaseDate() {
                   setForm({ release_date: date });
                 }
               }}
-              className="w-full flex justify-stretch [&>div]:w-full [&_button[data-selected-single=true]]:bg-[#0066FF] [&_button[data-selected-single=true]]:text-white [&_button[data-selected-single=true]]:rounded-full"
+              className="w-full px-6 pb-4 pt-0"
             />
           </div>
           {/* Time Selector */}

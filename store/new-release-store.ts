@@ -7,7 +7,7 @@ import SplitRoyalty from "@/app/(dashboard)/discography/single/new/steps/split-r
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { goeyToast } from "goey-toast";
-import { AlignLeft, Calendar, Disc, DollarSign, Info, Layers } from "lucide-react";
+import { AlignLeft, Calendar, Disc, DollarSign, Info, Layers, ShoppingBag } from "lucide-react";
 import { create } from "zustand";
 
 export interface ReleaseDetailsForm {
@@ -93,6 +93,14 @@ export const newReleaseStoreTitles = [
     tab_title: "Split Royalty",
     icon: DollarSign,
     path: "split-royalty",
+    Component: SplitRoyalty,
+  },
+  {
+    title: "Preorder Date",
+    subtitle: "Set your preorder start date and build early anticipation",
+    tab_title: "Pre-order",
+    icon: ShoppingBag,
+    path: "pre-order",
     Component: SplitRoyalty,
   },
   {

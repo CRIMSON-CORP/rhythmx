@@ -404,6 +404,8 @@ interface ReleaseDetail {
   links: [];
   status_log: [];
   owns_full_royalty?: boolean;
+  preorder_date?: string | null;
+  preorder_time?: string | null;
 }
 
 interface RoyaltySplit {
