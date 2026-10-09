@@ -33,15 +33,15 @@ export function XpressDialog({
   open: controlledOpen,
   onOpenChangeAction: controlledOnOpenChange,
   checkoutData,
-  onProceedToPayment,
-  onLearnMoreClick,
+  onProceedToPaymentAction: onProceedToPayment,
+  onLearnMoreClickAction: onLearnMoreClick,
 }: {
   xpressRelease: boolean;
   open?: boolean;
   onOpenChangeAction?: (open: boolean) => void;
   checkoutData?: FastTrackCheckoutData | null;
-  onProceedToPayment?: () => void;
-  onLearnMoreClick?: () => void;
+  onProceedToPaymentAction?: () => void;
+  onLearnMoreClickAction?: () => void;
 }) {
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = controlledOpen !== undefined ? controlledOpen : localOpen;
@@ -252,8 +252,7 @@ function ReleaseDate({
         }
       } catch (err: unknown) {
         console.error("Fast track request failed:", err);
-        const errorMsg =
-          (err as { message?: string })?.message || "Failed to activate fast track.";
+        const errorMsg = (err as { message?: string })?.message || "Failed to activate fast track.";
         goeyToast.error("Cannot activate Fast Track", { description: errorMsg });
       } finally {
         setIsFastTrackLoading(false);
@@ -301,7 +300,6 @@ function ReleaseDate({
         if (res.release?.is_fast_track) {
           setXpressRelease(true);
           setCheckoutData(null);
-          router.refresh();
           goeyToast.success("Fast track activated successfully!");
         }
       } catch (err) {
@@ -425,8 +423,8 @@ function ReleaseDate({
                   open={isXpressDialogOpen}
                   onOpenChangeAction={setIsXpressDialogOpen}
                   checkoutData={checkoutData}
-                  onProceedToPayment={handleProceedToPayment}
-                  onLearnMoreClick={handleOpenLearnMore}
+                  onProceedToPaymentAction={handleProceedToPayment}
+                  onLearnMoreClickAction={handleOpenLearnMore}
                 />
               </span>
               <Switch
