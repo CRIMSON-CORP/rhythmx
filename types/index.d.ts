@@ -471,3 +471,9 @@ interface ConnectedArtist {
   name: string;
   url?: string | null;
 }
+
+interface ApiResponse<T> {
+  data: T;
+  message: string;
+  status: number;
+}

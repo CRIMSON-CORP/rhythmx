@@ -61,6 +61,8 @@ export const API_ROUTES = {
     FAST_TRACK: (reference: string) => `/api/releases/draft/${reference}/fast-track`,
   },
   LABEL: {
+    ME: "/api/label",
+    LOGO: "/api/label/logo",
     ARTISTS: "/api/label/artists",
     UPDATE_ARTIST_PROFILE: (reference: string) => `/api/label/artists/${reference}/profile`,
     PHOTO: (reference: string) => `/api/label/artists/${reference}/photo`,

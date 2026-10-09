@@ -100,3 +100,20 @@ interface PublishingType {
 interface PublishingTypesResponse {
   publishing_types: PublishingType[];
 }
+
+interface LabelDetailsResponse {
+  label: {
+    reference: string;
+    name: string;
+    slug: string;
+    email: string;
+    phone: string;
+    region: string;
+    website: string;
+    logo: string;
+    logo_url: string;
+    is_verified: boolean;
+    wallet_control: string;
+    created_at: string;
+  };
+}
