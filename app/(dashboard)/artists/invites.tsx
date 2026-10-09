@@ -9,10 +9,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Clock, Link, Plus, User, X } from "lucide-react";
+import { Clock, Link as LinkIcon, Loader2, Plus, User, X } from "lucide-react";
 import Image from "next/image";
 import { VisuallyHidden } from "radix-ui";
 import { ReactNode, useState } from "react";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+import { goeyToast } from "goey-toast";
+import { useRouter } from "next/navigation";
 
 export function PendingInvitesTrigger() {
   return (
@@ -37,6 +41,76 @@ export function InvitesInvitesTrigger() {
 }
 
 function Invites({ children }: { children: ReactNode }) {
+  const [emails, setEmails] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const router = useRouter();
+
+  const handleCopyLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.origin + "/auth/register");
+      goeyToast.success("Invite link copied to clipboard");
+    }
+  };
+
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = emails.trim();
+    if (!trimmed) {
+      goeyToast.error("Please enter at least one email address.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const res = await api.post<InviteArtistResponse>(API_ROUTES.LABEL.INVITE_ARTIST, {
+        emails: trimmed,
+      });
+
+      const sentCount = res?.sent?.length ?? 0;
+      const skippedItems = res?.skipped ?? [];
+
+      const showSkippedWarning = () => {
+        if (skippedItems.length === 0) return;
+        if (skippedItems.length === 1) {
+          goeyToast.warning(`${skippedItems[0].email} skipped`, {
+            description: skippedItems[0].reason,
+            duration: 4000,
+          });
+        } else {
+          goeyToast.warning(`${skippedItems.length} invite(s) skipped`, {
+            description: (
+              <div className="flex flex-col gap-1 mt-1 text-xs">
+                {skippedItems.map((item, idx) => (
+                  <p key={idx}>
+                    <span className="font-semibold">{item.email}:</span> {item.reason}
+                  </p>
+                ))}
+              </div>
+            ),
+            duration: 5000,
+          });
+        }
+      };
+
+      if (sentCount > 0) {
+        goeyToast.success(`${sentCount} invite(s) sent.`, { duration: 3000 });
+        setEmails("");
+
+        if (skippedItems.length > 0) {
+          setTimeout(showSkippedWarning, 3000);
+        }
+      } else if (skippedItems.length > 0) {
+        showSkippedWarning();
+      }
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to send artist invites:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -48,9 +122,13 @@ function Invites({ children }: { children: ReactNode }) {
         <div className="absolute w-full top-0 right-0 h-26 bg-linear-to-r from-[#8A38F5] to-[#0066FF] -z-10 opacity-25 blur-3xl pointer-none:"></div>
         <header className="px-6 py-5 flex items-center gap-2.5">
           <p className="text-sm font-medium grow">Invite Artist</p>
-          <button className="p-2 rounded-md bg-white flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="p-2 rounded-md bg-white flex items-center gap-2 hover:bg-white/80 transition-colors"
+          >
             <span className="text-xs font-medium">Copy link</span>
-            <Link size={16} className="text-brand-blue" />
+            <LinkIcon size={16} className="text-brand-blue" />
           </button>
           <DialogClose className="p-2">
             <X size={20} />
@@ -67,15 +145,26 @@ function Invites({ children }: { children: ReactNode }) {
           <h3 className="text-center text-default font-medium text-base">Send Invite to artist</h3>
           <div className="flex items-stretch gap-2.5">
             <form
-              action=""
+              onSubmit={handleInvite}
               className="bg-white rounded-2xl overflow-hidden flex items-stretch outline outline-default-default grow"
             >
               <input
-                type="text"
+                type="email"
+                autoComplete="email"
+                value={emails}
+                onChange={(e) => setEmails(e.target.value)}
+                disabled={isSubmitting}
                 placeholder="Email, comma to seperate"
-                className="grow p-4 leading-none"
+                className="grow p-4 leading-none outline-none disabled:opacity-50 text-sm"
               />
-              <button className="px-7 py-3 bg-brand-blue text-white">Invite</button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-7 py-3 bg-brand-blue text-white font-medium flex items-center justify-center gap-2 disabled:opacity-70 transition-opacity"
+              >
+                {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+                <span>Invite</span>
+              </button>
             </form>
 
             <CreateArtist />

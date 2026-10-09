@@ -65,6 +65,7 @@ export const API_ROUTES = {
     LOGO: "/api/label/logo",
     ARTISTS: "/api/label/artists",
     ARTIST: (reference: string) => `/api/label/artists/${reference}`,
+    INVITE_ARTIST: "/api/label/artists/invite",
     UPDATE_ARTIST_PROFILE: (reference: string) => `/api/label/artists/${reference}/profile`,
     PHOTO: (reference: string) => `/api/label/artists/${reference}/photo`,
   },

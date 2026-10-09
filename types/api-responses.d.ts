@@ -162,3 +162,18 @@ interface LabelArtistDetailResponse {
   artist: LabelArtist;
 }
 
+interface InviteArtistSentItem {
+  invite_id: number;
+  email: string;
+}
+
+interface InviteArtistSkippedItem {
+  email: string;
+  reason: string;
+}
+
+interface InviteArtistResponse {
+  sent?: InviteArtistSentItem[];
+  skipped?: InviteArtistSkippedItem[];
+}
+
