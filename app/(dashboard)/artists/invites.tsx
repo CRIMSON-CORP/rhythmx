@@ -70,7 +70,7 @@ function Invites({ children }: { children: ReactNode }) {
       const sentCount = res?.sent?.length ?? 0;
       const skippedItems = res?.skipped ?? [];
 
-      const showSkippedWarning = () => {
+      const showSkippedWarning: () => void = () => {
         if (skippedItems.length === 0) return;
         if (skippedItems.length === 1) {
           goeyToast.warning(`${skippedItems[0].email} skipped`, {

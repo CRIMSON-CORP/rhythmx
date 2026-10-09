@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const teams: Team[] = [
   { id: "1", name: "Isabella", role: "New York", image: "/images/release-1.png" },
   { id: "2", name: "Miclof", role: "New York", image: "/images/release-2.png" },

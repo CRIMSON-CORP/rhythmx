@@ -51,9 +51,11 @@ interface Artist {
 
 interface Team {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   role: string;
   image: string;
+  email: string;
 }
 
 interface Track {

@@ -35,14 +35,24 @@ export function getFieldErrors<T extends Record<string, any> = Record<string, st
   const errObj = error as ApiErrorObject | null | undefined;
   const result: Record<string, string> = {};
 
-  if (errObj?.errors && typeof errObj.errors === "object" && !Array.isArray(errObj.errors)) {
-    for (const [key, value] of Object.entries(errObj.errors)) {
+  const errorBag = errObj?.errors || (errObj as any)?.error;
+  if (errorBag && typeof errorBag === "object" && !Array.isArray(errorBag)) {
+    for (const [key, value] of Object.entries(errorBag)) {
       if (!value) continue;
       result[key] = Array.isArray(value) ? value[0] : String(value);
     }
   }
 
   return result as Partial<T>;
+}
+
+/**
+ * Extracts the first field error string from an API error response, if available.
+ */
+export function getFirstFieldError(error: unknown): string | null {
+  const fieldErrors = getFieldErrors(error);
+  const values = Object.values(fieldErrors);
+  return values.length > 0 && typeof values[0] === "string" ? values[0] : null;
 }
 
 /**

@@ -177,3 +177,70 @@ interface InviteArtistResponse {
   skipped?: InviteArtistSkippedItem[];
 }
 
+interface TeamMemberRole {
+  id: number;
+  name: string;
+}
+
+interface TeamMember {
+  reference: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar_url: string;
+  status: string;
+  joined_at: string;
+  role: TeamMemberRole;
+}
+
+interface LabelTeamResponse {
+  team: TeamMember[];
+  meta?: {
+    pagination: PaginationMeta;
+  };
+}
+
+interface RoleCataloguePermission {
+  key: string;
+  label: string;
+  description: string;
+}
+
+interface RoleCatalogueGroup {
+  key: string;
+  label: string;
+  description: string;
+  permissions: RoleCataloguePermission[];
+}
+
+interface RoleItem {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  is_active?: boolean;
+  members?: number;
+  permissions?: Record<string, boolean>;
+  created_at?: string;
+}
+
+interface LabelRolesResponse {
+  roles: RoleItem[];
+  catalogue?: RoleCatalogueGroup[];
+}
+
+type CreateTeamMemberPayload = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  role_id: number;
+};
+
+interface CreateTeamMemberResponse {
+  reference?: string;
+  member?: TeamMember;
+}
+
+
+
