@@ -12,6 +12,8 @@ export interface UseInfiniteScrollOptions<T> {
   search?: string;
   debounceMs?: number;
   enabled?: boolean;
+  initialItems?: T[];
+  initialHasMore?: boolean;
 }
 
 export function useInfiniteScroll<T>({
@@ -19,15 +21,18 @@ export function useInfiniteScroll<T>({
   search = "",
   debounceMs = 300,
   enabled = true,
+  initialItems = [],
+  initialHasMore = true,
 }: UseInfiniteScrollOptions<T>) {
-  const [items, setItems] = useState<T[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [items, setItems] = useState<T[]>(initialItems);
+  const [page, setPage] = useState<number>(initialItems.length > 0 ? 2 : 1);
+  const [hasMore, setHasMore] = useState<boolean>(initialHasMore);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const isInitialMount = useRef(true);
 
   // Keep a stable ref to fetchPage
   const fetchPageRef = useRef(fetchPage);
@@ -38,6 +43,14 @@ export function useInfiniteScroll<T>({
   // Load initial page (or reset on search/enabled change)
   useEffect(() => {
     if (!enabled) return;
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      // If initial items were provided and search is empty, skip fetching page 1 on mount
+      if (initialItems.length > 0 && !search) {
+        return;
+      }
+    }
 
     let isMounted = true;
     const timeoutId = setTimeout(async () => {

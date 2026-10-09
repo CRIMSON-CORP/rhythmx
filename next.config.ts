@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.dicebear.com",
       },
+      {
+        protocol: "https",
+        hostname: "api.rhythmx.com",
+      },
     ],
   },
   allowedDevOrigins: ["10.13.131.78"],

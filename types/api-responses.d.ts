@@ -117,3 +117,39 @@ interface LabelDetailsResponse {
     created_at: string;
   };
 }
+
+interface LabelArtist {
+  reference: string;
+  legal_name: string;
+  stage_name: string;
+  email: string;
+  phone: string | null;
+  genre: string;
+  country: string;
+  country_name: string;
+  avatar_url: string;
+  portrait_url: string;
+  spotify_linked: boolean;
+  spotify_url: string | null;
+  apple_music_linked: boolean;
+  apple_music_url: string | null;
+  status: string;
+  joined_at: string;
+}
+
+interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
+interface LabelArtistsResponse {
+  artists: LabelArtist[];
+  meta?: {
+    pagination: PaginationMeta;
+  };
+}
+
