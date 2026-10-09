@@ -16,6 +16,15 @@ export interface UseInfiniteScrollOptions<T> {
   initialHasMore?: boolean;
 }
 
+function areArraysShallowEqual<T>(a: T[], b: T[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
 export function useInfiniteScroll<T>({
   fetchPage,
   search = "",
@@ -34,22 +43,60 @@ export function useInfiniteScroll<T>({
   const observerRef = useRef<IntersectionObserver | null>(null);
   const isInitialMount = useRef(true);
 
+  // Track initial props to detect when server sends fresh data (e.g., router.refresh())
+  const prevInitialItemsRef = useRef(initialItems);
+  const prevInitialHasMoreRef = useRef(initialHasMore);
+  const initialItemsRef = useRef(initialItems);
+  const initialHasMoreRef = useRef(initialHasMore);
+
+  useEffect(() => {
+    initialItemsRef.current = initialItems;
+    initialHasMoreRef.current = initialHasMore;
+  }, [initialItems, initialHasMore]);
+
   // Keep a stable ref to fetchPage
   const fetchPageRef = useRef(fetchPage);
   useEffect(() => {
     fetchPageRef.current = fetchPage;
   }, [fetchPage]);
 
-  // Load initial page (or reset on search/enabled change)
+  // Sync state when initialItems or initialHasMore updates (e.g. from router.refresh())
+  useEffect(() => {
+    const itemsChanged = !areArraysShallowEqual(prevInitialItemsRef.current, initialItems);
+    const hasMoreChanged = prevInitialHasMoreRef.current !== initialHasMore;
+
+    if (itemsChanged || hasMoreChanged) {
+      prevInitialItemsRef.current = initialItems;
+      prevInitialHasMoreRef.current = initialHasMore;
+
+      // Only sync if not currently actively searching
+      if (!search) {
+        setItems(initialItems);
+        setHasMore(initialHasMore);
+        setPage(initialItems.length > 0 ? 2 : 1);
+      }
+    }
+  }, [initialItems, initialHasMore, search]);
+
+  // Handle search changes or initial fetch when initialItems is empty
   useEffect(() => {
     if (!enabled) return;
 
     if (isInitialMount.current) {
       isInitialMount.current = false;
       // If initial items were provided and search is empty, skip fetching page 1 on mount
-      if (initialItems.length > 0 && !search) {
+      if (initialItemsRef.current.length > 0 && !search) {
         return;
       }
+    }
+
+    // When search is cleared back to empty, immediately restore initialItems if available
+    if (!search && initialItemsRef.current.length > 0) {
+      setItems(initialItemsRef.current);
+      setHasMore(initialHasMoreRef.current);
+      setPage(initialItemsRef.current.length > 0 ? 2 : 1);
+      setIsLoading(false);
+      return;
     }
 
     let isMounted = true;
