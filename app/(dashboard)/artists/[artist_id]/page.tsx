@@ -1,6 +1,5 @@
 import Icon from "@/components/icon";
 import Link from "next/link";
-import { artists } from "@/data/artists";
 import {
   Select,
   SelectContent,
@@ -17,14 +16,6 @@ import { Button } from "@/components/ui/button";
 import { earnings } from "@/data/earnings";
 import { EarningItem } from "../../components/earning-item";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
@@ -33,17 +24,43 @@ import {
   Disc,
   Music,
   Search,
-  Trash2,
-  X,
 } from "lucide-react";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+import { RemoveArtistDialog } from "./remove-artist-dialog";
+
+function formatDob(dobStr: string | null | undefined): string {
+  if (!dobStr) return "—";
+  try {
+    const d = new Date(dobStr);
+    if (isNaN(d.getTime())) return dobStr;
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  } catch {
+    return dobStr;
+  }
+}
 
 async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }) {
   const { artist_id } = await params;
 
-  // Find current release, default to first release if not found
-  const artist = artists.find((a) => a.id === artist_id);
+  let artist: LabelArtist | null = null;
+  try {
+    const res = await api.get<LabelArtistDetailResponse>(API_ROUTES.LABEL.ARTIST(artist_id));
+    if (res?.artist) {
+      artist = res.artist;
+    }
+  } catch (error) {
+    console.error("Failed to fetch artist profile:", error);
+  }
 
   if (!artist) redirect("/artists");
+
+  const displayName = artist.legal_name || artist.stage_name;
+  const avatarImage = artist.portrait_url || artist.avatar_url || "/images/avatar.png";
 
   return (
     <div className="flex flex-col gap-8 container">
@@ -55,7 +72,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               href="/artists"
               className="size-[42] bg-brand-blue text-white rounded-full p-2 hover:bg-brand-blue/90 active:scale-95 transition-[colors,transform]"
             >
-              <ArrowLeft name="arrow-left" size={27} />
+              <ArrowLeft size={27} />
             </Link>
             <h1 className="font-heading text-3xl md:text-5xl font-semibold leading-[0.7]">
               Artist Profile
@@ -65,47 +82,9 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
         <div className="flex items-center gap-3">
           <Button variant="white">
             <CircleMinus size={16} />
-            <span>Disable Artist</span>
+            <span>{artist.status === "inactive" ? "Enable Artist" : "Disable Artist"}</span>
           </Button>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="white">
-                <Trash2 size={16} />
-                <span>Remove Artist</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent
-              showCloseButton={false}
-              className="max-w-115 w-full p-8 rounded-30 bg-white"
-            >
-              <div className="flex flex-col gap-6 relative">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <DialogTitle className="text-xl font-semibold text-default font-heading">
-                    Remove Artist
-                  </DialogTitle>
-                  <DialogClose className="cursor-pointer text-default hover:opacity-80">
-                    <X size={20} />
-                  </DialogClose>
-                </div>
-
-                {/* Body */}
-                <DialogDescription className="text-default">
-                  Are you sure, you want this artist to removed from your record label?
-                </DialogDescription>
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-end gap-3 mt-4">
-                  <DialogClose asChild>
-                    <Button size="sm" variant="outline">
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button variant="destructive">Yes, Remove</Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <RemoveArtistDialog reference={artist.reference} />
         </div>
       </header>
       <section>
@@ -113,34 +92,30 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
           <div className="flex gap-8 flex-wrap">
             <div className="p-6 bg-white flex flex-col items-start gap-6 rounded-30 flex-2">
               <div className="flex items-center self-stretch flex-wrap gap-6">
-                <Image
-                  src={artist.image}
-                  alt={artist.name}
-                  width={168}
-                  height={168}
-                  className="rounded-full flex-none aspect-square object-cover object-center"
-                />
+                <div className="size-42 aspect-square relative rounded-full overflow-hidden bg-default-secondary/30 shrink-0">
+                  <Image
+                    src={avatarImage}
+                    alt={displayName}
+                    fill
+                    className="rounded-full object-cover object-center"
+                  />
+                </div>
                 <div className="flex grow justify-center items-center divide-x divide-default-default">
                   <div className="flex flex-col p-5 w-full max-w-63">
-                    <p className="text-lg">20 February 1996</p>
+                    <p className="text-lg">{formatDob(artist.dob)}</p>
                     <p className="text-border-default-secondary">Born</p>
                   </div>
                   <div className="flex flex-col p-5 w-full max-w-63">
-                    <p className="text-lg">Pop</p>
+                    <p className="text-lg">{artist.genre || "—"}</p>
                     <p className="text-border-default-secondary">Genre</p>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <h1 className="font-semibold text-2xl font-heading">{artist.name}</h1>
-                <p className="font-medium text-border-default-secondary">
-                  &quot;You have to be really open, I think,&quot; Mabel tells Apple Music about the
-                  personal nature of her songwriting. &quot;All the songs people really relate to,
-                  that&apos;s because you&apos;re being human and saying, &apos;Look-this is the
-                  real!&quot;&quot; Born in 1996 in Spain, Mabel Alabama-Pearl McVey-daughter of
-                  Swedish artist Neneh Cherry and English producer Cameron McVey-has a knack for
-                  taking the intimate and relatable and turning it into spectacular, pumped-up
-                </p>
+                <h1 className="font-semibold text-2xl font-heading">{displayName}</h1>
+                {artist.bio ? (
+                  <p className="font-medium text-border-default-secondary">{artist.bio}</p>
+                ) : null}
               </div>
               <Button variant="orange" size="xl">
                 <span>Edit Profile</span>
@@ -236,14 +211,14 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
           {releases.map((release) => (
             <ReleaseCard
               key={release.id}
-              id={release.id}
-              name={release.name}
-              href={release.href}
-              imageSrc={release.imageSrc}
-              sources={release.sources}
-              engagements={release.engagements}
-              title={release.title}
-              type={release.type}
+              {...({
+                reference: release.id,
+                cover_url: release.imageSrc,
+                title: release.title,
+                total_streams: release.engagements,
+                type: release.type,
+                platforms: [],
+              } as unknown as Release)}
             />
           ))}
         </ReleaseCards>

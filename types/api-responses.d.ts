@@ -124,17 +124,22 @@ interface LabelArtist {
   stage_name: string;
   email: string;
   phone: string | null;
-  genre: string;
+  gender?: string | null;
+  dob?: string | null;
   country: string;
   country_name: string;
+  genre: string;
+  bio?: string | null;
   avatar_url: string;
   portrait_url: string;
-  spotify_linked: boolean;
+  spotify_linked?: boolean;
   spotify_url: string | null;
-  apple_music_linked: boolean;
+  apple_music_linked?: boolean;
   apple_music_url: string | null;
+  is_verified?: boolean;
   status: string;
   joined_at: string;
+  registered_at?: string;
 }
 
 interface PaginationMeta {
@@ -151,5 +156,9 @@ interface LabelArtistsResponse {
   meta?: {
     pagination: PaginationMeta;
   };
+}
+
+interface LabelArtistDetailResponse {
+  artist: LabelArtist;
 }
 
