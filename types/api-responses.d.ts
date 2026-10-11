@@ -177,6 +177,30 @@ interface InviteArtistResponse {
   skipped?: InviteArtistSkippedItem[];
 }
 
+interface ArtistInviteItem {
+  invite_id: number;
+  email: string;
+  status: "pending" | "accepted" | "expired" | "revoked";
+  expires_at: string;
+  accepted_at: string | null;
+  created_at: string;
+  can_cancel: boolean;
+}
+
+interface ArtistInvitesCounts {
+  pending: number;
+  accepted: number;
+  expired: number;
+  revoked: number;
+}
+
+interface ArtistInvitesResponse {
+  invites: ArtistInviteItem[];
+  meta?: {
+    counts: ArtistInvitesCounts;
+  };
+}
+
 interface TeamMemberRole {
   id: number;
   name: string;
@@ -241,6 +265,87 @@ interface CreateTeamMemberResponse {
   reference?: string;
   member?: TeamMember;
 }
+
+interface PlanFeature {
+  name: string;
+  value: boolean | number | string;
+}
+
+interface PlanCyclePrices {
+  quarterly: number;
+  biannual: number;
+  annual: number;
+}
+
+interface PlanItem {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  currency: string;
+  cycle_prices: PlanCyclePrices;
+  royalty_commission: number;
+  max_artists: number;
+  is_custom: boolean;
+  features: PlanFeature[];
+}
+
+interface PlansResponse {
+  plans: PlanItem[];
+}
+
+interface UserSubscriptionPlan {
+  id: number;
+  name: string;
+  slug: string;
+  price: number;
+  max_artists?: number;
+}
+
+interface UserSubscription {
+  reference: string;
+  status: "active" | "cancelled" | "expired" | "on_hold" | string;
+  billing_cycle: "quarterly" | "biannual" | "annual" | string;
+  auto_renew: boolean;
+  start_at: string;
+  end_at: string;
+  next_billing_at: string | null;
+  cancelled_at: string | null;
+  amount_paid: number;
+  amount: number;
+  currency: string;
+  gateway: string;
+  plan: UserSubscriptionPlan;
+}
+
+interface SubscriptionPaymentHistoryItem {
+  plan_id: number;
+  plan_name: string;
+  action: string;
+  amount_paid: number;
+  amount: number;
+  currency: string;
+  created_at: string;
+  method?: string;
+  status?: string;
+}
+
+interface SubscriptionResponse {
+  subscription: UserSubscription | null;
+  history?: SubscriptionPaymentHistoryItem[];
+}
+
+interface StartSubscriptionResponse {
+  reference: string;
+  payment_link: string;
+  amount: number;
+  currency: string;
+  amount_gbp: number;
+  fx_rate?: number;
+  gateway: string;
+}
+
 
 
 

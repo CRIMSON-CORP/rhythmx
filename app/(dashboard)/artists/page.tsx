@@ -19,18 +19,36 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 export default async function ArtistsPage() {
   let initialArtists: LabelArtist[] = [];
   let initialMeta: PaginationMeta | undefined;
+  let initialInvites: ArtistInviteItem[] = [];
+  let pendingCount = 0;
 
   try {
-    const res = await api.get<LabelArtistsResponse>(
-      `${API_ROUTES.LABEL.ARTISTS}?page=1&limit=20`
-    );
-    if (res?.artists) {
-      initialArtists = res.artists;
-      initialMeta = res.meta?.pagination;
+    const [artistsRes, invitesRes] = await Promise.all([
+      api.get<LabelArtistsResponse>(
+        `${API_ROUTES.LABEL.ARTISTS}?page=1&limit=20`
+      ),
+      api.get<ArtistInvitesResponse>(API_ROUTES.LABEL.INVITE_ARTIST).catch((err) => {
+        console.error("Failed to fetch artist invites on server:", err);
+        return undefined;
+      }),
+    ]);
+
+    if (artistsRes?.artists) {
+      initialArtists = artistsRes.artists;
+      initialMeta = artistsRes.meta?.pagination;
+    }
+
+    if (invitesRes?.invites) {
+      initialInvites = invitesRes.invites;
+      pendingCount =
+        invitesRes.meta?.counts?.pending ??
+        invitesRes.invites.filter((i) => i.status === "pending").length;
     }
   } catch (error) {
     console.error("Failed to fetch initial artists on server:", error);
   }
+
+  const pendingInvites = initialInvites.filter((i) => i.status === "pending");
 
   // Derive "Recently Added" on the server:
   // Artists who joined in the last 7 days; fallback to top 10 most recent artists
@@ -59,8 +77,10 @@ export default async function ArtistsPage() {
           </div>
         </h1>
         <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
-          <PendingInvitesTrigger />
-          <InvitesInvitesTrigger />
+          {pendingCount > 0 && (
+            <PendingInvitesTrigger count={pendingCount} invites={pendingInvites} />
+          )}
+          <InvitesInvitesTrigger invites={pendingInvites} />
         </div>
       </div>
 

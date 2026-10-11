@@ -18,20 +18,30 @@ import { API_ROUTES } from "@/lib/api-routes";
 import { goeyToast } from "goey-toast";
 import { useRouter } from "next/navigation";
 
-export function PendingInvitesTrigger() {
+export function PendingInvitesTrigger({
+  count,
+  invites,
+}: {
+  count: number;
+  invites?: ArtistInviteItem[];
+}) {
   return (
-    <Invites>
+    <Invites invites={invites}>
       <Button variant="white">
         <Clock size={16} />
-        <span>Pending Invites (3)</span>
+        <span>Pending Invites ({count})</span>
       </Button>
     </Invites>
   );
 }
 
-export function InvitesInvitesTrigger() {
+export function InvitesInvitesTrigger({
+  invites,
+}: {
+  invites?: ArtistInviteItem[];
+}) {
   return (
-    <Invites>
+    <Invites invites={invites}>
       <Button>
         <span className="text-sm leading-none">Add Artist</span>
         <Plus size={16} />
@@ -40,7 +50,13 @@ export function InvitesInvitesTrigger() {
   );
 }
 
-function Invites({ children }: { children: ReactNode }) {
+function Invites({
+  children,
+  invites = [],
+}: {
+  children: ReactNode;
+  invites?: ArtistInviteItem[];
+}) {
   const [emails, setEmails] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -171,22 +187,31 @@ function Invites({ children }: { children: ReactNode }) {
           </div>
           <div className="flex flex-col gap-2.5">
             <p className="font-medium text-xs">Pending Invites</p>
-            <ul className="divide-y divide-default-default max-h-96 overflow-y-auto">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <li key={i} className="flex items-center gap-3 py-4">
-                  <div className="bg-brand-purple/12 rounded-full p-1.5">
-                    <User size={20} className="text-brand-purple" />
-                  </div>
-                  <div className="grow">
-                    <p className="text-default font-medium">mike.ross@example.com</p>
-                    <p className="text-xs text-default">
-                      <span>Status:</span> <span className="text-[#FF9A03]">Pending</span>
+            {invites.length > 0 ? (
+              <ul className="divide-y divide-default-default max-h-96 overflow-y-auto">
+                {invites.map((invite) => (
+                  <li key={invite.invite_id} className="flex items-center gap-3 py-4">
+                    <div className="bg-brand-purple/12 rounded-full p-1.5 shrink-0">
+                      <User size={20} className="text-brand-purple" />
+                    </div>
+                    <div className="grow min-w-0">
+                      <p className="text-default font-medium truncate text-sm">{invite.email}</p>
+                      <p className="text-xs text-default">
+                        <span>Status:</span>{" "}
+                        <span className="text-[#FF9A03] capitalize">{invite.status}</span>
+                      </p>
+                    </div>
+                    <p className="self-start text-default text-xs shrink-0">
+                      {invite.created_at ? invite.created_at.slice(0, 16) : ""}
                     </p>
-                  </div>
-                  <p className="self-start text-default text-xs">2023-10-01 10:15</p>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="py-8 text-center text-sm text-default-tertiary">
+                No pending invites
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>
