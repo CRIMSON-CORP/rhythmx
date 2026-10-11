@@ -28,6 +28,20 @@ const nextConfig: NextConfig = {
     ],
   },
   allowedDevOrigins: ["10.13.131.78"],
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "date-fns",
+      "framer-motion",
+      "motion",
+      "radix-ui",
+    ],
+  },
 };
 
 export default nextConfig;
