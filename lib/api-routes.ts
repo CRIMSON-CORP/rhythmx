@@ -94,4 +94,12 @@ export const API_ROUTES = {
     SPOTIFY: (q: string) => `/api/artist-lookup/spotify?q=${encodeURIComponent(q)}`,
     APPLE_MUSIC: (q: string) => `/api/artist-lookup/apple-music?q=${encodeURIComponent(q)}`,
   },
+  PLANS: {
+    LIST: "/api/plans",
+  },
+  SUBSCRIPTION: {
+    GET: "/api/subscription",
+    START: "/api/subscription/start",
+    CANCEL: "/api/subscription/cancellation",
+  },
 };

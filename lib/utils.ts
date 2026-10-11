@@ -85,4 +85,25 @@ export function getErrorMessage(
   return fallback;
 }
 
+/**
+ * Formats a numeric amount into a localized currency string using Intl.NumberFormat.
+ */
+export function formatCurrency(
+  amount?: number | null,
+  currency: string = "GBP",
+  locale: string = "en-GB",
+): string {
+  if (amount === undefined || amount === null) return "";
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: currency.toUpperCase(),
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${currency} ${amount}`;
+  }
+}
+
+
 
