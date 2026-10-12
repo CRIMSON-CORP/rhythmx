@@ -3,6 +3,7 @@ import Icon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 function Layout({
@@ -13,6 +14,7 @@ function Layout({
   const [error, setError] = useState("");
   const [activeAction, setActiveAction] = useState<"agree" | "disagree" | null>(null);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleTermsAgreement = (accepted: boolean) => {
     return () => {
@@ -23,7 +25,7 @@ function Layout({
           await api.patch(API_ROUTES.ONBOARDING.TERMS_AGREEMENT, {
             accepted,
           });
-          window.location.href = "/";
+          router.push(accepted ? "/billing" : "/");
         } catch (error: unknown) {
           setError(
             (error as Record<string, string>).accepted ||
