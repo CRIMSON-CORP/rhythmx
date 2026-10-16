@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, Check, Loader2 } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import Icon from "@/components/icon";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
@@ -13,86 +13,46 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PlanCard, { DURATION_OPTIONS, DurationKey } from "./plan-card";
 
-interface CurrencyOption {
-  code: string;
-  label: string;
-  name: string;
-  symbol: string;
-  rateFromGBP: number;
-}
-
-const CURRENCIES: CurrencyOption[] = [
-  { code: "USD", label: "USD, US Dollar", name: "US Dollar", symbol: "$", rateFromGBP: 1.28 },
-  {
-    code: "NGN",
-    label: "NGN, Nigerian Naira",
-    name: "Nigerian Naira",
-    symbol: "₦",
-    rateFromGBP: 2050,
-  },
-  {
-    code: "GBP",
-    label: "GBP, British Pound",
-    name: "British Pound",
-    symbol: "£",
-    rateFromGBP: 1.0,
-  },
-  { code: "EUR", label: "EUR, Euro", name: "Euro", symbol: "€", rateFromGBP: 1.17 },
-];
-
-function AsteriskIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M12 4V20M19 8L5 16M19 16L5 8" />
-    </svg>
-  );
-}
-
-function formatFeature(feature: PlanFeature): string {
-  if (typeof feature.value === "boolean") {
-    return feature.name;
+function getCurrencySymbol(code: string): string {
+  try {
+    const parts = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: code,
+      currencyDisplay: "narrowSymbol",
+    }).formatToParts(0);
+    return parts.find((p) => p.type === "currency")?.value || code;
+  } catch {
+    return code;
   }
-  if (typeof feature.value === "number") {
-    return `${feature.value} ${feature.name}`;
-  }
-  return `${feature.name}: ${feature.value}`;
 }
 
-function getPlanShortName(name: string): string {
-  return name.replace(/^Rhythm\s+/i, "");
+function extractCurrencyCodes(res?: PaymentCurrenciesResponse | null): string[] {
+  if (!res?.currencies?.length) return ["GBP", "NGN", "USD"];
+  return res.currencies.map((item) => (typeof item === "string" ? item : item.code));
 }
 
-function getPriorityScore(featureName: string): number {
-  const lower = featureName.toLowerCase();
-  if (lower.includes("artist")) return 1;
-  if (lower.includes("release")) return 2;
-  if (lower.includes("schedule")) return 3;
-  if (lower.includes("lead time")) return 4;
-  if (lower.includes("royalt")) return 5;
-  if (lower.includes("platform")) return 6;
-  if (lower.includes("manager")) return 7;
-  if (lower.includes("report")) return 8;
-  return 99;
-}
-
-export default function BillingClient({ initialPlans }: { initialPlans: PlanItem[] }) {
+export default function BillingClient({
+  initialPlans,
+  initialCurrencies,
+}: {
+  initialPlans: PlanItem[];
+  initialCurrencies?: PaymentCurrenciesResponse | null;
+}) {
   const [plans, setPlans] = useState<PlanItem[]>(initialPlans);
   const [isLoadingPlans, setIsLoadingPlans] = useState(initialPlans.length === 0);
-  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyOption>(CURRENCIES[0]);
-  const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
-  const [expandedPlanIds, setExpandedPlanIds] = useState<Record<number, boolean>>({});
 
+  const initialCodes = extractCurrencyCodes(initialCurrencies);
+  const [currencyCodes, setCurrencyCodes] = useState<string[]>(initialCodes);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(
+    initialCurrencies?.default || initialCodes[0] || "GBP",
+  );
+
+  const [selectedDuration, setSelectedDuration] = useState<DurationKey>("annual");
+  const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
+
+  // 1. Fetch live plans if not provided by server
   useEffect(() => {
     if (initialPlans.length > 0) return;
 
@@ -118,9 +78,33 @@ export default function BillingClient({ initialPlans }: { initialPlans: PlanItem
     };
   }, [initialPlans]);
 
-  const toggleExpand = (planId: number) => {
-    setExpandedPlanIds((prev) => ({ ...prev, [planId]: !prev[planId] }));
-  };
+  // 2. Fetch supported currencies from GET /api/payments/currencies
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchCurrencies() {
+      try {
+        const res = await api.get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES);
+        console.log("[GET /api/payments/currencies]:", res);
+        if (isMounted && res?.currencies?.length) {
+          const codes = res.currencies.map((c) => (typeof c === "string" ? c : c.code));
+          setCurrencyCodes(codes);
+
+          setSelectedCurrency((prev) => {
+            if (codes.includes(prev)) return prev;
+            if (res.default && codes.includes(res.default)) return res.default;
+            return codes[0] || prev;
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch currencies from /api/payments/currencies:", err);
+      }
+    }
+
+    fetchCurrencies();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSelectPlan = async (plan: PlanItem) => {
     if (plan.is_custom) {
@@ -132,8 +116,8 @@ export default function BillingClient({ initialPlans }: { initialPlans: PlanItem
       setLoadingPlanId(plan.id);
       const res = await api.post<StartSubscriptionResponse>(API_ROUTES.SUBSCRIPTION.START, {
         plan_id: plan.id,
-        billing_cycle: "annual",
-        currency: selectedCurrency.code,
+        billing_cycle: selectedDuration,
+        currency: selectedCurrency,
         redirect_url: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
       });
 
@@ -151,17 +135,8 @@ export default function BillingClient({ initialPlans }: { initialPlans: PlanItem
     }
   };
 
-  const calculateConvertedPrice = (plan: PlanItem): number => {
-    const baseGbpPrice = plan.price;
-    if (!baseGbpPrice) return 0;
-    if (selectedCurrency.code === "GBP") return baseGbpPrice;
-
-    const converted = baseGbpPrice * selectedCurrency.rateFromGBP;
-    if (selectedCurrency.code === "NGN") {
-      return Math.round(converted / 100) * 100;
-    }
-    return Math.round(converted);
-  };
+  const selectedSymbol = getCurrencySymbol(selectedCurrency);
+  const selectedLabel = `${selectedCurrency} (${selectedSymbol})`;
 
   return (
     <div className="relative min-h-screen w-full bg-white text-[#141414] overflow-x-hidden flex flex-col items-center">
@@ -171,7 +146,7 @@ export default function BillingClient({ initialPlans }: { initialPlans: PlanItem
         className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-full max-w-[1440px] h-[480px] rounded-full blur-[100px] opacity-25"
         style={{
           background:
-            "linear-gradient(69deg, rgba(151, 71, 255, 0.5) 0%, rgba(0, 102, 255, 0.5) 100%)",
+            "linear-gradient(69deg, rgba(151, 71, 255, 0.3) 0%, rgba(0, 102, 255, 0.3) 100%)",
         }}
       />
 
@@ -191,50 +166,76 @@ export default function BillingClient({ initialPlans }: { initialPlans: PlanItem
           </p>
         </header>
 
-        {/* Currency Selector Pill & Caption */}
-        <div className="flex flex-col items-center gap-3 mb-12">
+        {/* Controls Container: Duration Segmented Control + Currency Selector */}
+        <div className="flex flex-col items-center gap-4 mb-12">
+          {/* Duration Segmented Control */}
+          <div className="flex items-center gap-1 p-1 bg-[#FDFCFA] border border-[#EAE6DF] rounded-full shadow-xs">
+            {DURATION_OPTIONS.map((opt) => {
+              const isActive = selectedDuration === opt.key;
+              return (
+                <div key={opt.key} className="relative">
+                  {opt.discountBadge && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#DC2626] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap shadow-xs pointer-events-none">
+                      {opt.discountBadge}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDuration(opt.key)}
+                    className={cn(
+                      "px-4 py-2 text-sm rounded-full transition-all cursor-pointer select-none",
+                      isActive
+                        ? "bg-[#18151A] text-[#F5F4F2] font-semibold shadow-xs"
+                        : "text-[#625C57] hover:text-[#18151A] hover:bg-neutral-100/50 font-medium",
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Currency Selector Pill */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
                 className="h-10 px-4 rounded-full bg-[#F9FAFC]/80 border border-[#E5E7EB] hover:bg-neutral-50 hover:border-[#D1D5DB] transition-all flex items-center gap-2 text-sm font-medium text-[#1E1E1E] cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
               >
-                <span>{selectedCurrency.label}</span>
+                <span>{selectedLabel}</span>
                 <ChevronDown size={16} className="text-[#1E1E1E] opacity-70" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="center"
-              className="w-56 bg-white border border-[#E5E7EB] shadow-xl p-1.5 rounded-2xl"
+              className="w-48 max-h-72 overflow-y-auto bg-white border border-[#E5E7EB] shadow-xl p-1.5 rounded-2xl"
             >
-              {CURRENCIES.map((currency) => (
-                <DropdownMenuItem
-                  key={currency.code}
-                  onClick={() => setSelectedCurrency(currency)}
-                  className="flex items-center justify-between px-3 py-2 text-sm rounded-xl cursor-pointer hover:bg-neutral-100 font-medium text-[#1E1E1E]"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-xs text-neutral-500 w-8">
-                      {currency.code}
-                    </span>
-                    <span>{currency.name}</span>
-                  </div>
-                  {selectedCurrency.code === currency.code && (
-                    <Check size={16} className="text-brand-blue shrink-0" />
-                  )}
-                </DropdownMenuItem>
-              ))}
+              {currencyCodes.map((code) => {
+                const symbol = getCurrencySymbol(code);
+                return (
+                  <DropdownMenuItem
+                    key={code}
+                    onClick={() => setSelectedCurrency(code)}
+                    className="flex items-center justify-between px-3 py-2 text-sm rounded-xl cursor-pointer hover:bg-neutral-100 font-medium text-[#1E1E1E]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-sm">{code}</span>
+                      <span className="text-xs text-neutral-500">({symbol})</span>
+                    </div>
+                    {selectedCurrency === code && (
+                      <Check size={16} className="text-brand-blue shrink-0" />
+                    )}
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <p className="text-sm md:text-base font-medium text-[#0066FF] text-center">
-            Annual billing • Prices shown in {selectedCurrency.code}
-          </p>
         </div>
 
         {/* Plans Grid */}
         {isLoadingPlans ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
@@ -272,124 +273,16 @@ export default function BillingClient({ initialPlans }: { initialPlans: PlanItem
                 : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-7xl",
             )}
           >
-            {plans.map((plan) => {
-              const isPopular =
-                plan.slug === "rhythm-elite" || plan.name.toLowerCase().includes("elite");
-              const isCustom = plan.is_custom;
-              const convertedPrice = calculateConvertedPrice(plan);
-              const allIncludedFeatures = (plan.features || []).filter(
-                (f) => f.value !== false && f.value !== "false",
-              );
-
-              // Sort features: prioritize key highlight features
-              const sortedFeatures = [...allIncludedFeatures].sort(
-                (a, b) => getPriorityScore(a.name) - getPriorityScore(b.name),
-              );
-
-              const isExpanded = !!expandedPlanIds[plan.id];
-              const displayedFeatures = isExpanded ? sortedFeatures : sortedFeatures.slice(0, 5);
-
-              const isLoadingThis = loadingPlanId === plan.id;
-
-              return (
-                <article
-                  key={plan.id}
-                  className="bg-white rounded-30 border border-[#D9D9D9] p-6 flex flex-col justify-between duration-200 hover:border-[#BFBFBF]"
-                >
-                  {/* Card Header & Content */}
-                  <div>
-                    {/* Title & Badge */}
-                    <div className="flex items-center justify-between gap-3 min-h-[32px]">
-                      <h2 className="text-2xl font-semibold text-[#1E1E1E] tracking-tight">
-                        {plan.name}
-                      </h2>
-                      {isPopular && (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#DCFCE7] text-[#0066FF]">
-                          Popular
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Subtitle */}
-                    <p className="text-base font-medium text-[#707070] mt-1">
-                      {isCustom ? "For labels & agencies" : "For artists"}
-                    </p>
-
-                    {/* Pricing Display */}
-                    <div className="mt-5 flex flex-col gap-0.5">
-                      <div className="text-[32px] font-medium text-[#1E1E1E] leading-tight tracking-tight">
-                        {isCustom
-                          ? "Custom"
-                          : `${selectedCurrency.code} ${convertedPrice.toLocaleString()}`}
-                      </div>
-                      <p className="text-xs font-medium text-[#757575]">
-                        {isCustom ? "Contact us" : "per year"}
-                      </p>
-                    </div>
-
-                    {/* Description */}
-                    <p className="mt-4 text-sm font-normal text-[#757575] leading-relaxed min-h-[42px]">
-                      {plan.description ||
-                        (isCustom
-                          ? "It depends on the number of artist accounts to be managed, offering a more suitable service."
-                          : "Music distribution plan with world-class support and global DSP delivery.")}
-                    </p>
-
-                    {/* Features List */}
-                    <div className="mt-6 border-t border-[#D9D9D9]/50 flex flex-col">
-                      {displayedFeatures.map((feature, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-3 py-3 border-b border-[#D9D9D9]/50 text-xs font-medium text-[#757575]"
-                        >
-                          <AsteriskIcon className="size-5 shrink-0 text-brand-orange" />
-                          <span className="leading-snug">{formatFeature(feature)}</span>
-                        </div>
-                      ))}
-
-                      {sortedFeatures.length > 5 && (
-                        <button
-                          type="button"
-                          onClick={() => toggleExpand(plan.id)}
-                          className="mt-2 text-xs font-medium text-brand-blue hover:underline py-1.5 self-start cursor-pointer"
-                        >
-                          {isExpanded
-                            ? "Show fewer features"
-                            : `+${sortedFeatures.length - 5} more features`}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Card CTA Button */}
-                  <div className="pt-6">
-                    <button
-                      type="button"
-                      disabled={isLoadingThis}
-                      onClick={() => handleSelectPlan(plan)}
-                      className={cn(
-                        "w-full h-14 rounded-[10px] font-medium text-base transition-all duration-200 flex items-center justify-center gap-2",
-                        isCustom
-                          ? "bg-black text-white hover:bg-black/90 cursor-default"
-                          : "bg-black text-white hover:bg-black/85 active:scale-[0.99] cursor-pointer",
-                        isLoadingThis && "opacity-75 cursor-wait",
-                      )}
-                    >
-                      {isLoadingThis ? (
-                        <>
-                          <Loader2 className="size-5 animate-spin text-white" />
-                          <span>Processing...</span>
-                        </>
-                      ) : (
-                        <span>
-                          {isCustom ? "Contact us" : `Continue with ${getPlanShortName(plan.name)}`}
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
+            {plans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                selectedCurrency={selectedCurrency}
+                selectedDuration={selectedDuration}
+                isLoadingAction={loadingPlanId === plan.id}
+                onSelectPlanAction={handleSelectPlan}
+              />
+            ))}
           </div>
         )}
       </div>

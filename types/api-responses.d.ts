@@ -346,6 +346,27 @@ interface StartSubscriptionResponse {
   gateway: string;
 }
 
+interface PaymentCurrencyItem {
+  code: string;
+  channels: string[];
+}
 
+interface PaymentCurrenciesResponse {
+  default: string;
+  currencies: (PaymentCurrencyItem | string)[];
+}
 
+interface PaymentConvertResponse {
+  base_currency: string;
+  amount_gbp: number;
+  currency: string;
+  rate: number;
+  amount: number;
+  plan: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  billing_cycle: string;
+}
 

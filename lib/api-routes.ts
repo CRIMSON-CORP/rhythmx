@@ -102,4 +102,9 @@ export const API_ROUTES = {
     START: "/api/subscription/start",
     CANCEL: "/api/subscription/cancellation",
   },
+  PAYMENTS: {
+    CURRENCIES: "/api/payments/currencies",
+    CONVERT: (to: string, plan_id: number | string, billing_cycle: string) =>
+      `/api/payments/convert?to=${encodeURIComponent(to)}&plan_id=${encodeURIComponent(plan_id)}&billing_cycle=${encodeURIComponent(billing_cycle)}`,
+  },
 };

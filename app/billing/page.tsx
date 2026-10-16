@@ -10,13 +10,23 @@ export const metadata: Metadata = {
 
 export default async function BillingPage() {
   let initialPlans: PlanItem[] = [];
+  let initialCurrencies: PaymentCurrenciesResponse | null = null;
 
   try {
-    const res = await api.get<PlansResponse>(API_ROUTES.PLANS.LIST);
-    initialPlans = res?.plans || [];
+    const [plansRes, currenciesRes] = await Promise.allSettled([
+      api.get<PlansResponse>(API_ROUTES.PLANS.LIST),
+      api.get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES),
+    ]);
+
+    if (plansRes.status === "fulfilled") {
+      initialPlans = plansRes.value?.plans || [];
+    }
+    if (currenciesRes.status === "fulfilled") {
+      initialCurrencies = currenciesRes.value;
+    }
   } catch (error) {
-    console.error("Failed to load plans on server for billing page:", error);
+    console.error("Failed to load plans or currencies on server:", error);
   }
 
-  return <BillingClient initialPlans={initialPlans} />;
+  return <BillingClient initialPlans={initialPlans} initialCurrencies={initialCurrencies} />;
 }
