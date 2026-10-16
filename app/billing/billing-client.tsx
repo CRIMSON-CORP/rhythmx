@@ -143,10 +143,10 @@ export default function BillingClient({
       {/* Ambient Gradient Glow from Figma */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-full max-w-[1440px] h-[480px] rounded-full blur-[100px] opacity-25"
+        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-full h-[70vh] blur-[200px] opacity-30"
         style={{
           background:
-            "linear-gradient(69deg, rgba(151, 71, 255, 0.3) 0%, rgba(0, 102, 255, 0.3) 100%)",
+            "linear-gradient(86.95deg, rgba(151, 71, 255, 0.3) 2.53%, rgba(0, 102, 255,0.3) 102.88%)",
         }}
       />
 
@@ -169,7 +169,7 @@ export default function BillingClient({
         {/* Controls Container: Duration Segmented Control + Currency Selector */}
         <div className="flex flex-col items-center gap-4 mb-12">
           {/* Duration Segmented Control */}
-          <div className="flex items-center gap-1 p-1 bg-[#FDFCFA] border border-[#EAE6DF] rounded-full shadow-xs">
+          <div className="flex items-center gap-1 p-1 bg-[#FDFCFA] rounded-full">
             {DURATION_OPTIONS.map((opt) => {
               const isActive = selectedDuration === opt.key;
               return (
@@ -201,7 +201,7 @@ export default function BillingClient({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="h-10 px-4 rounded-full bg-[#F9FAFC]/80 border border-[#E5E7EB] hover:bg-neutral-50 hover:border-[#D1D5DB] transition-all flex items-center gap-2 text-sm font-medium text-[#1E1E1E] cursor-pointer shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+                className="h-10 px-4 rounded-full bg-[#F9FAFC]/80 flex items-center gap-2 text-sm font-medium text-[#1E1E1E] cursor-pointer"
               >
                 <span>{selectedLabel}</span>
                 <ChevronDown size={16} className="text-[#1E1E1E] opacity-70" />
