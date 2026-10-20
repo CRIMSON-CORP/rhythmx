@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Input from "../../../../components/Input";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { loginSchema } from "@/models/login-schema";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 
 function Page() {
   const [email, setEmail] = useState("");
@@ -42,6 +42,14 @@ function Page() {
       }
 
       if (res.ok) {
+        const session = await getSession();
+        const nextStep = session?.next_step ?? session?.user?.next_step;
+
+        if (nextStep === "choose_plan" || nextStep === "renew") {
+          window.location.href = "/billing";
+          return;
+        }
+
         const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl") || "/";
         window.location.href = callbackUrl || "/";
       } else if (res.error) {

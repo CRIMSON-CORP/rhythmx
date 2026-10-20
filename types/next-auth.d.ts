@@ -18,6 +18,7 @@ declare module "next-auth" {
       phone?: string;
       role?: string;
       account_type?: string;
+      next_step?: string | null;
     } & DefaultSession["user"];
   }
 

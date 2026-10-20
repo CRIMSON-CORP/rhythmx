@@ -6,8 +6,11 @@ export const proxy = withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
-    // Redirect signed-in users away from pre-login auth pages (get-started, login, verify) to dashboard
+    // Redirect signed-in users away from pre-login auth pages (get-started, login, verify)
     if (token && pathname.startsWith("/auth") && !pathname.startsWith("/auth/create-account")) {
+      if (token.next_step === "choose_plan" || token.next_step === "renew") {
+        return NextResponse.redirect(new URL("/billing", req.url));
+      }
       return NextResponse.redirect(new URL("/", req.url));
     }
 
@@ -19,6 +22,16 @@ export const proxy = withAuth(
     // Redirect unauthenticated users trying to access /auth/create-account to /auth/get-started
     if (!token && pathname.startsWith("/auth/create-account")) {
       return NextResponse.redirect(new URL("/auth/get-started", req.url));
+    }
+
+    // Redirect signed-in users needing to choose or renew plan to /billing
+    if (
+      token &&
+      (token.next_step === "choose_plan" || token.next_step === "renew") &&
+      !pathname.startsWith("/billing") &&
+      !pathname.startsWith("/auth")
+    ) {
+      return NextResponse.redirect(new URL("/billing", req.url));
     }
 
     return NextResponse.next();

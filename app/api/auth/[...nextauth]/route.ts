@@ -70,6 +70,7 @@ export const authOptions: NextAuthOptions = {
               country: userData.country,
               two_factor_enabled: userData.two_factor_enabled,
               created_at: userData.created_at,
+              next_step: data.next_step,
             };
           }
 
@@ -138,12 +139,21 @@ export const authOptions: NextAuthOptions = {
             return "/auth/create-account";
           }
 
+          if (responseData?.next_step === "choose_plan" || responseData?.next_step === "renew") {
+            return "/billing";
+          }
+
           return true;
         } catch (error) {
           console.error("[NextAuth Google Sign-In] Network error sending token to backend:", error);
           return "/auth/get-started?error=google_auth_failed";
         }
       }
+
+      if (user?.next_step === "choose_plan" || user?.next_step === "renew") {
+        return "/billing";
+      }
+
       return true;
     },
     async jwt({ token, user, account, trigger, session }) {
@@ -199,6 +209,7 @@ export const authOptions: NextAuthOptions = {
         session.access_token = token.access_token as string;
         session.refresh_token = token.refresh_token as string;
         session.next_step = token.next_step as string | null;
+        session.user.next_step = token.next_step as string | null;
         session.user.first_name = token.first_name as string;
         session.user.last_name = token.last_name as string;
         session.user.avatar = token.avatar as string;
