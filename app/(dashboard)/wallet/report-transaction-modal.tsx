@@ -16,35 +16,38 @@ import {
 import { VisuallyHidden } from "radix-ui";
 import { goeyToast } from "goey-toast";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 
 function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
-  // Use React controlled state to manage opening and programmatically closing the modal
   const [open, setOpen] = useState(false);
-  const [refId, setRefId] = useState(defaultRefId || "");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (loading) return;
 
-    // Validate fields
-    if (!refId.trim() || !description.trim()) {
+    if (!defaultRefId || !description.trim()) {
       goeyToast.error("Transaction Reference ID and Description are required.");
       return;
     }
 
     setLoading(true);
 
-    // Simulate API request delay (1.5 seconds)
-    setTimeout(() => {
+    try {
+      await api.post(API_ROUTES.EARNINGS.TRANSACTIONS.REPORT(defaultRefId), {
+        description: description.trim(),
+      });
       goeyToast.success("Transaction reported successfully.");
-
-      // Clean up fields and programmatically close Dialog
-      setRefId("");
       setDescription("");
       setOpen(false);
+    } catch (err: unknown) {
+      const message =
+        (err as { message?: string })?.message || "Failed to report transaction. Please try again.";
+      goeyToast.error(message);
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -96,10 +99,9 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
               <input
                 type="text"
                 placeholder="Enter the transaction"
-                className="w-full px-4 py-3.5 rounded-10 outline outline-default-default focus:outline-black text-default font-medium placeholder:text-neutral-400 transition-colors disabled:opacity-50"
-                value={refId}
-                onChange={(e) => setRefId(e.target.value)}
-                disabled={loading}
+                readOnly
+                className={`w-full px-4 py-3.5 rounded-10 outline outline-default-default text-default font-medium placeholder:text-neutral-400 transition-colors focus:outline-black bg-neutral-100/70 cursor-not-allowed select-all disabled:opacity-50`}
+                value={defaultRefId}
               />
             </div>
 

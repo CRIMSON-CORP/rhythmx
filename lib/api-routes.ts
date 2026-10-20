@@ -112,5 +112,13 @@ export const API_ROUTES = {
   EARNINGS: {
     GET: "/api/earnings",
     OVERVIEW: "/api/earnings/overview",
+    TRANSACTIONS: {
+      LIST: (queryString?: string) =>
+        `/api/earnings/transactions${queryString ? `?${queryString}` : ""}`,
+      DETAILS: (reference: string) => `/api/earnings/transactions/${encodeURIComponent(reference)}`,
+      REPORT: (reference: string) =>
+        `/api/earnings/transactions/${encodeURIComponent(reference)}/report`,
+      EXPORT: `/api/earnings/transactions/export`,
+    },
   },
 };

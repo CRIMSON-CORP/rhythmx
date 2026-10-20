@@ -148,6 +148,10 @@ export const api = {
       }
       throw newError;
     }
+
+    if (data.meta && typeof data.data === "object" && data.data !== null && !Array.isArray(data.data)) {
+      data.data.meta = data.meta;
+    }
     return data.data;
   },
   async postFormData({

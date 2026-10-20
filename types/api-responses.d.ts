@@ -431,3 +431,48 @@ interface EarningsOverviewResponse {
     royalty: RoyaltyEarning[];
   };
 }
+
+interface WalletTransaction {
+  reference: string;
+  type: "credit" | "debit" | string;
+  source: string;
+  amount: number;
+  currency: string;
+  balance_before: number;
+  balance_after: number;
+  created_at: string;
+  status?: "paid" | "approved" | "pending" | "on_hold" | "processing" | "canceled" | string;
+  transact_by?: {
+    name: string;
+    avatar_url?: string;
+  };
+  amount_ngn?: number;
+  report?: {
+    status: "open" | "resolved" | "dismissed" | string;
+    reported_at: string;
+  } | null;
+}
+
+interface WalletTransactionsResponse {
+  transactions: WalletTransaction[];
+  meta?: {
+    filters: {
+      type: string | null;
+      source: string | null;
+      from: string | null;
+      to: string | null;
+    };
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+      has_next: boolean;
+      has_prev: boolean;
+    };
+  };
+}
+
+interface TransactionDetailsResponse {
+  transaction: WalletTransaction;
+}
