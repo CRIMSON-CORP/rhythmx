@@ -145,8 +145,8 @@ export const api = {
       if (typeof window !== "undefined") {
         goeyToast.error(data.message, { id: CONSTANTS.GLOBAL_ERROR_TOAST_ID });
         await new Promise((resolve) => setTimeout(resolve, 50));
-        throw newError;
       }
+      throw newError;
     }
     return data.data;
   },
