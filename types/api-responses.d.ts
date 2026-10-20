@@ -393,3 +393,41 @@ interface PaymentStatusResponse {
   subscription?: UserSubscription;
   wizard?: Record<string, unknown>;
 }
+
+interface EarningsBalanceResponse {
+  balance: number;
+  currency: string;
+  pending_withdrawals: {
+    count: number;
+    total: number;
+  };
+}
+
+interface PlatformEarning {
+  platform: string;
+  logo_url: string;
+  amount: number;
+}
+
+interface RoyaltyEarning {
+  track: string;
+  isrc: string;
+  amount: number;
+}
+
+interface EarningsOverviewResponse {
+  total_earning: number;
+  available_funds: number;
+  payment_cleared: number;
+  ongoing_earnings: number;
+  earnings_to_date: number;
+  total_withdrawal: {
+    count: number;
+    amount: number;
+  };
+  currency: string;
+  earning_history: {
+    platforms: PlatformEarning[];
+    royalty: RoyaltyEarning[];
+  };
+}

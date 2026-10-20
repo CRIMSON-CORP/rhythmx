@@ -109,4 +109,8 @@ export const API_ROUTES = {
     STATUS: (reference: string) => `/api/payments/${encodeURIComponent(reference)}`,
     VERIFY: (reference: string) => `/api/payments/${encodeURIComponent(reference)}/verification`,
   },
+  EARNINGS: {
+    GET: "/api/earnings",
+    OVERVIEW: "/api/earnings/overview",
+  },
 };
