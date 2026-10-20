@@ -46,7 +46,7 @@ function Page() {
         window.location.href = callbackUrl || "/";
       } else if (res.error) {
         if (res.status === 401) {
-          setErrors({ form: "Invalid email or Password" });
+          setErrors({ form: res.error || "Invalid email or Password" });
           return;
         }
         throw res;

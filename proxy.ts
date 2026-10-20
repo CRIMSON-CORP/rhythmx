@@ -11,6 +11,11 @@ export const proxy = withAuth(
       return NextResponse.redirect(new URL("/", req.url));
     }
 
+    // Redirect unauthenticated users trying to access /billing to login
+    if (!token && pathname.startsWith("/billing")) {
+      return NextResponse.redirect(new URL("/auth/login?callbackUrl=/billing", req.url));
+    }
+
     // Redirect unauthenticated users trying to access /auth/create-account to /auth/get-started
     if (!token && pathname.startsWith("/auth/create-account")) {
       return NextResponse.redirect(new URL("/auth/get-started", req.url));

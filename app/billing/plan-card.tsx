@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { api } from "@/lib/api";
-import { API_ROUTES } from "@/lib/api-routes";
 import { cn } from "@/lib/utils";
 
 export type DurationKey = "monthly" | "quarterly" | "biannual" | "annual";
@@ -66,6 +64,10 @@ export function formatPriceWithIntl(amount: number, currencyCode: string): strin
   }
 }
 
+export interface PlanWithTotal extends PlanItem {
+  converted_total?: number | null;
+}
+
 export default function PlanCard({
   plan,
   selectedCurrency,
@@ -73,45 +75,13 @@ export default function PlanCard({
   isLoadingAction,
   onSelectPlanAction: onSelectPlan,
 }: {
-  plan: PlanItem;
+  plan: PlanWithTotal;
   selectedCurrency: string;
   selectedDuration: DurationKey;
   isLoadingAction: boolean;
   onSelectPlanAction: (plan: PlanItem) => void;
 }) {
-  const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // Each card independently fetches conversion whenever currency or duration changes
-  useEffect(() => {
-    if (plan.is_custom) return;
-
-    let isMounted = true;
-    async function fetchConversion() {
-      try {
-        const url = API_ROUTES.PAYMENTS.CONVERT(selectedCurrency, plan.id, selectedDuration);
-        const res = await api.get<PaymentConvertResponse>(url);
-        console.log(
-          `[GET /api/payments/convert] to=${selectedCurrency}&plan_id=${plan.id}&billing_cycle=${selectedDuration}:`,
-          res,
-        );
-
-        if (isMounted && res && typeof res.amount === "number") {
-          setConvertedAmount(res.amount);
-        }
-      } catch (err) {
-        console.error(
-          `[GET /api/payments/convert ERROR] to=${selectedCurrency}&plan_id=${plan.id}&billing_cycle=${selectedDuration}:`,
-          err,
-        );
-      }
-    }
-
-    fetchConversion();
-    return () => {
-      isMounted = false;
-    };
-  }, [plan.id, plan.is_custom, selectedCurrency, selectedDuration]);
 
   const isPopular = plan.slug === "rhythm-elite" || plan.name.toLowerCase().includes("elite");
   const isCustom = plan.is_custom;
@@ -119,15 +89,14 @@ export default function PlanCard({
   const currentDurationOpt =
     DURATION_OPTIONS.find((d) => d.key === selectedDuration) || DURATION_OPTIONS[3];
 
-  // Price calculation: use converted amount if available, otherwise base cycle price formatted with Intl
   let displayedPrice = "";
   let durationUnit = currentDurationOpt.unit;
 
   if (isCustom) {
     displayedPrice = "Custom";
     durationUnit = "";
-  } else if (convertedAmount !== null) {
-    displayedPrice = formatPriceWithIntl(convertedAmount, selectedCurrency);
+  } else if (typeof plan.converted_total === "number") {
+    displayedPrice = formatPriceWithIntl(plan.converted_total, selectedCurrency);
   }
 
   const includedFeatures = (plan.features || []).filter(
@@ -137,14 +106,14 @@ export default function PlanCard({
   const displayedFeatures = isExpanded ? includedFeatures : includedFeatures.slice(0, 5);
 
   return (
-    <article className="bg-white rounded-[30px] border border-[#D9D9D9] p-6 flex flex-col justify-between duration-200 hover:border-[#BFBFBF]">
+    <article className="bg-white rounded-30 border border-[#D9D9D9] p-6 flex flex-col justify-between duration-200 hover:border-[#BFBFBF]">
       {/* Card Header & Content */}
       <div>
         {/* Title & Badge */}
-        <div className="flex items-center justify-between gap-3 min-h-[32px]">
+        <div className="flex items-center justify-between gap-3 min-h-8">
           <h2 className="text-2xl font-semibold text-[#1E1E1E] tracking-tight">{plan.name}</h2>
           {isPopular && (
-            <span className="inline-flex items-center px-3 py-1 rounded-[20px] text-xs font-semibold bg-[#6F2C91]/5 text-[#6F2C91]">
+            <span className="inline-flex items-center px-3 py-1 rounded-20 text-xs font-semibold bg-[#6F2C91]/5 text-[#6F2C91]">
               Popular
             </span>
           )}
@@ -168,7 +137,7 @@ export default function PlanCard({
         </div>
 
         {/* Description */}
-        <p className="mt-4 text-sm font-normal text-[#757575] leading-relaxed min-h-[42px]">
+        <p className="mt-4 text-sm font-normal text-[#757575] leading-relaxed min-h-10.5">
           {plan.description ||
             (isCustom
               ? "It depends on the number of artist accounts to be managed, offering a more suitable service."
@@ -206,7 +175,7 @@ export default function PlanCard({
           disabled={isLoadingAction}
           onClick={() => onSelectPlan(plan)}
           className={cn(
-            "w-full h-14 rounded-[10px] font-medium text-base transition-all duration-200 flex items-center justify-center gap-2",
+            "w-full h-14 rounded-10 font-medium text-base transition-all duration-200 flex items-center justify-center gap-2",
             isCustom
               ? "bg-black text-white hover:bg-black/90 cursor-default"
               : "bg-black text-white hover:bg-black/85 active:scale-[0.99] cursor-pointer",

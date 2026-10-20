@@ -357,16 +357,39 @@ interface PaymentCurrenciesResponse {
 }
 
 interface PaymentConvertResponse {
-  base_currency: string;
-  amount_gbp: number;
-  currency: string;
-  rate: number;
-  amount: number;
   plan: {
     id: number;
     name: string;
     slug: string;
   };
   billing_cycle: string;
+  currency: string;
+  subtotal: number;
+  processing_fee: number;
+  total: number;
 }
 
+interface PaymentVerificationResponse {
+  payment?: {
+    reference: string;
+    status: string;
+    amount: number;
+    currency: string;
+    amount_gbp: number;
+    gateway?: string;
+  };
+  subscription?: UserSubscription;
+  wizard?: Record<string, unknown>;
+}
+
+interface PaymentStatusResponse {
+  payment: {
+    reference: string;
+    status: "pending" | "successful" | "failed" | string;
+    amount: number;
+    currency: string;
+    amount_gbp: number;
+  };
+  subscription?: UserSubscription;
+  wizard?: Record<string, unknown>;
+}

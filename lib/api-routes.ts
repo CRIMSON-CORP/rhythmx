@@ -106,5 +106,7 @@ export const API_ROUTES = {
     CURRENCIES: "/api/payments/currencies",
     CONVERT: (to: string, plan_id: number | string, billing_cycle: string) =>
       `/api/payments/convert?to=${encodeURIComponent(to)}&plan_id=${encodeURIComponent(plan_id)}&billing_cycle=${encodeURIComponent(billing_cycle)}`,
+    STATUS: (reference: string) => `/api/payments/${encodeURIComponent(reference)}`,
+    VERIFY: (reference: string) => `/api/payments/${encodeURIComponent(reference)}/verification`,
   },
 };

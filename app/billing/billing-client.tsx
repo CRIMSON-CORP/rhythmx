@@ -1,19 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { ChevronDown, Check } from "lucide-react";
 import Icon from "@/components/icon";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { cn, getErrorMessage } from "@/lib/utils";
 import { goeyToast } from "goey-toast";
+import { openFlutterwaveCheckout, loadFlutterwaveScript } from "@/lib/flutterwave";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import PlanCard, { DURATION_OPTIONS, DurationKey } from "./plan-card";
+import PlanCard, { DURATION_OPTIONS, DurationKey, PlanWithTotal } from "./plan-card";
+import { CONSTANTS } from "@/lib/constants";
 
 function getCurrencySymbol(code: string): string {
   try {
@@ -34,77 +39,69 @@ function extractCurrencyCodes(res?: PaymentCurrenciesResponse | null): string[] 
 }
 
 export default function BillingClient({
-  initialPlans,
-  initialCurrencies,
+  plans,
+  currencies,
+  selectedCurrency,
+  selectedDuration,
 }: {
-  initialPlans: PlanItem[];
-  initialCurrencies?: PaymentCurrenciesResponse | null;
+  plans: PlanWithTotal[];
+  currencies?: PaymentCurrenciesResponse | null;
+  selectedCurrency: string;
+  selectedDuration: DurationKey;
 }) {
-  const [plans, setPlans] = useState<PlanItem[]>(initialPlans);
-  const [isLoadingPlans, setIsLoadingPlans] = useState(initialPlans.length === 0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
 
-  const initialCodes = extractCurrencyCodes(initialCurrencies);
-  const [currencyCodes, setCurrencyCodes] = useState<string[]>(initialCodes);
-  const [selectedCurrency, setSelectedCurrency] = useState<string>(
-    initialCurrencies?.default || initialCodes[0] || "GBP",
-  );
-
-  const [selectedDuration, setSelectedDuration] = useState<DurationKey>("annual");
+  const currencyCodes = extractCurrencyCodes(currencies);
   const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
 
-  // 1. Fetch live plans if not provided by server
+  // Preload Flutterwave inline checkout script
   useEffect(() => {
-    if (initialPlans.length > 0) return;
-
-    let isMounted = true;
-    async function fetchPlans() {
-      try {
-        setIsLoadingPlans(true);
-        const res = await api.get<PlansResponse>(API_ROUTES.PLANS.LIST);
-        if (isMounted && res?.plans) {
-          setPlans(res.plans);
-        }
-      } catch (err) {
-        console.error("Failed to load plans on client:", err);
-        goeyToast.error("Could not load plans from server. Please refresh the page.");
-      } finally {
-        if (isMounted) setIsLoadingPlans(false);
-      }
-    }
-
-    fetchPlans();
-    return () => {
-      isMounted = false;
-    };
-  }, [initialPlans]);
-
-  // 2. Fetch supported currencies from GET /api/payments/currencies
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchCurrencies() {
-      try {
-        const res = await api.get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES);
-        console.log("[GET /api/payments/currencies]:", res);
-        if (isMounted && res?.currencies?.length) {
-          const codes = res.currencies.map((c) => (typeof c === "string" ? c : c.code));
-          setCurrencyCodes(codes);
-
-          setSelectedCurrency((prev) => {
-            if (codes.includes(prev)) return prev;
-            if (res.default && codes.includes(res.default)) return res.default;
-            return codes[0] || prev;
-          });
-        }
-      } catch (err) {
-        console.error("Failed to fetch currencies from /api/payments/currencies:", err);
-      }
-    }
-
-    fetchCurrencies();
-    return () => {
-      isMounted = false;
-    };
+    loadFlutterwaveScript();
   }, []);
+
+  const buildQuery = (name: string, value: string) => {
+    const params = new URLSearchParams(searchParams ? searchParams.toString() : "");
+    params.set(name, value);
+    return params.toString();
+  };
+
+  const handleCurrencyChange = (code: string) => {
+    router.replace(`/billing?${buildQuery("currency", code)}`, { scroll: false });
+  };
+
+  const verifyPayment = async (
+    reference: string,
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      await api.post<PaymentVerificationResponse>(API_ROUTES.PAYMENTS.VERIFY(reference), {});
+      return { success: true };
+    } catch (err) {
+      console.warn("Direct verification pending or failed, polling status:", err);
+      // Poll up to 5 times (total 12.5 seconds)
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+        try {
+          const pollRes = await api.get<PaymentStatusResponse>(
+            API_ROUTES.PAYMENTS.STATUS(reference),
+          );
+          if (pollRes?.payment?.status === "successful") {
+            return { success: true };
+          }
+          if (pollRes?.payment?.status === "failed") {
+            return { success: false, error: "Payment was marked as failed by provider." };
+          }
+        } catch (pollErr) {
+          console.warn(`[Poll attempt ${attempt}] error:`, pollErr);
+        }
+      }
+      return {
+        success: false,
+        error: "Verification is taking longer than usual. Please check your dashboard in a moment.",
+      };
+    }
+  };
 
   const handleSelectPlan = async (plan: PlanItem) => {
     if (plan.is_custom) {
@@ -114,23 +111,101 @@ export default function BillingClient({
 
     try {
       setLoadingPlanId(plan.id);
+
+      // 1. Create order on backend to register payment reference and locked amount
       const res = await api.post<StartSubscriptionResponse>(API_ROUTES.SUBSCRIPTION.START, {
         plan_id: plan.id,
         billing_cycle: selectedDuration,
         currency: selectedCurrency,
-        redirect_url: typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
+        redirect_url:
+          typeof window !== "undefined" ? `${window.location.origin}/billing` : undefined,
       });
 
-      if (res?.payment_link) {
-        window.location.href = res.payment_link;
-      } else {
-        goeyToast.error("Failed to generate payment link. Please try again.");
+      if (!res?.reference) {
+        throw new Error("Invalid response from server: payment reference missing");
+      }
+
+      const publicKey = process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY;
+      const isPlaceholderKey =
+        !publicKey || publicKey.includes("your-public-key") || publicKey.includes("xxxxxxxx");
+
+      // Graceful fallback: If public key is not set, redirect to hosted link if available
+      if (isPlaceholderKey) {
+        if (res.payment_link) {
+          goeyToast.error(
+            "Flutterwave public key is not set in .env.local — redirecting to hosted checkout...",
+            { duration: 5000 },
+          );
+          window.location.href = res.payment_link;
+          return;
+        }
+        goeyToast.error(
+          "Please configure NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY in .env.local to open the inline checkout modal.",
+        );
+        setLoadingPlanId(null);
+        return;
+      }
+
+      // 2. Open Flutterwave Inline Modal Checkout
+      const checkoutResult = await openFlutterwaveCheckout({
+        public_key: publicKey,
+        tx_ref: res.reference,
+        amount: res.amount,
+        currency: res.currency,
+        payment_options: "card, mobilemoney, ussd, banktransfer",
+        customer: {
+          email: session?.user?.email || "customer@rhythmx.com",
+          name:
+            `${session?.user?.first_name || ""} ${session?.user?.last_name || ""}`.trim() ||
+            session?.user?.name ||
+            "RhythmX Artist",
+          phone_number: session?.user?.phone || "",
+        },
+        customizations: {
+          title: "RhythmX",
+          description: `Subscription to ${plan.name} (${selectedDuration})`,
+          logo: typeof window !== "undefined" ? `${window.location.origin}/favicon.ico` : undefined,
+        },
+        callback: async (paymentData) => {
+          console.log("[Flutterwave Payment Callback]:", paymentData);
+          if (paymentData.status === "successful" || paymentData.status === "completed") {
+            goeyToast.success("Payment received! Activating your subscription...");
+            const verifyRes = await verifyPayment(res.reference);
+            if (verifyRes.success) {
+              goeyToast.success("Payment verified! Your subscription is now active.");
+              router.push("/");
+              router.refresh();
+            } else {
+              goeyToast.error(
+                verifyRes.error || "Payment verification failed. Please check your dashboard.",
+              );
+            }
+          } else {
+            goeyToast.error(`Payment was not successful (Status: ${paymentData.status})`);
+          }
+          setLoadingPlanId(null);
+        },
+        onclose: (incomplete) => {
+          console.log("[Flutterwave Modal Closed]:", incomplete);
+          setLoadingPlanId(null);
+        },
+      });
+
+      if (!checkoutResult.success) {
+        // Fallback to hosted link if modal script fails to initialize
+        if (res.payment_link) {
+          window.location.href = res.payment_link;
+        } else {
+          goeyToast.error(checkoutResult.error || "Failed to open payment modal");
+          setLoadingPlanId(null);
+        }
       }
     } catch (error) {
-      console.error("Subscription start failed:", error);
+      console.warn("Subscription start failed:", error);
       const msg = getErrorMessage(error, "Failed to start subscription. Please try again.");
-      goeyToast.error(msg);
-    } finally {
+      goeyToast.update(CONSTANTS.GLOBAL_ERROR_TOAST_ID, {
+        title: msg,
+      });
       setLoadingPlanId(null);
     }
   };
@@ -179,18 +254,18 @@ export default function BillingClient({
                       {opt.discountBadge}
                     </span>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDuration(opt.key)}
+                  <Link
+                    href={`/billing?${buildQuery("cycle", opt.key)}`}
+                    scroll={false}
                     className={cn(
-                      "px-4 py-2 text-sm rounded-full transition-all cursor-pointer select-none",
+                      "inline-block px-4 py-2 text-sm rounded-full transition-all cursor-pointer select-none text-center",
                       isActive
                         ? "bg-[#18151A] text-[#F5F4F2] font-semibold shadow-xs"
                         : "text-[#625C57] hover:text-[#18151A] hover:bg-neutral-100/50 font-medium",
                     )}
                   >
                     {opt.label}
-                  </button>
+                  </Link>
                 </div>
               );
             })}
@@ -216,7 +291,7 @@ export default function BillingClient({
                 return (
                   <DropdownMenuItem
                     key={code}
-                    onClick={() => setSelectedCurrency(code)}
+                    onClick={() => handleCurrencyChange(code)}
                     className="flex items-center justify-between px-3 py-2 text-sm rounded-xl cursor-pointer hover:bg-neutral-100 font-medium text-[#1E1E1E]"
                   >
                     <div className="flex items-center gap-2">
@@ -234,25 +309,8 @@ export default function BillingClient({
         </div>
 
         {/* Plans Grid */}
-        {isLoadingPlans ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-[560px] rounded-[30px] border border-[#D9D9D9] p-6 bg-white animate-pulse flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  <div className="h-7 bg-neutral-200 rounded-md w-1/2" />
-                  <div className="h-4 bg-neutral-100 rounded-md w-1/3" />
-                  <div className="h-10 bg-neutral-200 rounded-md w-2/5 mt-4" />
-                  <div className="h-12 bg-neutral-100 rounded-md w-full mt-2" />
-                </div>
-                <div className="h-14 bg-neutral-200 rounded-[10px] w-full" />
-              </div>
-            ))}
-          </div>
-        ) : plans.length === 0 ? (
-          <div className="bg-white rounded-[30px] border border-[#D9D9D9] p-12 text-center max-w-md w-full">
+        {plans.length === 0 ? (
+          <div className="bg-white rounded-30 border border-[#D9D9D9] p-12 text-center max-w-md w-full">
             <h2 className="text-lg font-medium text-[#1E1E1E] mb-2">No plans available</h2>
             <p className="text-sm text-[#757575] mb-6">
               Unable to find distribution plans at this moment.
