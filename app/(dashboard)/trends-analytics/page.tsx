@@ -10,6 +10,7 @@ import { VisuallyHidden } from "radix-ui";
 import Releases from "../discography/releases";
 import PlatformRangeSelect from "@/components/platform-range-select";
 import Image from "next/image";
+import WorldDominationMap from "./world-domination-map";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { formatCurrency } from "@/lib/utils";
@@ -44,7 +45,7 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
     ? rawPlatformRange
     : "30d";
 
-  const [analysisRes, platformsRes] = await Promise.all([
+  const [analysisRes, platformsRes, countriesRes] = await Promise.all([
     api.get<AnalysisOverViewResponse>(API_ROUTES.ANALYTICS.OVERVIEW("30d")).catch((err) => {
       console.error("Failed to load analytics overview:", err);
       return null;
@@ -53,6 +54,12 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
       .get<AnalyticsPlatformsResponse>(API_ROUTES.ANALYTICS.PLATFORMS(platformRange))
       .catch((err) => {
         console.error("Failed to load analytics platforms:", err);
+        return null;
+      }),
+    api
+      .get<AnalyticsCountriesResponse>(API_ROUTES.ANALYTICS.COUNTRIES("30d"))
+      .catch((err) => {
+        console.error("Failed to load analytics countries:", err);
         return null;
       }),
   ]);
@@ -68,6 +75,17 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
 
   const platforms = platformsRes?.platforms || [];
   const currentRangeLabel = RANGE_LABELS[platformRange] || "30 days";
+
+  const countries = countriesRes?.countries || [];
+  const totalMapLocations = 256;
+  const dominationPercent =
+    countries.length > 0 ? (countries.length / totalMapLocations) * 100 : 0;
+  const dominationFormatted =
+    dominationPercent === 0
+      ? "0%"
+      : dominationPercent < 1
+      ? `${dominationPercent.toFixed(1)}%`
+      : `${Math.round(dominationPercent)}%`;
 
   return (
     <div className="flex flex-col gap-6">
@@ -325,15 +343,12 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
               <span className="text-border-default-secondary text-sm font-medium leading-tight">
                 By Percentage
               </span>
-              <span className="font-medium leading-tight">60%</span>
+              <span className="font-medium leading-tight">{dominationFormatted}</span>
             </div>
           </header>
-          <Image
-            src="/images/world.png"
-            alt="world-map"
-            width={1770}
-            height={715}
-            className="object-cover rounded-30"
+          <WorldDominationMap
+            countries={countries}
+            totals={countriesRes?.totals}
           />
         </div>
       </section>

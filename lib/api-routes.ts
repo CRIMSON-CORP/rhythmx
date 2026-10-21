@@ -77,6 +77,7 @@ export const API_ROUTES = {
   ANALYTICS: {
     OVERVIEW: (range: string = "30d") => `/api/analytics/overview?range=${encodeURIComponent(range)}`,
     PLATFORMS: (range: string = "30d") => `/api/analytics/platforms?range=${encodeURIComponent(range)}`,
+    COUNTRIES: (range: string = "30d") => `/api/analytics/countries?range=${encodeURIComponent(range)}`,
   },
   NOTFICATIONS: {
     LIST: "/api/notifications",

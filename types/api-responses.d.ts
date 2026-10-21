@@ -89,6 +89,32 @@ interface AnalyticsPlatformsResponse {
   };
 }
 
+interface AnalyticsCountryItem {
+  code: string;
+  name: string;
+  streams: number;
+  downloads: number;
+  revenue: number;
+  share: number;
+}
+
+interface AnalyticsCountriesResponse {
+  countries: AnalyticsCountryItem[];
+  totals: {
+    streams: number;
+    downloads: number;
+    revenue: number;
+    currency: string;
+  };
+  meta?: {
+    range: string;
+    from: string;
+    to: string;
+    tier: string;
+    last_synced_at: string;
+  };
+}
+
 interface EarningsResponse {
   reference: string;
   currency: string;
