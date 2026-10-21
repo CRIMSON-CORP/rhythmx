@@ -75,7 +75,7 @@ export const API_ROUTES = {
     PHOTO: (reference: string) => `/api/label/artists/${reference}/photo`,
   },
   ANALYTICS: {
-    OVERVIEW: "/api/analytics/overview",
+    OVERVIEW: (range: string = "30d") => `/api/analytics/overview?range=${encodeURIComponent(range)}`,
   },
   NOTFICATIONS: {
     LIST: "/api/notifications",

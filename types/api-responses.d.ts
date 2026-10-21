@@ -56,6 +56,13 @@ interface AnalysisOverViewResponse {
     currency: string;
   };
   earnings_history: EarningHistory[];
+  meta?: {
+    range: string;
+    from: string;
+    to: string;
+    tier: string;
+    last_synced_at: string;
+  };
 }
 
 interface EarningsResponse {
