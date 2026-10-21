@@ -65,6 +65,30 @@ interface AnalysisOverViewResponse {
   };
 }
 
+interface AnalyticsPlatformItem {
+  platform: string;
+  slug: string;
+  logo_url: string;
+  streams: number;
+  downloads: number;
+  share: number;
+}
+
+interface AnalyticsPlatformsResponse {
+  platforms: AnalyticsPlatformItem[];
+  totals: {
+    streams: number;
+    downloads: number;
+  };
+  meta?: {
+    range: string;
+    from: string;
+    to: string;
+    tier: string;
+    last_synced_at: string;
+  };
+}
+
 interface EarningsResponse {
   reference: string;
   currency: string;
