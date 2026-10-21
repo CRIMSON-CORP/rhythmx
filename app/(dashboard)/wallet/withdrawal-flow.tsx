@@ -1,6 +1,6 @@
 "use client";
 import useWithdrawalStore, { WithdrawalView } from "@/store/withdrawal-store";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Dialog,
   DialogClose,
@@ -41,9 +41,8 @@ function WithdrawalFlow() {
   const Component = VIEW_MAP[view];
   const title = TITLE_MAP[view];
 
-  useEffect(() => resetState, [resetState]);
   return (
-    <Dialog>
+    <Dialog onOpenChange={resetState}>
       <DialogTrigger asChild>
         <Button>
           <span>Withdraw</span>
