@@ -121,4 +121,17 @@ export const API_ROUTES = {
       EXPORT: `/api/earnings/transactions/export`,
     },
   },
+  WITHDRAWALS: {
+    ARTISTS: (queryString?: string) =>
+      `/api/withdrawals/artists${queryString ? `?${queryString}` : ""}`,
+    ACCOUNTS: {
+      LIST: "/api/withdrawals/accounts",
+      ADD: "/api/withdrawals/accounts",
+      SET_DEFAULT: (id: number | string) => `/api/withdrawals/accounts/${id}`,
+      DELETE: (id: number | string) => `/api/withdrawals/accounts/${id}`,
+    },
+    REQUEST: "/api/withdrawals/request",
+    REQUEST_CONFIRM: "/api/withdrawals/request-confirm",
+    CANCEL: (reference: string) => `/api/withdrawals/request/${encodeURIComponent(reference)}`,
+  },
 };

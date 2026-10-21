@@ -14,6 +14,8 @@ interface WithdrawalStore {
     selected_artist: null | string | number;
     amount: number;
     withdrawal_account_id: number | string | null;
+    selected_bank?: WithdrawalAccount | null;
+    withdrawal_response?: any | null;
     otp: string;
   };
   setForm: (form: Partial<WithdrawalStore["form"]>) => void;
@@ -27,6 +29,8 @@ const useWithdrawalStore = create<WithdrawalStore>((set) => ({
     selected_artist: null,
     amount: 0,
     withdrawal_account_id: null,
+    selected_bank: null,
+    withdrawal_response: null,
     otp: "",
   },
   setForm: (form) => set((state) => ({ form: { ...state.form, ...form } })),
@@ -37,6 +41,8 @@ const useWithdrawalStore = create<WithdrawalStore>((set) => ({
         selected_artist: null,
         amount: 0,
         withdrawal_account_id: null,
+        selected_bank: null,
+        withdrawal_response: null,
         otp: "",
       },
     }),

@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import useWithdrawalStore from "@/store/withdrawal-store";
 import { cn } from "@/lib/utils";
 import { goeyToast } from "goey-toast";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 
 function EnterOtpView() {
   const form = useWithdrawalStore((state) => state.form);
@@ -16,13 +18,13 @@ function EnterOtpView() {
   // Active OTP state is stored inside the Zustand store form object as a string
   const otp = form.otp;
 
-  // Calculate the currently active digit box index (0 to 3)
-  const activeIndex = Math.min(otp.length, 3);
+  // Calculate the currently active digit box index (0 to 5)
+  const activeIndex = Math.min(otp.length, 5);
 
   // Append a digit to the store's form.otp string
   const handleInputDigit = (digit: string) => {
     if (loading) return;
-    if (otp.length < 4) {
+    if (otp.length < 6) {
       setForm({ otp: otp + digit });
     }
   };
@@ -35,57 +37,62 @@ function EnterOtpView() {
     }
   };
 
-  // Handle verify logic when Ok is clicked
-  const handleVerify = useCallback(() => {
-    if (otp.length === 4 && !loading) {
+  // Handle verify logic when Ok is clicked or 6 digits entered
+  const handleVerify = useCallback(async () => {
+    if (otp.length === 6 && !loading) {
       setLoading(true);
-
-      // Simulate verification api request (1.5s delay)
-      setTimeout(() => {
-        if (otp === "1234") {
-          setView("tranfer-success");
-        } else {
-          goeyToast.error("Verification failed. Please type 1234 to proceed.");
-          setForm({ otp: "" }); // reset field
+      try {
+        const res = await api.post<WithdrawalRequestConfirmResponse>(
+          API_ROUTES.WITHDRAWALS.REQUEST_CONFIRM,
+          { otp },
+        );
+        if (res?.withdrawal) {
+          setForm({ withdrawal_response: res.withdrawal });
         }
+        goeyToast.success("Withdrawal confirmed successfully.");
+        setView("tranfer-success");
+      } catch (err: unknown) {
+        console.error("Failed to confirm withdrawal OTP:", err);
+        setForm({ otp: "" });
+      } finally {
         setLoading(false);
-      }, 1500);
+      }
     }
   }, [otp, loading, setForm, setView]);
 
-  // Auto trigger verification once all 4 digits are completed
+  // Auto trigger verification once all 6 digits are completed
   useEffect(() => {
-    if (otp.length === 4) {
+    if (otp.length === 6) {
       const timer = setTimeout(() => {
         handleVerify();
-      }, 500);
+      }, 400);
       return () => clearTimeout(timer);
     }
   }, [handleVerify, otp]);
 
   return (
-    <div className="p-6">
+    <div className="p-6 relative">
       <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-r from-[#0080FF] to-[#9747FF] -z-10 opacity-25 blur-3xl"></div>
 
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-6 relative z-10">
         {/* Verification layout */}
-        <div className="flex flex-col items-center gap-4 my-3 select-none">
+        <div className="flex flex-col items-center gap-3 my-2 select-none">
           <div className="text-2xl font-bold text-black tracking-tight">Enter OTP</div>
-          <p className="text-[#8E8E93] text-center text-sm max-w-61.5 leading-relaxed">
-            Enter the 4-digit code sent via SMS to 0802 345 6789
+          <p className="text-[#8E8E93] text-center text-sm max-w-72 leading-relaxed">
+            Enter the 6-digit code sent to your email to confirm this withdrawal.
           </p>
 
-          {/* 4 Digit OTP Boxes */}
-          <div className="flex items-center gap-4 mt-2">
-            {[0, 1, 2, 3].map((idx) => {
+          {/* 6 Digit OTP Boxes */}
+          <div className="flex items-center gap-2.5 mt-2">
+            {[0, 1, 2, 3, 4, 5].map((idx) => {
               const isActive = idx === activeIndex;
               const hasDigit = idx < otp.length;
               return (
                 <div
                   key={idx}
                   className={cn(
-                    "w-14 h-14 rounded-20 outline outline-black flex items-center justify-center font-bold text-xl text-black transition-all",
-                    isActive ? "opacity-100" : "opacity-30",
+                    "w-11 h-12 rounded-xl outline outline-black/30 flex items-center justify-center font-bold text-xl text-black transition-all bg-white/70",
+                    isActive ? "opacity-100 outline-black scale-105" : "opacity-40",
                   )}
                 >
                   {hasDigit ? otp[idx] : isActive ? "|" : ""}
@@ -110,7 +117,7 @@ function EnterOtpView() {
 
           <button
             onClick={handleVerify}
-            disabled={loading || otp.length < 4}
+            disabled={loading || otp.length < 6}
             className="w-18 h-18 hover:bg-neutral-100 rounded-full flex items-center justify-center text-[20px] font-bold text-black cursor-pointer select-none disabled:opacity-50"
           >
             {loading ? (

@@ -1,11 +1,14 @@
 "use client";
-import { ArrowUpRight, Eye, Search } from "lucide-react";
 
-import { Suspense, useState, useEffect } from "react";
+import { ArrowUpRight, Eye, Loader2, Search } from "lucide-react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import useWithdrawalStore from "@/store/withdrawal-store";
-import useApi from "@/hooks/useApi";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
+import { formatCurrency } from "@/lib/utils";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 function SkeletonRow() {
   return (
@@ -33,97 +36,87 @@ function SkeletonList() {
   );
 }
 
-interface ArtistListProps {
-  search: string;
-  onSelectArtist: (id: string) => void;
-}
-
-function ArtistList({ search, onSelectArtist }: ArtistListProps) {
-  const artists = useApi<Artist[]>(`/api/artists?search=${encodeURIComponent(search)}`);
-
-  if (artists.length === 0) {
-    return (
-      <div className="col-start-1 col-end-4 text-center py-8 text-default-tertiary font-medium">
-        No artists found
-      </div>
-    );
-  }
-
-  return (
-    <ul className="grid grid-cols-subgrid col-start-1 col-end-4 gap-4 overflow-auto max-h-[calc(100vh-15rem)] scrollbar-none">
-      {artists.map((artist) => (
-        <li key={artist.id} className="grid grid-cols-subgrid col-start-1 col-end-4 items-center">
-          <div className="flex items-center gap-4">
-            <Image
-              src={artist.image}
-              width={54}
-              height={54}
-              className="rounded-full bg-neutral-100 object-cover flex-none aspect-square"
-              alt={artist.name}
-              onError={(e) => {
-                // Fallback standard avatar if mockup image path fails
-                const img = e.target as HTMLImageElement;
-                img.src = "/images/release-1.png";
-              }}
-            />
-            <div className="grow flex flex-col gap-1">
-              <p className="font-medium text-default">{artist.name}</p>
-              <p className="font-medium text-xs text-border-default-secondary">{artist.location}</p>
-            </div>
-          </div>
-          <Button onClick={() => onSelectArtist(artist.id)} size="sm" variant="outline">
-            <span>Withdraw</span>
-            <ArrowUpRight size={16} />
-          </Button>
-          <p className="px-2.5 py-2 rounded-full bg-page-background font-semibold text-sm text-center text-default">
-            {"$" +
-              (artist.balance ?? 0).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-          </p>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 function SelectArtistView() {
   const { setForm, setView } = useWithdrawalStore();
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [currency, setCurrency] = useState<string>("GBP");
+  const [error, setError] = useState<string | null>(null);
 
-  // Debounce search input changes by 300ms
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 300);
+  const fetchArtistsPage = useCallback(async (page: number, search: string) => {
+    try {
+      const params = new URLSearchParams();
+      if (search.trim()) params.set("search", search.trim());
+      params.set("page", String(page));
+      params.set("limit", "20");
 
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
+      const res = await api.get<WithdrawalArtistsResponse>(
+        API_ROUTES.WITHDRAWALS.ARTISTS(params.toString()),
+      );
 
-  const handleSelectArtist = (id: string) => {
-    setForm({ selected_artist: id });
+      if (res?.currency) {
+        setCurrency(res.currency);
+      }
+      setError(null);
+
+      return {
+        items: res?.artists || [],
+        hasMore: res?.meta?.pagination?.has_next ?? false,
+      };
+    } catch (err: unknown) {
+      console.error("Failed to load withdrawal artists:", err);
+      if (page === 1) {
+        setError((err as { message?: string })?.message || "Failed to load artists.");
+      }
+      return { items: [], hasMore: false };
+    }
+  }, []);
+
+  const {
+    items: artists,
+    isLoading,
+    isLoadingMore,
+    sentinelRef,
+    refetch,
+  } = useInfiniteScroll<WithdrawalArtistItem>({
+    fetchPage: fetchArtistsPage,
+    search: searchQuery,
+    debounceMs: 300,
+  });
+
+  const handleSelectArtist = (reference: string) => {
+    setForm({ selected_artist: reference });
     setView("enter-amount");
   };
 
   return (
-    <div className="overflow-auto h-full">
-      <div className="absolute w-full top-0 right-0 h-64 bg-linear-to-b from-[#8800FF] to-[#00F2EA]/0 -z-10 opacity-25 blur-3xl"></div>
-      <div className="px-6">
-        <div className="flex w-full gap-2.5 p-4 rounded-full items-center bg-transparent">
+    <div className="flex flex-col h-full">
+      {/* Ambient top gradient matching Figma node 2617-8692 */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-0 right-0 h-43.25 z-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_100%),linear-gradient(180deg,rgba(136,0,255,0.25)_0%,rgba(0,242,234,0)_78.61%)]"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%), linear-gradient(180deg, rgba(136, 0, 255, 0.25) 0%, rgba(0, 242, 234, 0) 78.61%)",
+        }}
+      />
+
+      {/* Frosted search input pill */}
+      <div className="px-6 relative z-10">
+        <div className="flex w-full gap-2.5 px-4.5 py-3 rounded-full items-center bg-white/20 backdrop-blur-md">
           <Search size={16} className="text-default-tertiary" />
           <input
             type="search"
-            className="bg-transparent w-full outline-none placeholder:text-default-tertiary text-default font-medium"
+            className="bg-transparent w-full outline-none placeholder:text-default-tertiary text-default font-medium text-sm"
             placeholder="Search Artist"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
-      <div className="grid gap-2.5 grid-cols-[1fr_max-content_max-content] px-6 pb-6 mt-4">
-        <header className="grid grid-cols-subgrid col-start-1 col-end-4 text-sm text-default font-semibold border-b border-default-default/10 pb-3 mb-2">
+
+      {/* Artist table list */}
+      <div className="grid gap-2.5 grid-cols-[1fr_max-content_max-content] px-6 pb-6 mt-4 relative z-10">
+        <header className="grid grid-cols-subgrid col-start-1 col-end-4 text-sm text-default font-semibold pb-3 mb-2">
           <p>Artist</p>
           <p>Action</p>
           <p className="flex items-center gap-2 select-none">
@@ -132,10 +125,74 @@ function SelectArtistView() {
           </p>
         </header>
 
-        {/* Suspense boundary wrapping the list fetching process */}
-        <Suspense fallback={<SkeletonList />}>
-          <ArtistList search={debouncedSearch} onSelectArtist={handleSelectArtist} />
-        </Suspense>
+        {isLoading ? (
+          <SkeletonList />
+        ) : error ? (
+          <div className="col-start-1 col-end-4 text-center py-8 flex flex-col items-center gap-3">
+            <p className="text-default-tertiary font-medium text-sm">{error}</p>
+            <Button size="sm" variant="outline" onClick={() => refetch()}>
+              Retry
+            </Button>
+          </div>
+        ) : artists.length === 0 ? (
+          <div className="col-start-1 col-end-4 text-center py-8 text-default-tertiary font-medium text-sm">
+            No artists found
+          </div>
+        ) : (
+          <ul className="grid grid-cols-subgrid col-start-1 col-end-4 gap-4 overflow-auto max-h-[calc(100vh-15rem)] scrollbar-none">
+            {artists.map((artist) => {
+              const numericBalance =
+                typeof artist.balance === "number"
+                  ? artist.balance
+                  : parseFloat(artist.balance) || 0;
+
+              return (
+                <li
+                  key={artist.reference}
+                  className="grid grid-cols-subgrid col-start-1 col-end-4 items-center"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <Image
+                      src={artist.avatar_url || "/images/release-1.png"}
+                      width={54}
+                      height={54}
+                      className="rounded-full bg-neutral-100 object-cover flex-none aspect-square"
+                      alt={artist.name}
+                      unoptimized
+                    />
+                    <div className="grow min-w-0 flex flex-col gap-1">
+                      <p className="font-semibold text-base text-default truncate">{artist.name}</p>
+                      <p className="font-normal text-xs text-default-tertiary truncate">
+                        {artist.location}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => handleSelectArtist(artist.reference)}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <span>Withdraw</span>
+                    <ArrowUpRight size={16} />
+                  </Button>
+                  <p className="px-4 py-2 rounded-full bg-page-background font-semibold text-sm text-center text-default whitespace-nowrap">
+                    {formatCurrency(numericBalance, currency)}
+                  </p>
+                </li>
+              );
+            })}
+
+            {/* Sentinel element for infinite scroll */}
+            <div ref={sentinelRef} className="col-start-1 col-end-4 h-2" />
+
+            {/* Loading indicator for next pages */}
+            {isLoadingMore && (
+              <li className="col-start-1 col-end-4 flex items-center justify-center py-4">
+                <Loader2 size={20} className="animate-spin text-default-tertiary" />
+              </li>
+            )}
+          </ul>
+        )}
       </div>
     </div>
   );

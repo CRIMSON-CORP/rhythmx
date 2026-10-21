@@ -54,9 +54,9 @@ function WithdrawalFlow() {
         className="overflow-hidden rounded-30 isolate gap-0 max-w-150"
         showCloseButton={false}
       >
-        <DialogHeader className="flex-row items-center justify-between px-6 py-5">
+        <DialogHeader className="flex-row items-center justify-between px-6 py-5 relative z-10 bg-transparent">
           <DialogTitle className="text-sm text-default font-medium">{title}</DialogTitle>
-          <DialogClose className="p-2 text-default">
+          <DialogClose className="p-2 text-default hover:bg-black/5 rounded-full transition-colors cursor-pointer">
             <X size={20} />
           </DialogClose>
         </DialogHeader>

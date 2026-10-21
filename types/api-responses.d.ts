@@ -348,12 +348,14 @@ interface StartSubscriptionResponse {
 
 interface PaymentCurrencyItem {
   code: string;
+  name: string;
+  symbol: string;
   channels: string[];
 }
 
 interface PaymentCurrenciesResponse {
   default: string;
-  currencies: (PaymentCurrencyItem | string)[];
+  currencies: PaymentCurrencyItem[];
 }
 
 interface PaymentConvertResponse {
@@ -475,4 +477,74 @@ interface WalletTransactionsResponse {
 
 interface TransactionDetailsResponse {
   transaction: WalletTransaction;
+}
+
+interface WithdrawalAccount {
+  id: number;
+  account_name: string;
+  bank_name: string;
+  bank_code: string | null;
+  account_number: string;
+  routing_number: string | null;
+  iban: string | null;
+  swift_code: string | null;
+  bank_country: string;
+  currency: string;
+  is_default: boolean;
+  is_verified: boolean;
+  created_at: string;
+}
+
+interface WithdrawalAccountsResponse {
+  accounts: WithdrawalAccount[];
+}
+
+interface WithdrawalArtistItem {
+  reference: string;
+  name: string;
+  location: string;
+  avatar_url: string | null;
+  balance: string | number;
+}
+
+interface WithdrawalArtistsResponse {
+  artists: WithdrawalArtistItem[];
+  currency?: string;
+  total_balance?: string;
+  meta?: {
+    pagination?: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+      has_next: boolean;
+      has_prev: boolean;
+    };
+  };
+}
+
+interface WithdrawalRequestItem {
+  reference: string;
+  amount: string;
+  currency: string;
+  status: string;
+  bank?: {
+    id: number;
+    bank_name: string;
+    last_four: string;
+  };
+  otp_expiry?: string;
+  expected_payout_date?: string;
+  created_at: string;
+}
+
+interface WithdrawalRequestResponse {
+  withdrawal: WithdrawalRequestItem;
+}
+
+interface WithdrawalRequestConfirmResponse {
+  withdrawal: WithdrawalRequestItem;
+  wallet?: {
+    balance: string;
+  };
 }
