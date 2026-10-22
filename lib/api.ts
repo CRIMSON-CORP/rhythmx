@@ -128,9 +128,19 @@ export const api = {
 
   async parseAndValidate(response: Response) {
     let data;
+    const savedResponse = response.clone();
     try {
       data = await response.json();
     } catch (error) {
+      if (typeof window === "undefined") {
+        try {
+          const { writeTextToFile } = await import("./write-file");
+          const text = await savedResponse.text();
+          await writeTextToFile(text);
+        } catch {
+          // ignore logging failure
+        }
+      }
       if (error instanceof SyntaxError) {
         throw new Error("Invalid response from server");
       }
@@ -149,7 +159,12 @@ export const api = {
       throw newError;
     }
 
-    if (data.meta && typeof data.data === "object" && data.data !== null && !Array.isArray(data.data)) {
+    if (
+      data.meta &&
+      typeof data.data === "object" &&
+      data.data !== null &&
+      !Array.isArray(data.data)
+    ) {
       data.data.meta = data.meta;
     }
     return data.data;
