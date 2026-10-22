@@ -217,7 +217,7 @@ export const authOptions: NextAuthOptions = {
         session.user.phone = token.phone as string;
 
         session.user.role = token.role as string;
-        session.user.account_type = token.account_type as string;
+        session.user.account_type = token.account_type as AccountType;
       }
       return session;
     },

@@ -1,30 +1,23 @@
-"use client";
-import { Suspense } from "react";
 import { ListFilter } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 
-const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
+interface EarningsProps {
+  data?: DashboardEarningsData;
+  rangeLabel?: string;
+}
 
-function EarningsInner() {
-  const searchParams = useSearchParams();
-  const timeSort = searchParams.get("time-sort");
-  let lastDays = "30 Days";
-  switch (timeSort) {
-    case "daily":
-      lastDays = "1 Day";
-      break;
-    case "weekly":
-      lastDays = "7 Days";
-      break;
-    case "monthly":
-      lastDays = "30 Days";
-      break;
-    case "yearly":
-      lastDays = "12 months";
-      break;
-  }
-
-  const dataMax = Math.max(...data);
+export default function Earnings({
+  data,
+  rangeLabel = "30 Days",
+}: EarningsProps) {
+  const bars = data?.bars ?? [];
+  const dataMax = Math.max(...bars.map((b) => b.value), 1);
+  const total = data?.range ?? 0;
+  const formatted = total.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  const [dollars, cents] = formatted.split(".");
 
   return (
     <div className="@container min-w-80 bg-white rounded-30 grow-2 flex flex-col gap-6">
@@ -34,32 +27,44 @@ function EarningsInner() {
       </header>
       <div className="flex @max-md:flex-col-reverse grow gap-6 items-end px-6 pb-6">
         <div className="flex @max-md:self-stretch items-end justify-between grow h-full min-h-27 gap-1.5">
-          {data.map((amount, index) => (
-            <div key={index} className="h-full flex items-end grow group">
-              <div
-                style={{ height: (amount / dataMax) * 100 + "%" }}
-                className="bg-brand-orange/5 rounded-full grow group-hover:bg-brand-orange/30 transition-colors"
-              ></div>
-            </div>
-          ))}
+          {bars.length > 0
+            ? bars.map((bar, index) => {
+                const heightPercent =
+                  bar.value > 0 ? Math.max((bar.value / dataMax) * 100, 8) : 8;
+                return (
+                  <div key={bar.date || index} className="h-full flex items-end grow group">
+                    <div
+                      title={`${bar.date}: $${bar.value.toLocaleString()}`}
+                      style={{ height: `${heightPercent}%` }}
+                      className={cn(
+                        "rounded-full grow transition-colors",
+                        bar.value > 0
+                          ? "bg-brand-orange/60 group-hover:bg-brand-orange"
+                          : "bg-brand-orange/10 group-hover:bg-brand-orange/20"
+                      )}
+                    />
+                  </div>
+                );
+              })
+            : Array.from({ length: 14 }).map((_, index) => (
+                <div key={index} className="h-full flex items-end grow group">
+                  <div
+                    style={{ height: "12%" }}
+                    className="bg-brand-orange/10 rounded-full grow transition-colors"
+                  />
+                </div>
+              ))}
         </div>
-        <div className="flex flex-col py-6 gap-3">
+        <div className="flex flex-col py-6 gap-3 shrink-0">
           <span className="text-default/40 font-medium leading-tight">
-            Total earning ({lastDays})
+            Total earning ({rangeLabel})
           </span>
           <span className="text-[32px] font-medium leading-tight">
-            $394,000<span className="text-default-tertiary">.00</span>
+            ${dollars}
+            <span className="text-default-tertiary">.{cents}</span>
           </span>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function Earnings() {
-  return (
-    <Suspense fallback={<div className="min-w-80 bg-white rounded-30 grow-2 h-[230px] animate-pulse" />}>
-      <EarningsInner />
-    </Suspense>
   );
 }

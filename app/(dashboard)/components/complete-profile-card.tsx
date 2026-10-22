@@ -4,7 +4,7 @@ import { ArrowUpRight, X, Zap } from "lucide-react";
 
 function CompletProfileCard() {
   return (
-    <div className="bg-brand-orange outline outline-default-default rounded-30 p-4 flex flex-col gap-6 w-full max-w-57">
+    <div className="bg-brand-orange outline outline-default-default rounded-30 p-4 flex flex-col gap-6">
       <header className="flex items-center justify-between">
         <Zap size={32} className="text-white" />
         <button>

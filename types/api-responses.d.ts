@@ -7,7 +7,7 @@ interface VerifyResponse {
     avatar: string;
     avatar_url: string;
     phone: string | null;
-    account_type: string;
+    account_type: AccountType;
     auth_provider: string;
     status: string;
     locale: string;

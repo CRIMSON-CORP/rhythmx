@@ -1,3 +1,5 @@
+type AccountType = "artist" | "label" | "collaborator";
+
 type ReleaseCardProps = {
   id: string;
   /**
@@ -508,4 +510,50 @@ interface ApiResponse<T> {
   data: T;
   message: string;
   status: number;
+}
+
+interface DashboardBarItem {
+  date: string;
+  value: number;
+}
+
+interface DashboardMetricData {
+  lifetime: number;
+  range: number;
+  bars: DashboardBarItem[];
+}
+
+interface DashboardEarningsData {
+  lifetime?: number;
+  range?: number;
+  bars?: DashboardBarItem[];
+}
+
+interface DashboardMeta {
+  range: string;
+  from: string;
+  to: string;
+  tier: "artist" | "label" | "collaborator" | string;
+  last_synced_at: string | null;
+}
+
+interface DashboardEarningHistoryItem {
+  id?: string;
+  platform?: string;
+  source?: string;
+  type?: string;
+  title?: string;
+  track?: string;
+  amount: number;
+  share?: number;
+  date?: string;
+}
+
+interface DashboardAnalyticsData {
+  streams?: DashboardMetricData;
+  releases?: DashboardMetricData;
+  artists?: DashboardMetricData;
+  earnings?: DashboardEarningsData;
+  earning_history?: DashboardEarningHistoryItem[];
+  meta?: DashboardMeta;
 }

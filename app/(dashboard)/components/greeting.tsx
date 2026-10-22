@@ -1,4 +1,6 @@
-function Greeting() {
+"use client";
+
+function getGreeting() {
   const hours = new Date().getHours();
   let greeting = "";
   if (hours < 12) {
@@ -8,10 +10,13 @@ function Greeting() {
   } else {
     greeting = "Evening";
   }
+  return greeting;
+}
 
+function Greeting() {
   return (
     <h1 className="font-heading text-3xl md:text-[32px] leading-tight font-semibold">
-      Good {greeting}, Captain 👨🏾‍🚀
+      Good {getGreeting()}, Captain 👨🏾‍🚀
     </h1>
   );
 }

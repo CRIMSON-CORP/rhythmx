@@ -38,13 +38,7 @@ const nextConfig: NextConfig = {
     },
   },
   experimental: {
-    optimizePackageImports: [
-      "lucide-react",
-      "date-fns",
-      "framer-motion",
-      "motion",
-      "radix-ui",
-    ],
+    optimizePackageImports: ["lucide-react", "date-fns", "framer-motion", "motion", "radix-ui"],
   },
 };
 

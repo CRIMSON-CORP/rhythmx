@@ -17,7 +17,7 @@ declare module "next-auth" {
       avatar_url?: string;
       phone?: string;
       role?: string;
-      account_type?: string;
+      account_type?: AccountType;
       next_step?: string | null;
     } & DefaultSession["user"];
   }
@@ -33,7 +33,7 @@ declare module "next-auth" {
     avatar_url?: string;
     phone?: string;
     role?: string;
-    account_type?: string;
+    account_type?: AccountType;
     next_step?: string | null;
   }
 }
@@ -50,7 +50,7 @@ declare module "next-auth/jwt" {
     avatar_url?: string;
     phone?: string;
     role?: string;
-    account_type?: string;
+    account_type?: AccountType;
     next_step?: string | null;
   }
 }

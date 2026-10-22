@@ -1,75 +1,65 @@
-"use client";
-import { Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Activity } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
+interface LifeTimeStreamsProps {
+  data?: DashboardMetricData;
+  rangeLabel?: string;
+}
 
-function LifeTimeStreamsInner() {
-  const searchParams = useSearchParams();
-  const timeSort = searchParams.get("time-sort");
-  let lastDays = "30 Days";
-  switch (timeSort) {
-    case "daily":
-      lastDays = "1 Day";
-      break;
-    case "weekly":
-      lastDays = "7 Days";
-      break;
-    case "monthly":
-      lastDays = "30 Days";
-      break;
-    case "yearly":
-      lastDays = "12 months";
-      break;
-  }
-
-  const dataMax = Math.max(...data);
+export default function LifeTimeStreams({
+  data,
+  rangeLabel = "30 Days",
+}: LifeTimeStreamsProps) {
+  const bars = data?.bars ?? [];
+  const dataMax = Math.max(...bars.map((b) => b.value), 1);
+  const lifetime = data?.lifetime ?? 0;
+  const rangeTotal = data?.range ?? 0;
 
   return (
-    <div className="bg-white rounded-30 basis-91.25">
+    <div className="bg-white rounded-30">
       <header className="flex items-center gap-1 text-default-tertiary px-4 py-5">
         <Activity size={16} />
         <h2 className="font-medium leading-tight">Lifetime Streams</h2>
       </header>
       <div className="flex flex-col px-6 pb-6 gap-6">
         <div className="flex flex-col gap-2 py-4 border-b border-b-default/10">
-          <span className="font-heading text-xl font-medium leading-tight">192,463,897</span>
+          <span className="font-heading text-xl font-medium leading-tight">
+            {lifetime.toLocaleString()}
+          </span>
           <span className="text-default/40 font-medium leading-tight">Streams</span>
           <Link
             href="/trends-analytics"
-            className="text-default/40 font-medium px-9 py-2.5 rounded-full bg-default/5 leading-tight self-start"
+            className="text-default/40 font-medium px-9 py-2.5 rounded-full bg-default/5 leading-tight self-start hover:bg-default/10 transition-colors"
           >
             See trends
           </Link>
         </div>
         <div className="flex flex-col gap-2 self-stretch">
-          <span className="font-heading text-xl font-medium leading-tight">874,376</span>
-          <span className="text-default/40 font-medium leading-tight">
-            Total Stream Last {lastDays}
+          <span className="font-heading text-xl font-medium leading-tight">
+            {rangeTotal.toLocaleString()}
           </span>
-          <div className="flex items-end justify-between h-12.5">
-            {data.map((amount, index) => (
-              <div
-                key={index}
-                style={{ height: (amount / dataMax) * 100 + "%" }}
-                className="bg-brand-blue rounded-full w-1.5"
-              ></div>
-            ))}
+          <span className="text-default/40 font-medium leading-tight">
+            Total Stream Last {rangeLabel}
+          </span>
+          <div className="flex items-end justify-between h-12.5 gap-0.5">
+            {bars.map((bar, index) => {
+              const heightPercent = bar.value > 0 ? Math.max((bar.value / dataMax) * 100, 8) : 8;
+              return (
+                <div
+                  key={bar.date || index}
+                  title={`${bar.date}: ${bar.value.toLocaleString()}`}
+                  style={{ height: `${heightPercent}%` }}
+                  className={cn(
+                    "rounded-full w-1.5 transition-all",
+                    bar.value > 0 ? "bg-brand-blue" : "bg-brand-blue/20"
+                  )}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function LifeTimeStreams() {
-  return (
-    <Suspense
-      fallback={<div className="bg-white rounded-30 basis-91.25 h-[230px] animate-pulse" />}
-    >
-      <LifeTimeStreamsInner />
-    </Suspense>
   );
 }

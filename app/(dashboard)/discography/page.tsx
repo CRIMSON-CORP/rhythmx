@@ -40,14 +40,12 @@ function DisocgraphyPage() {
           {releases.map((release) => (
             <ReleaseCard
               key={release.id}
-              id={release.id}
-              name={release.name}
-              href={release.href}
-              imageSrc={release.imageSrc}
-              sources={release.sources}
-              engagements={release.engagements}
-              title={release.title}
+              reference={release.id.toString()}
+              title={release.name}
               type={release.type}
+              total_streams={release.engagements}
+              platforms={[]}
+              cover_url={release.imageSrc}
             />
           ))}
         </ReleaseCards>
@@ -107,14 +105,12 @@ function DisocgraphyPage() {
           {releases.map((release) => (
             <ReleaseCard
               key={release.id}
-              id={release.id}
-              name={release.name}
-              href={release.href}
-              imageSrc={release.imageSrc}
-              sources={release.sources}
-              engagements={release.engagements}
-              title={release.title}
+              reference={release.id.toString()}
+              title={release.name}
               type={release.type}
+              total_streams={release.engagements}
+              cover_url={release.imageSrc}
+              platforms={[]}
             />
           ))}
         </ReleaseCards>

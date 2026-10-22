@@ -10,7 +10,7 @@ function ReleaseCard({
   total_streams,
   type,
   platforms = [],
-}: Release) {
+}: Pick<Release, "reference" | "cover_url" | "title" | "type" | "total_streams" | "platforms">) {
   const shownPlatforms = platforms.slice(0, 2);
   const hasMorePlatforms = platforms.length > 2;
   return (
