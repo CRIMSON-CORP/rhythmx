@@ -75,9 +75,12 @@ export const API_ROUTES = {
     PHOTO: (reference: string) => `/api/label/artists/${reference}/photo`,
   },
   ANALYTICS: {
-    OVERVIEW: (range: string = "30d") => `/api/analytics/overview?range=${encodeURIComponent(range)}`,
-    PLATFORMS: (range: string = "30d") => `/api/analytics/platforms?range=${encodeURIComponent(range)}`,
-    COUNTRIES: (range: string = "30d") => `/api/analytics/countries?range=${encodeURIComponent(range)}`,
+    OVERVIEW: (range: string = "30d") =>
+      `/api/analytics/overview?range=${encodeURIComponent(range)}`,
+    PLATFORMS: (range: string = "30d") =>
+      `/api/analytics/platforms?range=${encodeURIComponent(range)}`,
+    COUNTRIES: (range: string = "30d") =>
+      `/api/analytics/countries?range=${encodeURIComponent(range)}`,
   },
   NOTFICATIONS: {
     LIST: "/api/notifications",
@@ -86,6 +89,7 @@ export const API_ROUTES = {
     ACCEPT: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/accept`,
     DECLINE: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/decline`,
   },
+  SEARCH: (q: string = "") => `/api/search?q=${encodeURIComponent(q)}`,
   META: {
     COUNTRIES: "/api/meta/countries",
     BANKS: "/api/meta/banks",

@@ -271,6 +271,18 @@ interface NotificationsData {
   };
 }
 
+interface SearchResult {
+  reference: string;
+  title: string;
+  cover_url: string;
+  type: string;
+  platforms: string[];
+}
+
+interface SearchResponseData {
+  results: SearchResult[];
+}
+
 interface Country {
   code: string;
   name: string;
