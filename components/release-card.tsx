@@ -40,7 +40,7 @@ function ReleaseCard({
                 key={index}
                 className="px-2.5 py-1 rounded-full bg-[#F2F2F7]/10 backdrop-blur-lg"
               >
-                {platform.name}
+                {platform}
               </span>
             ))}
             {hasMorePlatforms && (

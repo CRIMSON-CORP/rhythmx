@@ -367,7 +367,7 @@ interface Release {
    * @description total plays across all its songs, all time. Plays, not money.
    */
   total_streams: number;
-  platforms: ReleasePlatform[];
+  platforms: string[];
 }
 
 interface ArtistRelease {

@@ -2,7 +2,7 @@ import Icon from "@/components/icon";
 import { formatCount } from "@/lib/count-formatter";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowUp, DollarSign, Edit, Music } from "lucide-react";
+import { ArrowLeft, DollarSign, Edit, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
@@ -35,7 +35,6 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
           <div className="bg-white flex items-center gap-2.5 px-5 py-4 rounded-full font-medium">
             <span className="text-sm text-border-default-secondary">All Platform plays</span>
             <span className="font-semibold">{formatCount(release.all_platform_plays)}</span>
-            <ArrowUp size={32} className="text-positive-tertiary" />
           </div>
         </div>
         <div className="flex items-center gap-3">

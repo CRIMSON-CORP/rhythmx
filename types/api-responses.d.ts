@@ -605,3 +605,22 @@ interface WithdrawalRequestConfirmResponse {
     balance: string;
   };
 }
+
+interface ReleaseStatusCounts {
+  draft?: number;
+  pending_review?: number;
+  approved?: number;
+  rejected?: number;
+  distributed?: number;
+  on_hold?: number;
+  taken_down?: number;
+}
+
+interface ReleasesResponse {
+  releases: Release[];
+  meta?: {
+    pagination?: PaginationMeta;
+    counts?: ReleaseStatusCounts;
+  };
+}
+
