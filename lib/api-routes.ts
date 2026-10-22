@@ -81,6 +81,10 @@ export const API_ROUTES = {
   },
   NOTFICATIONS: {
     LIST: "/api/notifications",
+    READ_ALL: "/api/notifications/read-all",
+    READ: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/read`,
+    ACCEPT: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/accept`,
+    DECLINE: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/decline`,
   },
   META: {
     COUNTRIES: "/api/meta/countries",

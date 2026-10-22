@@ -16,8 +16,9 @@ export interface UseInfiniteScrollOptions<T> {
   initialHasMore?: boolean;
 }
 
-function areArraysShallowEqual<T>(a: T[], b: T[]): boolean {
+function areArraysShallowEqual<T>(a?: T[], b?: T[]): boolean {
   if (a === b) return true;
+  if (!a || !b) return false;
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i++) {
     if (a[i] !== b[i]) return false;
@@ -30,29 +31,27 @@ export function useInfiniteScroll<T>({
   search = "",
   debounceMs = 300,
   enabled = true,
-  initialItems = [],
+  initialItems,
   initialHasMore = true,
 }: UseInfiniteScrollOptions<T>) {
-  const [items, setItems] = useState<T[]>(initialItems);
-  const [page, setPage] = useState<number>(initialItems.length > 0 ? 2 : 1);
+  const hasInitialItems = initialItems !== undefined;
+
+  const [items, setItems] = useState<T[]>(initialItems ?? []);
+  const [page, setPage] = useState<number>(hasInitialItems ? 2 : 1);
   const [hasMore, setHasMore] = useState<boolean>(initialHasMore);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  const isInitialMount = useRef(true);
 
   // Track initial props to detect when server sends fresh data (e.g., router.refresh())
   const prevInitialItemsRef = useRef(initialItems);
   const prevInitialHasMoreRef = useRef(initialHasMore);
-  const initialItemsRef = useRef(initialItems);
-  const initialHasMoreRef = useRef(initialHasMore);
 
-  useEffect(() => {
-    initialItemsRef.current = initialItems;
-    initialHasMoreRef.current = initialHasMore;
-  }, [initialItems, initialHasMore]);
+  // Track search query changes to only trigger search fetch when search genuinely changes
+  const prevSearchRef = useRef(search);
+  const isInitialMount = useRef(true);
 
   // Keep a stable ref to fetchPage
   const fetchPageRef = useRef(fetchPage);
@@ -60,8 +59,10 @@ export function useInfiniteScroll<T>({
     fetchPageRef.current = fetchPage;
   }, [fetchPage]);
 
-  // Sync state when initialItems or initialHasMore updates (e.g. from router.refresh())
+  // Sync state when initialItems or initialHasMore updates from parent (e.g. router.refresh())
   useEffect(() => {
+    if (initialItems === undefined) return;
+
     const itemsChanged = !areArraysShallowEqual(prevInitialItemsRef.current, initialItems);
     const hasMoreChanged = prevInitialHasMoreRef.current !== initialHasMore;
 
@@ -73,30 +74,30 @@ export function useInfiniteScroll<T>({
       if (!search) {
         setItems(initialItems);
         setHasMore(initialHasMore);
-        setPage(initialItems.length > 0 ? 2 : 1);
+        setPage(2);
       }
     }
   }, [initialItems, initialHasMore, search]);
 
-  // Handle search changes or initial fetch when initialItems is empty
+  // Handle search changes or initial fetch when initialItems was omitted
   useEffect(() => {
     if (!enabled) return;
 
     if (isInitialMount.current) {
       isInitialMount.current = false;
-      // If initial items were provided and search is empty, skip fetching page 1 on mount
-      if (initialItemsRef.current.length > 0 && !search) {
+      prevSearchRef.current = search;
+
+      // If initial items were provided (even if empty []), do NOT fetch page 1 on mount!
+      if (hasInitialItems) {
         return;
       }
-    }
-
-    // When search is cleared back to empty, immediately restore initialItems if available
-    if (!search && initialItemsRef.current.length > 0) {
-      setItems(initialItemsRef.current);
-      setHasMore(initialHasMoreRef.current);
-      setPage(initialItemsRef.current.length > 0 ? 2 : 1);
-      setIsLoading(false);
-      return;
+      // If initialItems was omitted (undefined), proceed with initial fetch below
+    } else {
+      // On subsequent renders, only fetch if the search query actually changed
+      if (search === prevSearchRef.current) {
+        return;
+      }
+      prevSearchRef.current = search;
     }
 
     let isMounted = true;
@@ -110,7 +111,7 @@ export function useInfiniteScroll<T>({
           setPage(2);
         }
       } catch (err) {
-        console.error("Failed to fetch initial page:", err);
+        console.error("Failed to load initial page:", err);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -120,7 +121,7 @@ export function useInfiniteScroll<T>({
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, [search, debounceMs, enabled]);
+  }, [search, debounceMs, enabled, hasInitialItems]);
 
   // Fetch next page
   const fetchNextPage = useCallback(async () => {

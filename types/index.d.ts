@@ -243,14 +243,32 @@ interface EarningHistory {
   share: number;
 }
 
+interface NotificationRelease {
+  reference: string;
+  type: string;
+  cover_url: string;
+  platforms: string[];
+}
+
 interface Notification {
   reference: string;
+  kind?: "general" | "release_rejected" | "split_invite" | "label_invite" | string;
   title: string;
   message: string;
+  invite_status?: "pending" | "accepted" | "declined" | null | string;
+  release?: NotificationRelease | null;
   is_read: boolean;
-  read_at: string | null;
+  read_at?: string | null;
   created_at: string;
   image?: string;
+}
+
+interface NotificationsData {
+  notifications: Notification[];
+  meta?: {
+    unread_count?: number;
+    pagination?: PaginationMeta;
+  };
 }
 
 interface Country {

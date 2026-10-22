@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { Suspense } from "react";
 import HeaderWalletBalance from "./header-wallet-balance";
+import HeaderNotifications from "./header-notifications";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -123,10 +124,15 @@ async function Header() {
               <Search />
             </DialogContent>
           </Dialog>
-          <Link href="/notifications" className="relative @max-2xl:hidden">
-            <Inbox size={24} />
-            <span className="absolute size-2.5 bg-danger-default rounded-full top-0 right-0 block" />
-          </Link>
+          <Suspense
+            fallback={
+              <Link href="/notifications" className="relative @max-2xl:hidden" aria-label="Notifications">
+                <Inbox size={24} />
+              </Link>
+            }
+          >
+            <HeaderNotifications />
+          </Suspense>
           <Link
             href="/wallet"
             className="flex items-center gap-3 bg-brand-orange/10 rounded-full px-2.5 py-2 pl-4 @max-4xl:hidden"

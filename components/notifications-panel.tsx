@@ -4,10 +4,22 @@ import { X } from "lucide-react";
 import * as React from "react";
 import { Dialog as DialogPrimitive, VisuallyHidden } from "radix-ui";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 
 export default function NotificationsPanel({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(true);
+
+  React.useEffect(() => {
+    // Notify header client component to clear red unread dot immediately
+    window.dispatchEvent(new CustomEvent("notifications:read-all"));
+
+    // Call backend endpoint to mark all as read
+    api.post(API_ROUTES.NOTFICATIONS.READ_ALL, {}).catch((err) => {
+      console.error("Failed to mark all notifications as read:", err);
+    });
+  }, []);
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
