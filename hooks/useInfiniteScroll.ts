@@ -39,7 +39,7 @@ export function useInfiniteScroll<T>({
   const [items, setItems] = useState<T[]>(initialItems ?? []);
   const [page, setPage] = useState<number>(hasInitialItems ? 2 : 1);
   const [hasMore, setHasMore] = useState<boolean>(initialHasMore);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(!hasInitialItems && enabled);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -49,7 +49,7 @@ export function useInfiniteScroll<T>({
   const prevInitialItemsRef = useRef(initialItems);
   const prevInitialHasMoreRef = useRef(initialHasMore);
 
-  // Track search query changes to only trigger search fetch when search genuinely changes
+  // Track search query changes
   const prevSearchRef = useRef(search);
   const isInitialMount = useRef(true);
 
@@ -79,26 +79,50 @@ export function useInfiniteScroll<T>({
     }
   }, [initialItems, initialHasMore, search]);
 
-  // Handle search changes or initial fetch when initialItems was omitted
+  // Initial fetch when initialItems was omitted (client-driven components)
+  useEffect(() => {
+    if (!enabled || hasInitialItems) return;
+
+    let isMounted = true;
+    setIsLoading(true);
+
+    fetchPageRef
+      .current(1, search)
+      .then((result) => {
+        if (isMounted) {
+          setItems(result.items);
+          setHasMore(result.hasMore);
+          setPage(2);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load initial page:", err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [enabled, hasInitialItems, search]);
+
+  // Handle subsequent search query changes (debounced)
   useEffect(() => {
     if (!enabled) return;
 
+    // Skip on initial mount — the initial fetch effect or initialItems handles page 1
     if (isInitialMount.current) {
       isInitialMount.current = false;
       prevSearchRef.current = search;
-
-      // If initial items were provided (even if empty []), do NOT fetch page 1 on mount!
-      if (hasInitialItems) {
-        return;
-      }
-      // If initialItems was omitted (undefined), proceed with initial fetch below
-    } else {
-      // On subsequent renders, only fetch if the search query actually changed
-      if (search === prevSearchRef.current) {
-        return;
-      }
-      prevSearchRef.current = search;
+      return;
     }
+
+    // Only fetch if the search query actually changed
+    if (search === prevSearchRef.current) {
+      return;
+    }
+    prevSearchRef.current = search;
 
     let isMounted = true;
     const timeoutId = setTimeout(async () => {
@@ -111,7 +135,7 @@ export function useInfiniteScroll<T>({
           setPage(2);
         }
       } catch (err) {
-        console.error("Failed to load initial page:", err);
+        console.error("Failed to load search results:", err);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -121,7 +145,7 @@ export function useInfiniteScroll<T>({
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, [search, debounceMs, enabled, hasInitialItems]);
+  }, [search, debounceMs, enabled]);
 
   // Fetch next page
   const fetchNextPage = useCallback(async () => {
