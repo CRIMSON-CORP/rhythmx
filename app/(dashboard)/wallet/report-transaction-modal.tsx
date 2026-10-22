@@ -1,7 +1,7 @@
 "use client";
 import { MessageSquare, X } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Icon from "@/components/icon";
 import {
@@ -18,16 +18,42 @@ import { goeyToast } from "goey-toast";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
+import { cn } from "@/lib/utils";
 
 function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
   const [open, setOpen] = useState(false);
+  const [refId, setRefId] = useState(defaultRefId || "");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const isReadOnly = Boolean(defaultRefId);
+
+  useEffect(() => {
+    if (defaultRefId) {
+      setRefId(defaultRefId);
+    }
+  }, [defaultRefId]);
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (!nextOpen) {
+      setDescription("");
+      if (!defaultRefId) {
+        setRefId("");
+      }
+    } else {
+      if (defaultRefId) {
+        setRefId(defaultRefId);
+      }
+    }
+  };
 
   const handleSubmit = async () => {
     if (loading) return;
 
-    if (!defaultRefId || !description.trim()) {
+    const targetRefId = (defaultRefId || refId).trim();
+
+    if (!targetRefId || !description.trim()) {
       goeyToast.error("Transaction Reference ID and Description are required.");
       return;
     }
@@ -35,11 +61,14 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
     setLoading(true);
 
     try {
-      await api.post(API_ROUTES.EARNINGS.TRANSACTIONS.REPORT(defaultRefId), {
+      await api.post(API_ROUTES.EARNINGS.TRANSACTIONS.REPORT(targetRefId), {
         description: description.trim(),
       });
       goeyToast.success("Transaction reported successfully.");
       setDescription("");
+      if (!defaultRefId) {
+        setRefId("");
+      }
       setOpen(false);
     } catch (err: unknown) {
       const message =
@@ -51,7 +80,7 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="white">
           <span>Report Transaction</span>
@@ -98,10 +127,15 @@ function ReportTransactionModal({ defaultRefId }: { defaultRefId?: string }) {
               </label>
               <input
                 type="text"
-                placeholder="Enter the transaction"
-                readOnly
-                className={`w-full px-4 py-3.5 rounded-10 outline outline-default-default text-default font-medium placeholder:text-neutral-400 transition-colors focus:outline-black bg-neutral-100/70 cursor-not-allowed select-all disabled:opacity-50`}
-                value={defaultRefId}
+                placeholder="Enter the transaction reference ID"
+                readOnly={isReadOnly}
+                disabled={loading}
+                value={isReadOnly ? defaultRefId : refId}
+                onChange={(e) => !isReadOnly && setRefId(e.target.value)}
+                className={cn(
+                  "w-full px-4 py-3.5 rounded-10 outline outline-default-default text-default font-medium placeholder:text-neutral-400 transition-colors focus:outline-black disabled:opacity-50",
+                  isReadOnly ? "bg-neutral-100/70 cursor-not-allowed select-all" : "bg-white cursor-text"
+                )}
               />
             </div>
 
