@@ -4,34 +4,35 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function PlanBillingLayout({ children }: { children: React.ReactNode }) {
+function TabLink({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname();
-  const isBilling = pathname.endsWith("/plan-billing/billing");
+  const isActive =
+    href === "/settings/plan-billing"
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
 
+  return (
+    <Link
+      href={href}
+      className={`px-4 py-2 rounded-full transition-all ${
+        isActive
+          ? "outline outline-default bg-white text-default font-medium"
+          : "text-grey hover:text-default"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
+export default function PlanBillingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col h-full bg-page-background">
       {/* Top Switcher */}
       <div className="flex justify-center gap-3 p-3 shrink-0">
-        <Link
-          href="/settings/plan-billing"
-          className={`px-4 py-2 rounded-full transition-all ${
-            !isBilling
-              ? "outline outline-default bg-white text-default"
-              : "text-grey hover:text-default"
-          }`}
-        >
-          Manage Plan
-        </Link>
-        <Link
-          href="/settings/plan-billing/billing"
-          className={`px-4 py-2 rounded-full transition-all ${
-            isBilling
-              ? "outline outline-default bg-white text-default"
-              : "text-grey hover:text-default"
-          }`}
-        >
-          Billings
-        </Link>
+        <TabLink href="/settings/plan-billing">Manage Plan</TabLink>
+        <TabLink href="/settings/plan-billing/billing">Billings</TabLink>
+        <TabLink href="/settings/plan-billing/sharing">Sharing</TabLink>
       </div>
 
       {/* Scrollable Sub-Page Content */}
