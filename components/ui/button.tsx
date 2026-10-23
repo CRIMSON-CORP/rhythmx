@@ -18,6 +18,8 @@ const buttonVariants = cva(
           "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
         blue: "bg-brand-blue text-white outline-blue hover:brightness-80",
         orange: "bg-brand-orange rounded-full gap-2 text-white outline outline-black",
+        "orange-outline":
+          "bg-white text-black outline outline-brand-orange hover:bg-brand-orange/20 text-brand-orange",
         purple: "bg-brand-purple-2 rounded-full gap-2 text-white hover:bg-brand-purple",
         link: "text-primary underline-offset-4 hover:underline",
         destructive:
