@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "./components/header";
-import SessionUpdateListener from "@/components/SessionUpdateListener";
+
 function DashbaordLayout({
   children,
   notifications,
@@ -16,7 +16,6 @@ function DashbaordLayout({
         <Header />
         <main className="flex flex-col h-full overflow-auto">{children}</main>
       </div>
-      <SessionUpdateListener />
       {notifications}
       {settings}
     </>

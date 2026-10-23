@@ -76,51 +76,75 @@ export const api = {
     // Handle Token Expiry
     if (response.status === 401) {
       const session = await getUserSession();
-      const refreshResponse = await fetch(BACKEND_API_URL + API_ROUTES.AUTH.REFRESH, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ refresh_token: session?.refresh_token }),
-      });
 
-      // Refresh failed -> Force Logout
-      if (refreshResponse.status === 401) {
+      if (!session?.refresh_token) {
         if (typeof window !== "undefined") {
           signOut();
+          return new Promise(() => {}); // Halts caller cleanly while the browser page redirects
         } else {
           const { redirect } = await import("next/navigation");
           redirect("/api/auth/logout");
         }
-        return;
+        throw new Error("Unauthorized: Session Expired");
       }
 
-      const refreshPayload = await refreshResponse.json();
-      const dataObj = refreshPayload.data;
-      const newAccessToken = dataObj.access_token;
-      const newRefreshToken = dataObj.refresh_token;
+      let refreshResponse: Response;
+      try {
+        refreshResponse = await fetch(BACKEND_API_URL + API_ROUTES.AUTH.REFRESH, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ refresh_token: session.refresh_token }),
+        });
+      } catch {
+        return this.parseAndValidate(response);
+      }
 
-      // Fix: Retry the original request with the new token & sync NextAuth session
-      if (newAccessToken) {
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("auth:update-session", {
-              detail: {
-                access_token: newAccessToken,
-                refresh_token: newRefreshToken,
-              },
-            }),
-          );
+      // 1. Refresh succeeded -> Retry original request & sync NextAuth session
+      if (refreshResponse.ok) {
+        const refreshPayload = await refreshResponse.json().catch(() => null);
+        const dataObj = refreshPayload?.data;
+        const newAccessToken = dataObj?.tokens?.access_token || dataObj?.access_token;
+        const newRefreshToken =
+          dataObj?.tokens?.refresh_token || dataObj?.refresh_token || session.refresh_token;
+
+        if (newAccessToken) {
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(
+              new CustomEvent("auth:update-session", {
+                detail: {
+                  access_token: newAccessToken,
+                  refresh_token: newRefreshToken,
+                },
+              }),
+            );
+          }
+
+          const retryOptions = {
+            ...originalOptions,
+            headers: {
+              ...originalOptions.headers,
+              Authorization: `Bearer ${newAccessToken}`,
+            },
+          };
+          const retryResponse = await fetch(BACKEND_API_URL + originalUrl, retryOptions);
+          return this.parseAndValidate(retryResponse);
         }
-
-        const retryOptions = {
-          ...originalOptions,
-          headers: {
-            ...originalOptions.headers,
-            Authorization: `Bearer ${newAccessToken}`,
-          },
-        };
-        const retryResponse = await fetch(BACKEND_API_URL + originalUrl, retryOptions);
-        return this.parseAndValidate(retryResponse);
       }
+
+      // 2. Refresh token rejected/expired -> Force Logout
+      if (refreshResponse.status === 401 || refreshResponse.status === 403) {
+        if (typeof window !== "undefined") {
+          signOut();
+          return new Promise(() => {}); // Halts caller cleanly while the browser page redirects
+        } else {
+          const { redirect } = await import("next/navigation");
+          redirect("/api/auth/logout");
+        }
+        throw new Error("Unauthorized: Session Expired");
+      }
+
+      // 3. Temporary server error (5xx, etc.) -> Don't log out or crash, return parsed error
+      return this.parseAndValidate(response);
     }
 
     return this.parseAndValidate(response);
@@ -128,15 +152,15 @@ export const api = {
 
   async parseAndValidate(response: Response) {
     let data;
-    const savedResponse = response.clone();
+    const responseText = await response.text();
     try {
-      data = await response.json();
+      data = JSON.parse(responseText);
     } catch (error) {
       if (typeof window === "undefined") {
         try {
-          const { writeTextToFile } = await import("./write-file");
-          const text = await savedResponse.text();
-          await writeTextToFile(text);
+          const { writeFile } = await import("node:fs/promises");
+          const path = await import("node:path");
+          await writeFile(path.resolve(process.cwd(), "non-json-logs.log"), responseText, "utf-8");
         } catch {
           // ignore logging failure
         }

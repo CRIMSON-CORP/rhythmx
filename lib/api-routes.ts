@@ -111,6 +111,7 @@ export const API_ROUTES = {
     GET: "/api/subscription",
     START: "/api/subscription/start",
     CANCEL: "/api/subscription/cancellation",
+    MEMBER_INVITATIONS: "/api/subscription/member-invitations",
   },
   PAYMENTS: {
     CURRENCIES: "/api/payments/currencies",
