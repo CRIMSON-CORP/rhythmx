@@ -52,12 +52,8 @@ function Page() {
 
         const callbackUrl = new URLSearchParams(window.location.search).get("callbackUrl") || "/";
         window.location.href = callbackUrl || "/";
-      } else if (res.error) {
-        if (res.status === 401) {
-          setErrors({ form: res.error || "Invalid email or Password" });
-          return;
-        }
-        throw res;
+      } else {
+        setErrors({ form: res.error || "" });
       }
     } catch (err: unknown) {
       setErrors({

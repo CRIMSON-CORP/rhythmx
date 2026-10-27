@@ -73,8 +73,20 @@ export const api = {
   async processRequest(response: Response, originalUrl: string, originalOptions: RequestInit) {
     if (!response) throw new Error("Network request failed");
 
-    // Handle Token Expiry
-    if (response.status === 401) {
+    const isAuthRoute =
+      originalUrl === API_ROUTES.AUTH.LOGIN ||
+      originalUrl === API_ROUTES.AUTH.REGISTER ||
+      originalUrl === API_ROUTES.AUTH.VERIFY ||
+      originalUrl === API_ROUTES.AUTH.REFRESH ||
+      originalUrl === API_ROUTES.AUTH.SOCIAL;
+
+    const headersRecord = originalOptions.headers as Record<string, string> | undefined;
+    const hasAuthToken = Boolean(
+      headersRecord?.["Authorization"] || headersRecord?.["authorization"],
+    );
+
+    // Handle Token Expiry only for authenticated requests outside of auth endpoints
+    if (response.status === 401 && !isAuthRoute && hasAuthToken) {
       const session = await getUserSession();
 
       if (!session?.refresh_token) {
@@ -172,9 +184,9 @@ export const api = {
     }
 
     if (!data.status) {
-      const newError = Object.assign(new Error(), {
+      const newError = Object.assign(new Error(data.message || "Request failed"), {
         errors: data.errors,
-        message: data.message,
+        message: data.message || "Request failed",
       });
       if (typeof window !== "undefined") {
         goeyToast.error(data.message, { id: CONSTANTS.GLOBAL_ERROR_TOAST_ID });

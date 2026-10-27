@@ -32,7 +32,11 @@ function Input({ type = "text", name, label, error, prefilled, ...props }: Input
           {...props}
         />
         {type === "password" ? (
-          <button type="button" onClick={toggle}>
+          <button
+            type="button"
+            onClick={toggle}
+            className="cursor-pointer bg-transparent outline-none border-none z-10"
+          >
             <InputGroupAddon align="inline-end">
               {isOpen ? <EyeOff size={16} /> : <Eye size={16} />}
             </InputGroupAddon>

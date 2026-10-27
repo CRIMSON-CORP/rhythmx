@@ -46,10 +46,8 @@ function VerifyForm() {
 
       if (res?.ok) {
         window.location.href = "/auth/create-account";
-      } else if (res?.error) {
-        setErrors({ form: res.error });
       } else {
-        setErrors({ form: "Verification failed. Please try again." });
+        setErrors({ form: res?.error ?? undefined });
       }
     } catch (err: unknown) {
       console.error("Verification error:", err);
