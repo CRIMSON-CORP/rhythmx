@@ -10,11 +10,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { api } from "@/lib/api";
+import { API_ROUTES } from "@/lib/api-routes";
 import { VisuallyHidden } from "radix-ui";
 import { goeyToast } from "goey-toast";
 
 export interface PlanMember {
   id: string;
+  reference?: string;
   name: string;
   email: string;
   status: "active" | "pending";
@@ -25,7 +28,7 @@ interface RemoveMemberModalProps {
   member: PlanMember;
   planName?: string;
   trigger?: React.ReactNode;
-  onRemove?: () => void;
+  onRemove?: (memberRef: string) => void;
 }
 
 export default function RemoveMemberModal({
@@ -41,16 +44,19 @@ export default function RemoveMemberModal({
   const firstName = member.name ? member.name.split(" ")[0] : "User";
 
   const handleRemove = async () => {
+    const memberRef = member.reference || member.id;
     try {
       setLoading(true);
-      // Backend route pending; simulate and trigger router.refresh per user specification
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await api.delete(API_ROUTES.SUBSCRIPTION.MEMBERS(memberRef));
       goeyToast.success(`${member.name} has been removed from your plan.`);
       setOpen(false);
-      onRemove?.();
-      router.refresh();
-    } catch {
-      goeyToast.error("Failed to remove member.");
+      onRemove?.(memberRef);
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : (err as { message?: string })?.message || "Failed to remove member.";
+      goeyToast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -81,9 +87,7 @@ export default function RemoveMemberModal({
 
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-black/5">
-          <h2 className="text-base font-semibold text-default">
-            Remove {firstName} from your plan?
-          </h2>
+          <h2 className="font-medium text-black">Remove {firstName} from your plan?</h2>
           <DialogClose asChild>
             <button
               type="button"
@@ -98,13 +102,19 @@ export default function RemoveMemberModal({
         <div className="px-6 py-6 flex flex-col gap-5">
           {/* Trash Icon */}
           <div className="w-8 h-8 flex items-center justify-start text-default">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 28 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
-                d="M19.25 5.4167L18.5267 17.113C18.3423 20.1 18.2502 21.595 17.5 22.669C17.1297 23.2 16.6529 23.649 16.1 23.985C14.9835 24.667 13.4867 24.667 10.493 24.667C7.4947 24.667 5.9955 24.667 4.8767 23.984C4.3235 23.647 3.8467 23.198 3.4767 22.666C2.7277 21.59 2.6367 20.093 2.457 17.101L1.75 5.4167M7 12.6909H14M8.75 17.263H12.25M0 5.4167H21M15.2308 5.4167L14.4352 3.774C13.9055 2.682 13.6418 2.1372 13.1857 1.7965C13.0843 1.7211 12.977 1.654 12.8648 1.5959C12.3597 1.3334 11.753 1.3334 10.5397 1.3334C9.2972 1.3334 8.6753 1.3334 8.1608 1.6064C8.0471 1.6673 7.9386 1.7375 7.8365 1.8164C7.3745 2.1699 7.1167 2.7357 6.601 3.8662L5.8952 5.4167"
-                stroke="currentColor"
+                d="M22.75 6.41671L22.0267 18.1125C21.8423 21.1004 21.7502 22.5949 21 23.6694C20.6297 24.2004 20.1529 24.6486 19.6 24.9854C18.4835 25.6667 16.9867 25.6667 13.993 25.6667C10.9947 25.6667 9.4955 25.6667 8.37667 24.9842C7.82354 24.6467 7.34675 24.1977 6.97667 23.6659C6.22767 22.5902 6.13667 21.0934 5.957 18.1009L5.25 6.41671M10.5 13.6909H17.5M12.25 18.263H15.75M3.5 6.41671H24.5M18.7308 6.41671L17.9352 4.77404C17.4055 3.68204 17.1418 3.13721 16.6857 2.79654C16.5843 2.72108 16.477 2.65397 16.3648 2.59587C15.8597 2.33337 15.253 2.33337 14.0397 2.33337C12.7972 2.33337 12.1753 2.33337 11.6608 2.60637C11.5471 2.66729 11.4386 2.73753 11.3365 2.81637C10.8745 3.16987 10.6167 3.73571 10.101 4.86621L9.39517 6.41671"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                stroke="black"
               />
             </svg>
           </div>
@@ -130,8 +140,8 @@ export default function RemoveMemberModal({
 
           {/* Warning Copy */}
           <p className="text-sm text-border-default-secondary leading-relaxed">
-            {firstName} will lose access to your shared {planName} Plan when you remove them. Taylor&apos;s
-            pending invitation will stay in place.
+            {firstName} will lose access to your shared {planName} Plan when you remove them.
+            Taylor&apos;s pending invitation will stay in place.
           </p>
 
           {/* Actions */}

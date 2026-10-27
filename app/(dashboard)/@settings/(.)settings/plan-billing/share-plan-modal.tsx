@@ -22,6 +22,7 @@ interface SharePlanModalProps {
   subscriberName: string;
   disabled?: boolean;
   trigger?: React.ReactNode;
+  onInviteSent?: (invite: SubscriptionMemberInvite) => void;
 }
 
 export default function SharePlanModal({
@@ -29,11 +30,13 @@ export default function SharePlanModal({
   subscriberName,
   disabled = false,
   trigger,
+  onInviteSent,
 }: SharePlanModalProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"form" | "sent">("form");
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const planName = subscription?.plan?.name || "Active";
@@ -44,6 +47,7 @@ export default function SharePlanModal({
       setTimeout(() => {
         setStep("form");
         setEmail("");
+        setEmailError(null);
         setLoading(false);
       }, 200);
     }
@@ -53,22 +57,34 @@ export default function SharePlanModal({
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed) {
-      goeyToast.error("Please enter an email address.");
+      setEmailError("Please enter an email address.");
       return;
     }
 
     try {
       setLoading(true);
-      await api.post(API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS, {
-        email: trimmed,
-      });
+      setEmailError(null);
+      const res = await api.post<MemberInvitationResponse>(
+        API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS,
+        {
+          email: trimmed,
+        }
+      );
+
+      if (res?.invite) {
+        onInviteSent?.(res.invite);
+      }
 
       setStep("sent");
     } catch (err: unknown) {
+      const errorObj = err as { errors?: Record<string, string>; message?: string };
+      if (errorObj?.errors?.email) {
+        setEmailError(errorObj.errors.email);
+      }
       const errorMsg =
         err instanceof Error
           ? err.message
-          : (err as { message?: string })?.message || "Failed to send invite.";
+          : errorObj?.message || "Failed to send invite.";
       goeyToast.update(CONSTANTS.GLOBAL_ERROR_TOAST_ID, { title: errorMsg });
     } finally {
       setLoading(false);
@@ -166,13 +182,24 @@ export default function SharePlanModal({
                 autoComplete="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError(null);
+                }}
                 placeholder="jordan.lee@example.com"
-                className="w-full px-4 py-3 rounded-xl border border-default-default text-sm text-default placeholder:text-neutral-400 outline-none focus:border-black focus:ring-1 focus:ring-black transition-all bg-white"
+                className={`w-full px-4 py-3 rounded-xl border text-sm text-default placeholder:text-neutral-400 outline-none transition-all bg-white ${
+                  emailError
+                    ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    : "border-default-default focus:border-black focus:ring-1 focus:ring-black"
+                }`}
               />
-              <span className="text-sm text-border-default-secondary">
-                Use the email address they use for their account.
-              </span>
+              {emailError ? (
+                <span className="text-xs text-red-500 font-medium">{emailError}</span>
+              ) : (
+                <span className="text-sm text-border-default-secondary">
+                  Use the email address they use for their account.
+                </span>
+              )}
             </div>
 
             {/* Actions */}

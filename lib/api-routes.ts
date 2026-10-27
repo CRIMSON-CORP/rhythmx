@@ -112,6 +112,12 @@ export const API_ROUTES = {
     START: "/api/subscription/start",
     CANCEL: "/api/subscription/cancellation",
     MEMBER_INVITATIONS: "/api/subscription/member-invitations",
+    RESEND_INVITATION: (inviteId: number | string) =>
+      `/api/subscription/member-invitations/${encodeURIComponent(inviteId)}/resend`,
+    CANCEL_INVITATION: (inviteId: number | string) =>
+      `/api/subscription/member-invitations/${encodeURIComponent(inviteId)}`,
+    MEMBERS: (reference?: string) =>
+      reference ? `/api/subscription/members/${encodeURIComponent(reference)}` : "/api/subscription/members",
   },
   PAYMENTS: {
     CURRENCIES: "/api/payments/currencies",

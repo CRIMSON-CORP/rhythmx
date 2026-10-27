@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import BillingErrorToast from "./billing-error-toast";
 
 function TabLink({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -28,6 +29,10 @@ function TabLink({ href, children }: { href: string; children: React.ReactNode }
 export default function PlanBillingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col h-full bg-page-background">
+      <React.Suspense fallback={null}>
+        <BillingErrorToast />
+      </React.Suspense>
+
       {/* Top Switcher */}
       <div className="flex justify-center gap-3 p-3 shrink-0">
         <TabLink href="/settings/plan-billing">Manage Plan</TabLink>

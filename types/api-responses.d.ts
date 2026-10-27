@@ -393,6 +393,30 @@ interface SubscriptionResponse {
   history?: SubscriptionPaymentHistoryItem[];
 }
 
+interface SharedMember {
+  member_id: number;
+  name: string;
+  email: string;
+  reference?: string;
+}
+
+interface SubscriptionMemberInvite {
+  invite_id: number;
+  email: string;
+  name?: string | null;
+  status: "pending" | "accepted" | "cancelled" | "expired" | string;
+  expires_at?: string;
+}
+
+interface SubscriptionSharingResponse {
+  member: SharedMember | null;
+  invites: SubscriptionMemberInvite[];
+}
+
+interface MemberInvitationResponse {
+  invite: SubscriptionMemberInvite;
+}
+
 interface StartSubscriptionResponse {
   reference: string;
   payment_link: string;
