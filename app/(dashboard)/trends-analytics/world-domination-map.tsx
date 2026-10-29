@@ -177,7 +177,7 @@ export default function WorldDominationMap({
                     <Music2 size={11} className="text-[#00F2EA]" /> Streams
                   </span>
                   <span className="font-medium text-white text-xs">
-                    {hoverState.country.streams.toLocaleString()}
+                    {(hoverState.country.streams ?? 0).toLocaleString()}
                   </span>
                 </div>
 
@@ -186,7 +186,7 @@ export default function WorldDominationMap({
                     <Download size={11} className="text-[#00F2EA]" /> Downloads
                   </span>
                   <span className="font-medium text-white text-xs">
-                    {hoverState.country.downloads.toLocaleString()}
+                    {(hoverState.country.downloads ?? 0).toLocaleString()}
                   </span>
                 </div>
 
@@ -195,7 +195,7 @@ export default function WorldDominationMap({
                     <DollarSign size={11} className="text-[#00F2EA]" /> Revenue
                   </span>
                   <span className="font-semibold text-white text-xs">
-                    {formatCurrency(hoverState.country.revenue, currency)}
+                    {formatCurrency(hoverState.country.revenue ?? 0, currency)}
                   </span>
                 </div>
               </div>

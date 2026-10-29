@@ -11,12 +11,10 @@ import Releases from "../discography/releases";
 import PlatformRangeSelect from "@/components/platform-range-select";
 import Image from "next/image";
 import WorldDominationMap from "./world-domination-map";
+import MiniBarChart from "./mini-bar-chart";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { formatCurrency } from "@/lib/utils";
-
-const data = [15, 21, 6, 10, 9, 20, 23, 10, 3, 24, 16, 22, 4, 5];
-const dataMax = Math.max(...data);
 
 const VALID_RANGES = ["7d", "14d", "30d", "60d", "120d", "180d", "1yr"] as const;
 
@@ -45,38 +43,28 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
     ? rawPlatformRange
     : "30d";
 
-  const [analysisRes, platformsRes, countriesRes] = await Promise.all([
-    api.get<AnalysisOverViewResponse>(API_ROUTES.ANALYTICS.OVERVIEW("30d")).catch((err) => {
+  const analysisRes = await api
+    .get<AnalysisOverViewResponse>(API_ROUTES.ANALYTICS.OVERVIEW(platformRange))
+    .catch((err) => {
       console.error("Failed to load analytics overview:", err);
       return null;
-    }),
-    api
-      .get<AnalyticsPlatformsResponse>(API_ROUTES.ANALYTICS.PLATFORMS(platformRange))
-      .catch((err) => {
-        console.error("Failed to load analytics platforms:", err);
-        return null;
-      }),
-    api
-      .get<AnalyticsCountriesResponse>(API_ROUTES.ANALYTICS.COUNTRIES("30d"))
-      .catch((err) => {
-        console.error("Failed to load analytics countries:", err);
-        return null;
-      }),
-  ]);
+    });
 
   const analysis: AnalysisOverViewResponse = analysisRes || {
-    streams: { lifetime: 0, range: 0 },
-    downloads: { lifetime: 0, range: 0 },
-    artists: { lifetime: 0, range: 0 },
+    streams: { lifetime: 0, range: 0, bars: [] },
+    downloads: { lifetime: 0, range: 0, bars: [] },
+    artists: { lifetime: 0, range: 0, bars: [] },
     releases: { total: 0, approved: 0, rejected: 0, pending: 0 },
     revenue: { total: 0, currency: "GBP" },
     earnings_history: [],
+    platforms: [],
+    countries: [],
   };
 
-  const platforms = platformsRes?.platforms || [];
+  const platforms = analysis.platforms || [];
   const currentRangeLabel = RANGE_LABELS[platformRange] || "30 days";
 
-  const countries = countriesRes?.countries || [];
+  const countries = analysis.countries || [];
   const totalMapLocations = 256;
   const dominationPercent =
     countries.length > 0 ? (countries.length / totalMapLocations) * 100 : 0;
@@ -174,17 +162,9 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
                     {analysis.streams.range.toLocaleString()}
                   </span>
                   <span className="text-default/40 font-medium leading-tight">
-                    Total Stream Last 30 days
+                    Total Stream Last {currentRangeLabel}
                   </span>
-                  <div className="flex items-end justify-between h-12.5">
-                    {data.map((amount, index) => (
-                      <div
-                        key={index}
-                        style={{ height: (amount / dataMax) * 100 + "%" }}
-                        className="bg-default-tertiary rounded-full w-1.5"
-                      ></div>
-                    ))}
-                  </div>
+                  <MiniBarChart bars={analysis.streams.bars} />
                 </div>
               </div>
             </div>
@@ -206,17 +186,9 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
                     {analysis.artists.range.toLocaleString()}
                   </span>
                   <span className="text-default/40 font-medium leading-tight">
-                    Total Artists Last 30 days
+                    Total Artists Last {currentRangeLabel}
                   </span>
-                  <div className="flex items-end justify-between h-12.5">
-                    {data.map((amount, index) => (
-                      <div
-                        key={index}
-                        style={{ height: (amount / dataMax) * 100 + "%" }}
-                        className="bg-default-tertiary rounded-full w-1.5"
-                      ></div>
-                    ))}
-                  </div>
+                  <MiniBarChart bars={analysis.artists.bars} />
                 </div>
               </div>
             </div>
@@ -288,42 +260,37 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
             <PlatformRangeSelect />
           </header>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))] gap-6">
-            {platforms.map((item) => (
-              <div key={item.slug || item.platform} className="bg-white rounded-30 basis-91.25 p-6">
-                <header className="flex items-center gap-2.5">
-                  {item.logo_url && (
-                    <Image
-                      src={item.logo_url}
-                      alt={item.platform}
-                      width={32}
-                      height={32}
-                      className="size-8 object-contain rounded-lg shrink-0"
-                      unoptimized
-                    />
-                  )}
-                  <h2 className="font-medium leading-tight">{item.platform}</h2>
-                </header>
-                <div className="flex flex-col py-6">
-                  <div className="flex flex-col gap-2 self-stretch">
-                    <span className="font-heading text-xl font-medium leading-tight">
-                      {item.streams.toLocaleString()}
-                    </span>
-                    <span className="text-default/40 font-medium leading-tight">
-                      Total Stream Last {currentRangeLabel}
-                    </span>
-                    <div className="flex items-end justify-between h-12.5">
-                      {data.map((amount, index) => (
-                        <div
-                          key={index}
-                          style={{ height: (amount / dataMax) * 100 + "%" }}
-                          className="bg-default-tertiary rounded-full w-1.5"
-                        ></div>
-                      ))}
+            {platforms.map((item) => {
+              const streamCount = item.total ?? item.streams ?? 0;
+              return (
+                <div key={item.slug || item.platform} className="bg-white rounded-30 basis-91.25 p-6">
+                  <header className="flex items-center gap-2.5">
+                    {item.logo_url && (
+                      <Image
+                        src={item.logo_url}
+                        alt={item.platform}
+                        width={32}
+                        height={32}
+                        className="size-8 object-contain rounded-lg shrink-0"
+                        unoptimized
+                      />
+                    )}
+                    <h2 className="font-medium leading-tight">{item.platform}</h2>
+                  </header>
+                  <div className="flex flex-col py-6">
+                    <div className="flex flex-col gap-2 self-stretch">
+                      <span className="font-heading text-xl font-medium leading-tight">
+                        {streamCount.toLocaleString()}
+                      </span>
+                      <span className="text-default/40 font-medium leading-tight">
+                        Total Stream Last {currentRangeLabel}
+                      </span>
+                      <MiniBarChart bars={item.bars} />
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {platforms.length === 0 && (
               <div className="col-span-full py-12 text-center text-sm text-default-tertiary bg-white rounded-30">
                 No platform data found for this period.
@@ -348,7 +315,12 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
           </header>
           <WorldDominationMap
             countries={countries}
-            totals={countriesRes?.totals}
+            totals={{
+              streams: analysis.streams.range,
+              downloads: analysis.downloads?.range ?? 0,
+              revenue: analysis.revenue.total,
+              currency: analysis.revenue.currency,
+            }}
           />
         </div>
       </section>

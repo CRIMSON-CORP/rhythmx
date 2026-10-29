@@ -32,19 +32,31 @@ interface MeResponse {
   };
 }
 
+interface AnalysisBarItem {
+  date: string;
+  value: number;
+}
+
+interface AnalysisMetricWithBars {
+  lifetime: number;
+  range: number;
+  bars?: AnalysisBarItem[];
+}
+
+interface AnalysisEarningHistoryItem {
+  platform: string;
+  logo_url?: string;
+  amount: number;
+}
+
 interface AnalysisOverViewResponse {
-  streams: {
+  streams: AnalysisMetricWithBars;
+  downloads?: {
     lifetime: number;
     range: number;
+    bars?: AnalysisBarItem[];
   };
-  downloads: {
-    lifetime: number;
-    range: number;
-  };
-  artists: {
-    lifetime: number;
-    range: number;
-  };
+  artists: AnalysisMetricWithBars;
   releases: {
     total: number;
     approved: number;
@@ -55,12 +67,14 @@ interface AnalysisOverViewResponse {
     total: number;
     currency: string;
   };
-  earnings_history: EarningHistory[];
+  earnings_history: AnalysisEarningHistoryItem[];
+  platforms?: AnalyticsPlatformItem[];
+  countries?: AnalyticsCountryItem[];
   meta?: {
     range: string;
     from: string;
     to: string;
-    tier: string;
+    tier?: string;
     last_synced_at: string;
   };
 }
@@ -68,10 +82,12 @@ interface AnalysisOverViewResponse {
 interface AnalyticsPlatformItem {
   platform: string;
   slug: string;
-  logo_url: string;
-  streams: number;
-  downloads: number;
-  share: number;
+  logo_url?: string;
+  total?: number;
+  streams?: number;
+  downloads?: number;
+  share?: number;
+  bars?: AnalysisBarItem[];
 }
 
 interface AnalyticsPlatformsResponse {
@@ -84,7 +100,7 @@ interface AnalyticsPlatformsResponse {
     range: string;
     from: string;
     to: string;
-    tier: string;
+    tier?: string;
     last_synced_at: string;
   };
 }
@@ -92,10 +108,10 @@ interface AnalyticsPlatformsResponse {
 interface AnalyticsCountryItem {
   code: string;
   name: string;
-  streams: number;
-  downloads: number;
-  revenue: number;
   share: number;
+  streams?: number;
+  downloads?: number;
+  revenue?: number;
 }
 
 interface AnalyticsCountriesResponse {
