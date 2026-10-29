@@ -126,7 +126,11 @@ async function Header() {
           </Dialog>
           <Suspense
             fallback={
-              <Link href="/notifications" className="relative @max-2xl:hidden" aria-label="Notifications">
+              <Link
+                href="/notifications"
+                className="relative @max-2xl:hidden"
+                aria-label="Notifications"
+              >
                 <Inbox size={24} />
               </Link>
             }
@@ -226,7 +230,10 @@ async function Header() {
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex flex-col gap-6">
                   <PopoverClose asChild>
-                    <Link href="/discography/single/new" className="flex items-center gap-3">
+                    <Link
+                      href="/discography/release/draft/new?release_type=single"
+                      className="flex items-center gap-3"
+                    >
                       <span className="p-1.5 bg-brand-blue/10 rounded-full">
                         <Music name="music" size={20} className="text-brand-blue" />
                       </span>
@@ -240,7 +247,10 @@ async function Header() {
                     </Link>
                   </PopoverClose>
                   <PopoverClose asChild>
-                    <Link href="/releases" className="flex items-center gap-3">
+                    <Link
+                      href="/discography/release/draft/new?release_type=album"
+                      className="flex items-center gap-3"
+                    >
                       <span className="p-1.5 bg-brand-blue/10 rounded-full">
                         <Disc size={20} className="text-brand-blue" />
                       </span>

@@ -2,7 +2,12 @@ import ReleaseDetalsPageComponent from "../release-details";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 
-async function NewDraftReleasePage() {
+async function NewDraftReleasePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ release_type: string }>;
+}) {
+  const { release_type } = await searchParams;
   const [{ genres }, { languages }] = await Promise.all([
     api.get<GenresResponse>(API_ROUTES.META.GENRES),
     api.get<LanguagesResponse>(API_ROUTES.META.LANGUAGES),
@@ -14,7 +19,7 @@ async function NewDraftReleasePage() {
         reference: "",
         title: "",
         release_description: "",
-        type: "",
+        type: release_type ?? "",
         genre: "",
         sub_genre: "",
         version: "",
