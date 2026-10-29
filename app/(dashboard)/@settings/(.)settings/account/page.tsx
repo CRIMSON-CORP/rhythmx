@@ -10,7 +10,11 @@ export default async function AccountForm() {
   return (
     <div className="flex flex-col">
       {/* Profile Details Header */}
-      <ImageUpload image={user.avatar_url} />
+      <ImageUpload
+        first_name={user.first_name}
+        last_name={user.last_name}
+        image={user.avatar_url}
+      />
 
       {/* Input Fields */}
       <Form

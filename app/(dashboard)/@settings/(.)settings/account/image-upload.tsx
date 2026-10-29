@@ -9,8 +9,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-function ImageUpload({ image }: { image: string }) {
-  const { data, update } = useSession();
+function ImageUpload({
+  first_name,
+  last_name,
+  image,
+}: {
+  image: string;
+  first_name: string;
+  last_name: string;
+}) {
+  const { update } = useSession();
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState(image);
 
@@ -64,7 +72,7 @@ function ImageUpload({ image }: { image: string }) {
       </label>
       <div className="flex flex-col gap-1.5">
         <span className="text-xl text-default">
-          {data?.user?.first_name} {data?.user?.last_name}
+          {first_name} {last_name}
         </span>
         <div className="flex items-center gap-2 bg-[#CFF7D3] text-positive-secondary rounded-full p-2 w-fit">
           <span className="leading-none">Verified</span>

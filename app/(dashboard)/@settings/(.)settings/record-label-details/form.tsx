@@ -121,7 +121,7 @@ function Form(initialData: FormProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 col-span-2">
+      {/* <div className="flex flex-col gap-2 col-span-2">
         <label className="text-[11px] font-bold text-default-tertiary">Funding Date</label>
         <input
           type="date"
@@ -130,7 +130,7 @@ function Form(initialData: FormProps) {
           value={fundingDate}
           className="w-full bg-[#F5F5F5] rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none cursor-not-allowed"
         />
-      </div>
+      </div> */}
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-default-tertiary">Licence Number</label>

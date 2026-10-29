@@ -142,7 +142,13 @@ function Form(props: FormErrors) {
         <label className="text-[11px] font-bold text-default-tertiary uppercase tracking-wider pl-1">
           Gender
         </label>
-        <Select value={gender} onValueChange={(val) => setGender(val)}>
+        <Select
+          value={gender}
+          onValueChange={(val) => {
+            isDirty.current = true;
+            setGender(val);
+          }}
+        >
           <SelectTrigger className="w-full rounded-xl border border-default/10 px-4 py-3 text-sm text-default font-medium outline-none focus:border-brand-orange transition-all">
             <SelectValue placeholder="Select Gender" />
           </SelectTrigger>

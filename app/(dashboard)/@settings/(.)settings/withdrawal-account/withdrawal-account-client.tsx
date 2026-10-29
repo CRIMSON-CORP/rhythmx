@@ -555,16 +555,6 @@ export default function WithdrawalAccountClient({
                   </Select>
                 </div>
 
-                {/* Account Name */}
-                <Input
-                  name="account-name"
-                  label="Account Name"
-                  placeholder="e.g. Jane Doe"
-                  required
-                  value={accountName}
-                  onChange={(e) => setAccountName(e.target.value)}
-                />
-
                 {/* Account Number */}
                 <Input
                   name="account-number"
@@ -574,6 +564,16 @@ export default function WithdrawalAccountClient({
                   maxLength={25}
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
+                />
+
+                {/* Account Name */}
+                <Input
+                  name="account-name"
+                  label="Account Name"
+                  required
+                  disabled
+                  readOnly
+                  value={accountName}
                 />
 
                 {/* Routing Number (Optional) */}
