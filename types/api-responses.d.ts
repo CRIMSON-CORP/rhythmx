@@ -435,12 +435,29 @@ interface MemberInvitationResponse {
 
 interface StartSubscriptionResponse {
   reference: string;
-  payment_link: string;
-  amount: number;
-  currency: string;
-  amount_gbp: number;
+  payment_link?: string;
+  amount?: number;
+  currency?: string;
+  amount_gbp?: number;
   fx_rate?: number;
-  gateway: string;
+  gateway?: string;
+  checkout?: {
+    public_key: string;
+    tx_ref: string;
+    amount: number;
+    currency: string;
+    payment_options?: string;
+    customer: {
+      email: string;
+      name?: string;
+      phone_number?: string;
+    };
+    customizations?: {
+      title?: string;
+      description?: string;
+      logo?: string;
+    };
+  };
 }
 
 interface PaymentCurrencyItem {

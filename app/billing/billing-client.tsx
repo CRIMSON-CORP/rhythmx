@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { ChevronDown, Check } from "lucide-react";
 import Icon from "@/components/icon";
 import { api } from "@/lib/api";
@@ -51,7 +50,6 @@ export default function BillingClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
 
   const currencyCodes = extractCurrencyCodes(currencies);
   const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
@@ -112,7 +110,6 @@ export default function BillingClient({
     try {
       setLoadingPlanId(plan.id);
 
-      // 1. Create order on backend to register payment reference and locked amount
       const res = await api.post<StartSubscriptionResponse>(API_ROUTES.SUBSCRIPTION.START, {
         plan_id: plan.id,
         billing_cycle: selectedDuration,
@@ -121,56 +118,26 @@ export default function BillingClient({
           typeof window !== "undefined" ? `${window.location.origin}/billing` : undefined,
       });
 
-      if (!res?.reference) {
-        throw new Error("Invalid response from server: payment reference missing");
+      if (!res?.checkout) {
+        throw new Error("Invalid response from server: checkout details missing");
       }
 
-      const publicKey = process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY;
-      const isPlaceholderKey =
-        !publicKey || publicKey.includes("your-public-key") || publicKey.includes("xxxxxxxx");
-
-      // Graceful fallback: If public key is not set, redirect to hosted link if available
-      if (isPlaceholderKey) {
-        if (res.payment_link) {
-          goeyToast.error(
-            "Flutterwave public key is not set in .env.local — redirecting to hosted checkout...",
-            { duration: 5000 },
-          );
-          window.location.href = res.payment_link;
-          return;
-        }
-        goeyToast.error(
-          "Please configure NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY in .env.local to open the inline checkout modal.",
-        );
-        setLoadingPlanId(null);
-        return;
-      }
-
-      // 2. Open Flutterwave Inline Modal Checkout
       const checkoutResult = await openFlutterwaveCheckout({
-        public_key: publicKey,
-        tx_ref: res.reference,
-        amount: res.amount,
-        currency: res.currency,
-        payment_options: "card, mobilemoney, ussd, banktransfer",
-        customer: {
-          email: session?.user?.email || "customer@rhythmx.com",
-          name:
-            `${session?.user?.first_name || ""} ${session?.user?.last_name || ""}`.trim() ||
-            session?.user?.name ||
-            "RhythmX Artist",
-          phone_number: session?.user?.phone || "",
-        },
+        public_key: res.checkout.public_key,
+        tx_ref: res.checkout.tx_ref,
+        amount: res.checkout.amount,
+        currency: res.checkout.currency,
+        payment_options: res.checkout.payment_options || "card, mobilemoney, ussd, banktransfer",
+        customer: res.checkout.customer,
         customizations: {
-          title: "RhythmX",
-          description: `Subscription to ${plan.name} (${selectedDuration})`,
+          ...res.checkout.customizations,
           logo: typeof window !== "undefined" ? `${window.location.origin}/favicon.ico` : undefined,
         },
         callback: async (paymentData) => {
           console.log("[Flutterwave Payment Callback]:", paymentData);
           if (paymentData.status === "successful" || paymentData.status === "completed") {
             goeyToast.success("Payment received! Activating your subscription...");
-            const verifyRes = await verifyPayment(res.reference);
+            const verifyRes = await verifyPayment(res.reference || res.checkout!.tx_ref);
             if (verifyRes.success) {
               goeyToast.success("Payment verified! Your subscription is now active.");
               router.push("/");
@@ -192,13 +159,8 @@ export default function BillingClient({
       });
 
       if (!checkoutResult.success) {
-        // Fallback to hosted link if modal script fails to initialize
-        if (res.payment_link) {
-          window.location.href = res.payment_link;
-        } else {
-          goeyToast.error(checkoutResult.error || "Failed to open payment modal");
-          setLoadingPlanId(null);
-        }
+        goeyToast.error(checkoutResult.error || "Failed to open payment modal");
+        setLoadingPlanId(null);
       }
     } catch (error) {
       console.warn("Subscription start failed:", error);
