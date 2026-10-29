@@ -89,11 +89,13 @@ export default async function ManagePlanPage() {
             <Button asChild variant="purple">
               <Link href="/settings/plan-billing/sharing">Renew</Link>
             </Button>
-            <SharePlanModal
-              subscription={subscription}
-              subscriberName={subscriberName}
-              disabled={isExpired}
-            />
+            {subscription.plan?.slug === "rhythm-elite" && (
+              <SharePlanModal
+                subscription={subscription}
+                subscriberName={subscriberName}
+                disabled={isExpired}
+              />
+            )}
           </div>
         </div>
       )}
@@ -108,7 +110,11 @@ export default async function ManagePlanPage() {
         </div>
 
         {/* Plans Grid */}
-        <PlansGrid plans={plans} activePlanId={subscription?.plan?.id} />
+        <PlansGrid
+          plans={plans}
+          activePlanId={subscription?.plan?.id}
+          currentPlan={subscription?.plan}
+        />
       </div>
     </div>
   );
