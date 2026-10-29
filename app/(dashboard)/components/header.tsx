@@ -1,12 +1,4 @@
 import Icon from "@/components/icon";
-import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/components/ui/popover";
 import Image from "next/image";
 import Link from "next/link";
@@ -58,50 +50,56 @@ async function Header() {
               align="start"
               className="p-2 rounded-20 outline-none shadow-2xl ring-0 gap-0 min-w-75.25"
             >
-              <Command className="p-0">
-                <CommandList className="max-h-none font-medium">
-                  <CommandGroup className="p-0">
-                    {mainOptions.map((option) => (
-                      <CommandItem className="p-0 cursor-pointer" key={option.href}>
-                        <PopoverClose asChild>
-                          <Link
-                            href={option.href.trim()}
-                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
-                          >
-                            {typeof option.icon === "string" ? (
-                              <Icon name={option.icon} size={20} className="text-brand-orange" />
-                            ) : (
-                              <option.icon size={20} className="text-brand-orange" />
-                            )}
-                            <span>{option.title}</span>
-                            <CommandShortcut>{option.command}</CommandShortcut>
-                          </Link>
-                        </PopoverClose>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                  <CommandGroup className="p-0" heading="Management">
-                    {managementOptions.map((option) => (
-                      <CommandItem key={option.href} className="p-0 cursor-pointer">
-                        <PopoverClose asChild>
-                          <Link
-                            href={option.href.trim()}
-                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
-                          >
-                            {typeof option.icon === "string" ? (
-                              <Icon name={option.icon} size={20} className="text-brand-orange" />
-                            ) : (
-                              <option.icon size={20} className="text-brand-orange" />
-                            )}
-                            <span>{option.title}</span>
-                            <CommandShortcut>{option.command}</CommandShortcut>
-                          </Link>
-                        </PopoverClose>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
+              <div className="flex flex-col font-medium p-0">
+                <div className="flex flex-col">
+                  {mainOptions.map((option) => (
+                    <PopoverClose asChild key={option.href}>
+                      <Link
+                        href={option.href.trim()}
+                        className="flex items-center gap-2 px-4 py-3 w-full rounded-xl hover:bg-page-background text-default transition-colors text-sm"
+                      >
+                        {typeof option.icon === "string" ? (
+                          <Icon name={option.icon} size={20} className="text-brand-orange" />
+                        ) : (
+                          <option.icon size={20} className="text-brand-orange" />
+                        )}
+                        <span>{option.title}</span>
+                        {option.command && (
+                          <span className="ml-auto text-xs tracking-widest text-default-tertiary font-mono">
+                            {option.command}
+                          </span>
+                        )}
+                      </Link>
+                    </PopoverClose>
+                  ))}
+                </div>
+                <div className="my-1.5 h-px bg-border/50 -mx-1" />
+                <div className="flex flex-col">
+                  <span className="px-4 py-1.5 text-xs font-medium text-default-tertiary">
+                    Management
+                  </span>
+                  {managementOptions.map((option) => (
+                    <PopoverClose asChild key={option.href}>
+                      <Link
+                        href={option.href.trim()}
+                        className="flex items-center gap-2 px-4 py-3 w-full rounded-xl hover:bg-page-background text-default transition-colors text-sm"
+                      >
+                        {typeof option.icon === "string" ? (
+                          <Icon name={option.icon} size={20} className="text-brand-orange" />
+                        ) : (
+                          <option.icon size={20} className="text-brand-orange" />
+                        )}
+                        <span>{option.title}</span>
+                        {option.command && (
+                          <span className="ml-auto text-xs tracking-widest text-default-tertiary font-mono">
+                            {option.command}
+                          </span>
+                        )}
+                      </Link>
+                    </PopoverClose>
+                  ))}
+                </div>
+              </div>
               <footer className="text-brand-blue p-2 flex items-stretch justify-end gap-3.5">
                 <Globe size={24} />
                 <CircleQuestionMark size={24} />
@@ -166,7 +164,7 @@ async function Header() {
               align="end"
               className="p-2 rounded-20 outline-none shadow-2xl ring-0 gap-0 min-w-75.25"
             >
-              <Command className="p-0">
+              <div className="flex flex-col font-medium p-0">
                 <div className="flex items-center gap-4 p-4">
                   <Image
                     src={session?.user?.avatar_url || "/images/avatar.png"}
@@ -180,40 +178,50 @@ async function Header() {
                     <span className="text-border-default-secondary text-sm">Admin</span>
                   </div>
                 </div>
-                <CommandSeparator className="my-1" />
-                <CommandList className="max-h-none font-medium">
-                  <CommandGroup className="p-0">
-                    {profileOptions.map((option) => (
-                      <CommandItem key={option.href} className="p-0 cursor-pointer">
-                        <PopoverClose asChild>
-                          <Link
-                            href={option.href.trim()}
-                            className="flex items-center gap-2 px-4 py-3 w-full h-full"
-                          >
-                            {typeof option.icon === "string" ? (
-                              <Icon name={option.icon} size={20} className="text-brand-orange" />
-                            ) : (
-                              <option.icon size={20} className="text-brand-orange" />
-                            )}
-                            <span>{option.title}</span>
-                            <CommandShortcut>{option.command}</CommandShortcut>
-                          </Link>
-                        </PopoverClose>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                  <CommandSeparator className="my-1" />
-                  <CommandGroup className="p-0">
-                    <CommandItem key="privacy-policy" className="px-4 py-3 cursor-pointer">
+                <div className="my-1 h-px bg-border/50 -mx-1" />
+                <div className="flex flex-col">
+                  {profileOptions.map((option) => (
+                    <PopoverClose asChild key={option.href}>
+                      <Link
+                        href={option.href.trim()}
+                        className="flex items-center gap-2 px-4 py-3 w-full rounded-xl hover:bg-page-background text-default transition-colors text-sm"
+                      >
+                        {typeof option.icon === "string" ? (
+                          <Icon name={option.icon} size={20} className="text-brand-orange" />
+                        ) : (
+                          <option.icon size={20} className="text-brand-orange" />
+                        )}
+                        <span>{option.title}</span>
+                        {option.command && (
+                          <span className="ml-auto text-xs tracking-widest text-default-tertiary font-mono">
+                            {option.command}
+                          </span>
+                        )}
+                      </Link>
+                    </PopoverClose>
+                  ))}
+                </div>
+                <div className="my-1 h-px bg-border/50 -mx-1" />
+                <div className="flex flex-col">
+                  <PopoverClose asChild>
+                    <Link
+                      href="/privacy-policy"
+                      className="flex items-center px-4 py-3 cursor-pointer w-full text-sm hover:bg-page-background rounded-xl transition-colors font-medium text-default"
+                    >
                       <span>Privacy Policy</span>
-                    </CommandItem>
-                    <CommandItem key="terms-of-use" className="px-4 py-3 cursor-pointer">
+                    </Link>
+                  </PopoverClose>
+                  <PopoverClose asChild>
+                    <Link
+                      href="/terms-of-use"
+                      className="flex items-center px-4 py-3 cursor-pointer w-full text-sm hover:bg-page-background rounded-xl transition-colors font-medium text-default"
+                    >
                       <span>Terms of Use</span>
-                    </CommandItem>
-                    <LogoutButton />
-                  </CommandGroup>
-                </CommandList>
-              </Command>
+                    </Link>
+                  </PopoverClose>
+                  <LogoutButton />
+                </div>
+              </div>
             </PopoverContent>
           </Popover>
           <Popover>
