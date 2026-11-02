@@ -250,6 +250,7 @@ interface NotificationRelease {
   type: string;
   cover_url: string;
   platforms: string[];
+  artist_name?: string;
 }
 
 interface Notification {
@@ -279,6 +280,7 @@ interface SearchResult {
   cover_url: string;
   type: string;
   platforms: string[];
+  artist_name?: string;
 }
 
 interface SearchResponseData {
@@ -369,6 +371,7 @@ interface Release {
    */
   total_streams: number;
   platforms: string[];
+  artist_name?: string;
 }
 
 interface ArtistRelease {

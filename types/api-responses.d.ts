@@ -193,26 +193,35 @@ interface LabelDetailsResponse {
 
 interface LabelArtist {
   reference: string;
-  legal_name: string;
+  legal_name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
   stage_name: string;
   email: string;
   phone: string | null;
-  gender?: string | null;
-  dob?: string | null;
-  country: string;
-  country_name: string;
-  genre: string;
-  bio?: string | null;
+  gender: string | null;
+  dob: string | null;
+  country: string | null;
+  country_name: string | null;
+  genre: string | null;
+  bio: string | null;
   avatar_url: string;
-  portrait_url: string;
-  spotify_linked?: boolean;
+  portrait_url: string | null;
   spotify_url: string | null;
-  apple_music_linked?: boolean;
   apple_music_url: string | null;
-  is_verified?: boolean;
+  spotify_linked?: boolean;
+  apple_music_linked?: boolean;
+  is_verified: boolean;
   status: string;
   joined_at: string;
   registered_at?: string;
+}
+
+interface UpdateArtistAccessResponse {
+  artist: {
+    reference: string;
+    access_status: "active" | "disabled" | string;
+  };
 }
 
 interface PaginationMeta {
@@ -234,6 +243,32 @@ interface LabelArtistsResponse {
 interface LabelArtistDetailResponse {
   artist: LabelArtist;
 }
+
+interface ArtistStatsStore {
+  platform: string;
+  logo_url: string | null;
+  amount: number;
+}
+
+interface ArtistStatsPlays {
+  total: number;
+  this_month: number;
+  last_month: number;
+  change: "up" | "down" | "neutral" | string;
+}
+
+interface ArtistStatsEarnings {
+  total: number;
+  currency: string;
+  stores: ArtistStatsStore[];
+}
+
+interface ArtistStatsResponse {
+  plays: ArtistStatsPlays;
+  earnings: ArtistStatsEarnings;
+}
+
+type ArtistReleasesResponse = ReleasesResponse;
 
 interface InviteArtistSentItem {
   invite_id: number;

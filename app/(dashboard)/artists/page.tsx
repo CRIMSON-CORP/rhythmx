@@ -103,9 +103,14 @@ export default async function ArtistsPage() {
                 <Artist
                   id={artist.reference}
                   key={`recent-${artist.reference}`}
-                  image={artist.portrait_url || artist.avatar_url}
-                  name={artist.stage_name || artist.legal_name}
-                  location={artist.country_name || artist.country}
+                  image={artist.portrait_url || artist.avatar_url || "/images/avatar.png"}
+                  name={
+                    artist.stage_name ||
+                    artist.legal_name ||
+                    [artist.first_name, artist.last_name].filter(Boolean).join(" ") ||
+                    "Artist"
+                  }
+                  location={artist.country_name || artist.country || ""}
                 />
               ))}
             </div>

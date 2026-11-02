@@ -1,33 +1,21 @@
 import Icon from "@/components/icon";
 import Link from "next/link";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import ReleaseCards from "@/components/realease-cards";
-import { releases } from "@/data/releases";
-import ReleaseCard from "@/components/release-card";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { earnings } from "@/data/earnings";
-import { EarningItem } from "../../components/earning-item";
+import { formatCurrency } from "@/lib/utils";
 import {
+  ArrowDown,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
-  ArrowUpRight,
-  CircleMinus,
-  Disc,
-  Music,
-  Search,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { RemoveArtistDialog } from "./remove-artist-dialog";
+import { ToggleArtistAccessButton } from "./toggle-artist-access-button";
+import WithdrawalFlow from "@/app/(dashboard)/wallet/withdrawal-flow";
+import ArtistReleasesSection from "./artist-releases-section";
 
 function formatDob(dobStr: string | null | undefined): string {
   if (!dobStr) return "—";
@@ -48,10 +36,36 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
   const { artist_id } = await params;
 
   let artist: LabelArtist | null = null;
+  let stats: ArtistStatsResponse | null = null;
+  let initialReleases: Release[] = [];
+  let initialHasMore = false;
+
   try {
-    const res = await api.get<LabelArtistDetailResponse>(API_ROUTES.LABEL.ARTIST(artist_id));
-    if (res?.artist) {
-      artist = res.artist;
+    const [artistRes, statsRes, releasesRes] = await Promise.all([
+      api.get<LabelArtistDetailResponse>(API_ROUTES.LABEL.ARTIST(artist_id)),
+      api.get<ArtistStatsResponse>(API_ROUTES.LABEL.ARTIST_STATS(artist_id)).catch((err) => {
+        console.error("Failed to fetch artist stats:", err);
+        return null;
+      }),
+      api
+        .get<ArtistReleasesResponse>(
+          API_ROUTES.LABEL.ARTIST_RELEASES(artist_id, "page=1&limit=20"),
+        )
+        .catch((err) => {
+          console.error("Failed to fetch artist releases:", err);
+          return null;
+        }),
+    ]);
+    if (artistRes?.artist) {
+      artist = artistRes.artist;
+    }
+    if (statsRes) {
+      stats = statsRes;
+    }
+    if (releasesRes?.releases) {
+      initialReleases = releasesRes.releases;
+      initialHasMore =
+        releasesRes.meta?.pagination?.has_next ?? initialReleases.length >= 20;
     }
   } catch (error) {
     console.error("Failed to fetch artist profile:", error);
@@ -59,8 +73,29 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
 
   if (!artist) redirect("/artists");
 
-  const displayName = artist.legal_name || artist.stage_name;
+  const displayName =
+    artist.legal_name ||
+    artist.stage_name ||
+    [artist.first_name, artist.last_name].filter(Boolean).join(" ") ||
+    "Artist";
   const avatarImage = artist.portrait_url || artist.avatar_url || "/images/avatar.png";
+
+  const plays = stats?.plays;
+  const earningsData = stats?.earnings;
+
+  const totalPlays = plays?.total ?? 0;
+  const changeDirection = plays?.change?.toLowerCase();
+  const isUp = changeDirection === "up";
+  const isDown = changeDirection === "down";
+  const comparisonText = isUp
+    ? "Increase compared to last month"
+    : isDown
+    ? "Decrease compared to last month"
+    : "Compared to last month";
+
+  const currency = earningsData?.currency || "GBP";
+  const totalEarnings = earningsData?.total ?? 0;
+  const stores = earningsData?.stores ?? [];
 
   return (
     <div className="flex flex-col gap-8 container">
@@ -80,10 +115,10 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="white">
-            <CircleMinus size={16} />
-            <span>{artist.status === "inactive" ? "Enable Artist" : "Disable Artist"}</span>
-          </Button>
+          <ToggleArtistAccessButton
+            reference={artist.reference}
+            initialStatus={artist.status}
+          />
           <RemoveArtistDialog reference={artist.reference} />
         </div>
       </header>
@@ -125,10 +160,14 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
             <div className="p-6 bg-white flex flex-col gap-2 items-center justify-center rounded-30 grow flex-1 min-w-80">
               <p className="text-sm font-medium text-default">All Platform plays</p>
               <h2 className="flex items-center text-default gap-2">
-                <span className="text-5xl">12,303,394</span>
-                <ArrowUp size={32} className="text-positive-tertiary" />
+                <span className="text-5xl">{totalPlays.toLocaleString()}</span>
+                {isUp ? (
+                  <ArrowUp size={32} className="text-positive-tertiary" />
+                ) : isDown ? (
+                  <ArrowDown size={32} className="text-danger-default" />
+                ) : null}
               </h2>
-              <p className="text-[#454545] text-sm font-medium">Increase compared to last week</p>
+              <p className="text-[#454545] text-sm font-medium">{comparisonText}</p>
             </div>
             <div className="bg-white flex flex-col rounded-30 grow flex-1 min-w-80">
               <header className="p-4 flex items-baseline justify-between">
@@ -136,93 +175,55 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
                   <Icon name="dollar" size={16} />
                   <span>Earning History</span>
                 </div>
-                <Button>
-                  <span>Withdraw</span>
-                  <ArrowUpRight size={16} />
-                </Button>
+                <WithdrawalFlow initialArtistReference={artist.reference} />
               </header>
-              <div className="overflow-y-auto max-h-77.25">
+              <div className="overflow-y-auto max-h-77.25 min-h-36">
                 <ul className="px-2">
-                  {earnings.map((earning) => (
-                    <EarningItem key={earning.id} {...earning} />
+                  {stores.map((store, idx) => (
+                    <li
+                      key={`${store.platform}-${idx}`}
+                      className="p-4 flex items-center gap-3 transition-colors hover:bg-default-secondary/5 rounded-xl"
+                    >
+                      {store.logo_url ? (
+                        <Image
+                          src={store.logo_url}
+                          alt={store.platform}
+                          width={32}
+                          height={32}
+                          unoptimized
+                          className="w-8 h-8 rounded-full object-contain shrink-0 bg-default-secondary/10 p-0.5"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-brand-purple/12 p-1.5 flex items-center justify-center shrink-0">
+                          <Icon name="dollar" size={20} className="text-brand-purple" />
+                        </div>
+                      )}
+                      <div className="flex grow flex-col gap-0.5 min-w-0">
+                        <h4 className="font-medium text-sm truncate">{store.platform}</h4>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 font-medium text-sm text-[#131313]">
+                        <ArrowDown size={12} className="text-positive-tertiary" />
+                        <span>+{formatCurrency(store.amount, currency)}</span>
+                      </div>
+                    </li>
                   ))}
                 </ul>
               </div>
-              <footer className="p-5 flex items-center justify-center gap-2.5 border-t border-t-default-default">
+              <footer className="p-5 flex items-center justify-center gap-2.5 border-t border-t-default-default mt-auto">
                 <p className="text-border-default-secondary text-sm">Total Earnings</p>
-                <p className="font-medium text-default">$12,303,394</p>
+                <p className="font-medium text-default">{formatCurrency(totalEarnings, currency)}</p>
               </footer>
             </div>
           </div>
         </div>
       </section>
-      <section className="flex flex-col gap-8 pt-8 pb-4">
-        <header className="container flex items-center justify-between flex-wrap gap-3">
-          <h2 className="font-medium whitespace-nowrap">All Releases</h2>
-          <div className="flex items-center gap-2 sm:gap-6 flex-wrap">
-            <div className="flex items-center p-4 gap-x-2">
-              <Search size={16} />
-              <input
-                type="search"
-                placeholder="Search releases"
-                className="bg-transparent outline-none"
-              />
-            </div>
-            <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <ArrowUp size={16} />
-              <span>All</span>
-            </button>
-            <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Disc size={16} />
-              <span>Album</span>
-            </button>
-            <button className="flex items-center gap-2 px-5 py-3 rounded-full bg-white leading-tight">
-              <Music size={16} />
-              <span>Single</span>
-            </button>
-            <Select defaultValue="recent">
-              <SelectTrigger className="bg-white rounded-full flex px-4 py-3 items-center">
-                <span>Sort:</span>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper" align="start" className="outline-0! p-2">
-                <SelectItem value="recent">Recent</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="popular">Popular</SelectItem>
-                <SelectItem value="unpopular">Unpopular</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select defaultValue="any">
-              <SelectTrigger className="bg-white rounded-full flex px-4 py-3 items-center">
-                <span>Artist:</span>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper" align="start" className="outline-0! p-2">
-                <SelectItem value="any">Any</SelectItem>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </header>
-        <ReleaseCards>
-          {releases.map((release) => (
-            <ReleaseCard
-              key={release.id}
-              {...({
-                reference: release.id,
-                cover_url: release.imageSrc,
-                title: release.title,
-                total_streams: release.engagements,
-                type: release.type,
-                platforms: [],
-              } as unknown as Release)}
-            />
-          ))}
-        </ReleaseCards>
-      </section>
+
+      {/* All Releases Section with Infinite Scroll & Filter Bar */}
+      <ArtistReleasesSection
+        artistId={artist_id}
+        initialReleases={initialReleases}
+        initialHasMore={initialHasMore}
+      />
     </div>
   );
 }

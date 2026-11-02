@@ -202,9 +202,14 @@ export default function AllArtistsSection({
                   <Artist
                     id={artist.reference}
                     key={`all-${artist.reference}`}
-                    image={artist.portrait_url || artist.avatar_url}
-                    name={artist.stage_name || artist.legal_name}
-                    location={artist.country_name || artist.country}
+                    image={artist.portrait_url || artist.avatar_url || "/images/avatar.png"}
+                    name={
+                      artist.stage_name ||
+                      artist.legal_name ||
+                      `${artist.first_name || ""} ${artist.last_name || ""}`.trim() ||
+                      "Artist"
+                    }
+                    location={artist.country_name || artist.country || ""}
                   />
                 ))}
           </div>
