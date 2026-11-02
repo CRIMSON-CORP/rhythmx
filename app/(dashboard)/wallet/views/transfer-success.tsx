@@ -3,6 +3,8 @@ import { DialogClose } from "@/components/ui/dialog";
 import Image from "next/image";
 import useWithdrawalStore from "@/store/withdrawal-store";
 import { Landmark } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 function TransferSuccess() {
   const form = useWithdrawalStore((state) => state.form);
@@ -12,6 +14,12 @@ function TransferSuccess() {
   });
 
   const bank = form.selected_bank;
+
+  const router = useRouter();
+
+  useEffect(() => {
+    router.refresh();
+  }, [router]);
 
   return (
     <div className="flex flex-col items-center gap-6 py-12 px-8 bg-white relative">
@@ -39,9 +47,7 @@ function TransferSuccess() {
               <span className="font-medium text-xs text-default-tertiary leading-tight">
                 {bank.account_number}
               </span>
-              <span className="text-xs text-grey leading-tight truncate">
-                {bank.bank_name}
-              </span>
+              <span className="text-xs text-grey leading-tight truncate">{bank.bank_name}</span>
             </div>
           </div>
         )}

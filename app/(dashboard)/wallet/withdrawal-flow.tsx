@@ -35,19 +35,43 @@ const TITLE_MAP: Record<WithdrawalView, string> = {
   "tranfer-success": "Transferred",
 };
 
-function WithdrawalFlow() {
+interface WithdrawalFlowProps {
+  initialArtistReference?: string | null;
+  trigger?: React.ReactNode;
+}
+
+function WithdrawalFlow({ initialArtistReference, trigger }: WithdrawalFlowProps = {}) {
   const view = useWithdrawalStore((state) => state.view);
   const resetState = useWithdrawalStore((state) => state.resetState);
+  const setForm = useWithdrawalStore((state) => state.setForm);
+  const setView = useWithdrawalStore((state) => state.setView);
   const Component = VIEW_MAP[view];
   const title = TITLE_MAP[view];
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      if (initialArtistReference) {
+        setForm({ selected_artist: initialArtistReference, amount: 0 });
+        setView("enter-amount");
+      } else {
+        resetState();
+      }
+    } else {
+      resetState();
+    }
+  };
+
   return (
-    <Dialog onOpenChange={resetState}>
+    <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>
-          <span>Withdraw</span>
-          <ArrowUpRight size={16} />
-        </Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button>
+            <span>Withdraw</span>
+            <ArrowUpRight size={16} />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent
         className="overflow-hidden rounded-30 isolate gap-0 max-w-150"

@@ -99,7 +99,7 @@ export default async function WalletPage({ searchParams }: WalletPageProps) {
           <ReportTransactionModal />
         </div>
       </div>
-      <div className="container grid grid-rows-[max-content_1fr] grid-cols-[minmax(0,1fr)_379px] gap-5 grow min-h-0 overflow-auto">
+      <div className="container grid grid-rows-[max-content_1fr] xl:grid-cols-[minmax(0,1fr)_379px] gap-5 grow min-h-0 overflow-auto">
         <header className="flex items-center justify-between gap-4 flex-wrap">
           <p className="text-lg font-medium">Transactions History</p>
           <div className="flex items-center max-md:gap-4 gap-8">
@@ -174,12 +174,12 @@ export default async function WalletPage({ searchParams }: WalletPageProps) {
                       <p className="text-default/70 font-medium text-sm">
                         {formatDate(tx.created_at)}
                       </p>
-                        <p className="font-semibold text-sm text-default">
-                          {formatCurrency(tx.amount, tx.currency)}
-                        </p>
-                        <div>
-                          <StatusBadge status={tx.status} />
-                        </div>
+                      <p className="font-semibold text-sm text-default">
+                        {formatCurrency(tx.amount, tx.currency)}
+                      </p>
+                      <div>
+                        <StatusBadge status={tx.status} />
+                      </div>
                     </li>
                   ))
                 ) : (
