@@ -6,10 +6,7 @@ interface EarningsProps {
   rangeLabel?: string;
 }
 
-export default function Earnings({
-  data,
-  rangeLabel = "30 Days",
-}: EarningsProps) {
+export default function Earnings({ data, rangeLabel = "30 Days" }: EarningsProps) {
   const bars = data?.bars ?? [];
   const dataMax = Math.max(...bars.map((b) => b.value), 1);
   const total = data?.range ?? 0;
@@ -20,7 +17,7 @@ export default function Earnings({
   const [dollars, cents] = formatted.split(".");
 
   return (
-    <div className="@container min-w-80 bg-white rounded-30 grow-2 flex flex-col gap-6">
+    <div className="@container col-span-2 min-w-80 bg-white rounded-30 grow-2 flex flex-col gap-6">
       <header className="flex items-center justify-between gap-1 text-default-tertiary px-4 py-5">
         <h2 className="font-medium leading-tight">Earnings</h2>
         <ListFilter size={24} />
@@ -29,8 +26,7 @@ export default function Earnings({
         <div className="flex @max-md:self-stretch items-end justify-between grow h-full min-h-27 gap-1.5">
           {bars.length > 0
             ? bars.map((bar, index) => {
-                const heightPercent =
-                  bar.value > 0 ? Math.max((bar.value / dataMax) * 100, 8) : 8;
+                const heightPercent = bar.value > 0 ? Math.max((bar.value / dataMax) * 100, 8) : 8;
                 return (
                   <div key={bar.date || index} className="h-full flex items-end grow group">
                     <div
@@ -40,7 +36,7 @@ export default function Earnings({
                         "rounded-full grow transition-colors",
                         bar.value > 0
                           ? "bg-brand-orange/60 group-hover:bg-brand-orange"
-                          : "bg-brand-orange/10 group-hover:bg-brand-orange/20"
+                          : "bg-brand-orange/10 group-hover:bg-brand-orange/20",
                       )}
                     />
                   </div>

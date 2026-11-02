@@ -313,4 +313,3 @@ export default async function EarningsPage() {
     </div>
   );
 }
-
