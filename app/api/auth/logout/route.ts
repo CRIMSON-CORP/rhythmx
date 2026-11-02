@@ -4,23 +4,24 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const cookieStore = await cookies();
+  const response = NextResponse.redirect(new URL("/auth/login?expired=1", request.url));
 
-  // NextAuth uses different cookie names in development (HTTP) vs production (HTTPS)
-  const nextAuthCookies = [
-    "next-auth.session-token",
-    "next-auth.csrf-token",
-    "next-auth.callback-url",
-    "__Secure-next-auth.session-token",
-    "__Secure-next-auth.callback-url",
-    "__Host-next-auth.csrf-token",
-  ];
-
-  for (const cookieName of nextAuthCookies) {
-    if (cookieStore.has(cookieName)) {
-      cookieStore.delete(cookieName);
+  const allCookies = cookieStore.getAll();
+  for (const cookie of allCookies) {
+    if (cookie.name.includes("next-auth")) {
+      cookieStore.delete(cookie.name);
+      response.cookies.delete(cookie.name);
+      response.cookies.set(cookie.name, "", {
+        maxAge: 0,
+        path: "/",
+        expires: new Date(0),
+      });
     }
   }
 
-  // Redirect silently to your custom login page
-  return NextResponse.redirect(new URL("/auth/login", request.url));
+  return response;
+}
+
+export async function POST(request: Request) {
+  return GET(request);
 }

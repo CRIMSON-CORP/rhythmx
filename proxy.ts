@@ -6,6 +6,25 @@ export const proxy = withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
+    // If visiting auth pages with expired or logout query param, clear any stale session cookies and allow access
+    if (
+      pathname.startsWith("/auth") &&
+      (req.nextUrl.searchParams.has("expired") || req.nextUrl.searchParams.has("logout"))
+    ) {
+      const response = NextResponse.next();
+      req.cookies.getAll().forEach((cookie) => {
+        if (cookie.name.includes("next-auth")) {
+          response.cookies.delete(cookie.name);
+          response.cookies.set(cookie.name, "", {
+            maxAge: 0,
+            path: "/",
+            expires: new Date(0),
+          });
+        }
+      });
+      return response;
+    }
+
     // Redirect signed-in users away from pre-login auth pages (get-started, login, verify)
     if (token && pathname.startsWith("/auth") && !pathname.startsWith("/auth/create-account")) {
       if (token.next_step === "choose_plan" || token.next_step === "renew") {

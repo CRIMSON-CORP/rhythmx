@@ -20,6 +20,65 @@ async function getUserSession() {
   return await getSession();
 }
 
+
+let activeRefreshPromise: Promise<string | null> | null = null;
+
+async function handleUnauthorized() {
+  if (typeof window !== "undefined") {
+    signOut({ redirect: false }).catch(() => {});
+    window.location.href = "/api/auth/logout";
+    return new Promise(() => {}); // Halts caller cleanly while the browser page redirects
+  } else {
+    const { redirect } = await import("next/navigation");
+    redirect("/api/auth/logout");
+  }
+}
+
+async function getRefreshedAccessToken(refreshToken: string): Promise<string | null> {
+  if (activeRefreshPromise) {
+    return activeRefreshPromise;
+  }
+
+  activeRefreshPromise = (async () => {
+    try {
+      const refreshResponse = await fetch(BACKEND_API_URL + API_ROUTES.AUTH.REFRESH, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+
+      if (!refreshResponse.ok) {
+        return null;
+      }
+
+      const refreshPayload = await refreshResponse.json().catch(() => null);
+      const dataObj = refreshPayload?.data;
+      const newAccessToken = dataObj?.tokens?.access_token || dataObj?.access_token;
+      const newRefreshToken =
+        dataObj?.tokens?.refresh_token || dataObj?.refresh_token || refreshToken;
+
+      if (newAccessToken && typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("auth:update-session", {
+            detail: {
+              access_token: newAccessToken,
+              refresh_token: newRefreshToken,
+            },
+          }),
+        );
+      }
+
+      return newAccessToken || null;
+    } catch {
+      return null;
+    } finally {
+      activeRefreshPromise = null;
+    }
+  })();
+
+  return activeRefreshPromise;
+}
+
 export const api = {
   get<T>(url: string) {
     return this.fetch(url, "GET") as Promise<T>;
@@ -86,83 +145,48 @@ export const api = {
     );
 
     // Handle Token Expiry only for authenticated requests outside of auth endpoints
-    if (response.status === 401 && !isAuthRoute && hasAuthToken) {
+    if (response.status === 401 && !isAuthRoute) {
       const session = await getUserSession();
 
       if (!session?.refresh_token) {
-        if (typeof window !== "undefined") {
-          signOut();
-          return new Promise(() => {}); // Halts caller cleanly while the browser page redirects
-        } else {
-          const { redirect } = await import("next/navigation");
-          redirect("/api/auth/logout");
-        }
+        await handleUnauthorized();
         throw new Error("Unauthorized: Session Expired");
       }
 
-      let refreshResponse: Response;
-      try {
-        refreshResponse = await fetch(BACKEND_API_URL + API_ROUTES.AUTH.REFRESH, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ refresh_token: session.refresh_token }),
-        });
-      } catch {
-        return this.parseAndValidate(response);
-      }
+      const newAccessToken = await getRefreshedAccessToken(session.refresh_token);
 
-      // 1. Refresh succeeded -> Retry original request & sync NextAuth session
-      if (refreshResponse.ok) {
-        const refreshPayload = await refreshResponse.json().catch(() => null);
-        const dataObj = refreshPayload?.data;
-        const newAccessToken = dataObj?.tokens?.access_token || dataObj?.access_token;
-        const newRefreshToken =
-          dataObj?.tokens?.refresh_token || dataObj?.refresh_token || session.refresh_token;
-
-        if (newAccessToken) {
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(
-              new CustomEvent("auth:update-session", {
-                detail: {
-                  access_token: newAccessToken,
-                  refresh_token: newRefreshToken,
-                },
-              }),
-            );
-          }
-
-          const retryOptions = {
-            ...originalOptions,
-            headers: {
-              ...originalOptions.headers,
-              Authorization: `Bearer ${newAccessToken}`,
-            },
-          };
-          const retryResponse = await fetch(BACKEND_API_URL + originalUrl, retryOptions);
-          return this.parseAndValidate(retryResponse);
-        }
-      }
-
-      // 2. Refresh token rejected/expired -> Force Logout
-      if (refreshResponse.status === 401 || refreshResponse.status === 403) {
-        if (typeof window !== "undefined") {
-          signOut();
-          return new Promise(() => {}); // Halts caller cleanly while the browser page redirects
-        } else {
-          const { redirect } = await import("next/navigation");
-          redirect("/api/auth/logout");
-        }
+      if (!newAccessToken) {
+        await handleUnauthorized();
         throw new Error("Unauthorized: Session Expired");
       }
 
-      // 3. Temporary server error (5xx, etc.) -> Don't log out or crash, return parsed error
-      return this.parseAndValidate(response);
+      const retryOptions = {
+        ...originalOptions,
+        headers: {
+          ...originalOptions.headers,
+          Authorization: `Bearer ${newAccessToken}`,
+        },
+      };
+
+      const retryResponse = await fetch(BACKEND_API_URL + originalUrl, retryOptions);
+
+      if (retryResponse.status === 401) {
+        await handleUnauthorized();
+        throw new Error("Unauthorized: Session Expired");
+      }
+
+      return this.parseAndValidate(retryResponse, isAuthRoute);
     }
 
-    return this.parseAndValidate(response);
+    return this.parseAndValidate(response, isAuthRoute);
   },
 
-  async parseAndValidate(response: Response) {
+  async parseAndValidate(response: Response, isAuthRoute: boolean = false) {
+    if (response.status === 401 && !isAuthRoute) {
+      await handleUnauthorized();
+      throw new Error("Unauthorized: Session Expired");
+    }
+
     let data;
     const responseText = await response.text();
     try {
@@ -229,6 +253,10 @@ export const api = {
 
     return new Promise((resolve, reject) => {
       xhr.addEventListener("load", async function () {
+        if (xhr.status === 401) {
+          await handleUnauthorized();
+          return;
+        }
         try {
           const response = JSON.parse(xhr.response);
           if (response.status) {

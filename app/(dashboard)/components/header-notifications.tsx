@@ -1,3 +1,4 @@
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import HeaderNotificationsClient from "./header-notifications-client";
@@ -19,6 +20,7 @@ export default async function HeaderNotifications() {
     const unreadCount = data?.meta?.unread_count ?? 0;
     hasUnread = unreadCount > 0;
   } catch (error) {
+    if (isRedirectError(error)) throw error;
     console.error("Failed to fetch notification count for header:", error);
   }
 

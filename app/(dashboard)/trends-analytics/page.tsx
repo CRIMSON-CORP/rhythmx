@@ -1,3 +1,4 @@
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { Activity, ArrowUp, CircleCheckBig, Disc, Globe, TrendingUp } from "lucide-react";
 import {
   Dialog,
@@ -28,8 +29,6 @@ const RANGE_LABELS: Record<string, string> = {
   "1yr": "1 year",
 };
 
-
-
 interface TrendsAnalyticsPageProps {
   searchParams: Promise<{
     platform_range?: string;
@@ -46,6 +45,7 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
   const analysisRes = await api
     .get<AnalysisOverViewResponse>(API_ROUTES.ANALYTICS.OVERVIEW(platformRange))
     .catch((err) => {
+      if (isRedirectError(err)) throw err;
       console.error("Failed to load analytics overview:", err);
       return null;
     });
@@ -66,14 +66,13 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
 
   const countries = analysis.countries || [];
   const totalMapLocations = 256;
-  const dominationPercent =
-    countries.length > 0 ? (countries.length / totalMapLocations) * 100 : 0;
+  const dominationPercent = countries.length > 0 ? (countries.length / totalMapLocations) * 100 : 0;
   const dominationFormatted =
     dominationPercent === 0
       ? "0%"
       : dominationPercent < 1
-      ? `${dominationPercent.toFixed(1)}%`
-      : `${Math.round(dominationPercent)}%`;
+        ? `${dominationPercent.toFixed(1)}%`
+        : `${Math.round(dominationPercent)}%`;
 
   return (
     <div className="flex flex-col gap-6">
@@ -263,7 +262,10 @@ async function TrendsAnalyticsPage({ searchParams }: TrendsAnalyticsPageProps) {
             {platforms.map((item) => {
               const streamCount = item.total ?? item.streams ?? 0;
               return (
-                <div key={item.slug || item.platform} className="bg-white rounded-30 basis-91.25 p-6">
+                <div
+                  key={item.slug || item.platform}
+                  className="bg-white rounded-30 basis-91.25 p-6"
+                >
                   <header className="flex items-center gap-2.5">
                     {item.logo_url && (
                       <Image

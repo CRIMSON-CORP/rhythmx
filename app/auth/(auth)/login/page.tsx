@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Input from "../../../../components/Input";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { loginSchema } from "@/models/login-schema";
-import { getSession, signIn } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
 
 function Page() {
+  useEffect(() => {
+    signOut({ redirect: false });
+    if (new URLSearchParams(window.location.search).get("expired")) {
+      setErrors({ form: "Your session has expired. Please log in again." });
+    }
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});

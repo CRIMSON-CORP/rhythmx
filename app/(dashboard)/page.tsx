@@ -1,3 +1,4 @@
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import TimeSorterSelect from "@/components/time-sorter-select";
 import Greeting from "./components/greeting";
 import CompletProfileCard from "./components/complete-profile-card";
@@ -51,6 +52,7 @@ async function DashboardMetricsCards({ range }: { range: string }) {
       `/api/analytics/dashboard?range=${range}`
     );
   } catch (error) {
+    if (isRedirectError(error)) throw error;
     console.error("Failed to fetch dashboard analytics:", error);
   }
 
