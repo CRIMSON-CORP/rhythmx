@@ -69,7 +69,7 @@ export function UploadLicenseModal({
       // Form data with 'license' field that contains the file
       formData.append("license", file);
 
-      const endpoint = API_ROUTES.RELEASES.TRACKS.UPLOAD_LICENSE(releaseReference, trackReference);
+      const endpoint = API_ROUTES.RELEASES.DRAFT.TRACKS.LICENSE(releaseReference, trackReference);
       const res = await api.post<{
         status?: boolean;
         message?: string;

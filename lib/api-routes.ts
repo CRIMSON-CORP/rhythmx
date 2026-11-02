@@ -2,80 +2,100 @@ export const API_ROUTES = {
   AUTH: {
     LOGIN: "/api/auth/login",
     REGISTER: "/api/auth/register",
-    VERIFY: "/api/auth/email-verification",
+    EMAIL_VERIFICATION: "/api/auth/email-verification",
     SOCIAL: "/api/auth/social",
     LOGOUT: "/api/auth/logout",
     REFRESH: "/api/auth/refresh",
   },
   ONBOARDING: {
-    PROFILE: "/api/onboarding/profile",
-    UPLOAD_AVATAR: "/api/onboarding/profile/avatar",
-    ACCOUNT_TYPE: "/api/onboarding/account-type",
-    ARTIST_DETAILS: "/api/onboarding/account-type/artist",
-    COLLABORATOR_DETAILS: "/api/onboarding/account-type/collaborator",
-    LABEL_DETAILS: "/api/onboarding/account-type/label",
-    ARTIST_PHOTO: "/api/onboarding/account-type/artist/photo",
-    COLLABORATOR_PHOTO: "/api/onboarding/account-type/collaborator/photo",
-    LABEL_PHOTO: "/api/onboarding/account-type/label/photo",
-    TERMS_AGREEMENT: "/api/onboarding/accept-terms",
+    PROFILE: {
+      INDEX: "/api/onboarding/profile",
+      AVATAR: "/api/onboarding/profile/avatar",
+    },
+    ACCOUNT_TYPE: {
+      INDEX: "/api/onboarding/account-type",
+      ARTIST: {
+        INDEX: "/api/onboarding/account-type/artist",
+        PHOTO: "/api/onboarding/account-type/artist/photo",
+      },
+      COLLABORATOR: {
+        INDEX: "/api/onboarding/account-type/collaborator",
+        PHOTO: "/api/onboarding/account-type/collaborator/photo",
+      },
+      LABEL: {
+        INDEX: "/api/onboarding/account-type/label",
+        PHOTO: "/api/onboarding/account-type/label/photo",
+      },
+    },
+    ACCEPT_TERMS: "/api/onboarding/accept-terms",
   },
-  USER: {
-    ME: "/api/me",
+  ME: {
+    INDEX: "/api/me",
     LOCALE: "/api/me/locale",
     AVATAR: "/api/me/avatar",
-    PUSH_NOTIFICATION_TOKEN: "/api/me/fcm-tokens",
+    FCM_TOKENS: "/api/me/fcm-tokens",
     NOTIFICATION_PREFERENCES: "/api/me/notification-preferences",
     ACCOUNT_DELETION: "/api/me/account-deletion",
-    DEVICES: "/api/me/devices",
-    DEVICE_SIGN_OUT: "/api/me/devices",
+    DEVICES: {
+      INDEX: "/api/me/devices",
+      DEVICE: (id: number | string) => `/api/me/devices/${encodeURIComponent(id)}`,
+    },
     DEVICE_SIGN_OUTS: "/api/me/device-sign-outs",
   },
   RELEASES: {
-    MY: "/api/releases",
-    CREATE_DRAFT: "/api/releases/draft",
-    UPLOAD_ARTWORK: (reference: string) => `/api/releases/draft/${reference}/artwork`,
-    TAKEDOWN: (reference: string) => `/api/releases/${reference}/takedown`,
-    EARNINGS: (reference: string) => `/api/releases/${reference}/earnings`,
-    DRAFT: (reference: string) => `/api/releases/draft/${reference}`,
-    ARTISTS: (reference: string) => `/api/releases/draft/${reference}/artists`,
-    TRACKS: {
-      LIST: (reference: string) => `/api/releases/draft/${reference}/tracks`,
-      ADD: (reference: string) => `/api/releases/draft/${reference}/tracks`,
-      GET: (reference: string, trackRef: string) => `/api/releases/${reference}/tracks/${trackRef}`,
-      UPDATE: (reference: string, trackRef: string) =>
-        `/api/releases/draft/${reference}/tracks/${trackRef}`,
-      DELETE: (reference: string, trackRef: string) =>
-        `/api/releases/draft/${reference}/tracks/${trackRef}`,
-      UPLOAD_LICENSE: (reference: string, trackRef: string) =>
-        `/api/releases/draft/${reference}/tracks/${trackRef}/license`,
-      REMOVE_LICENSE: (reference: string, trackRef: string) =>
-        `/api/releases/draft/${reference}/tracks/${trackRef}/license`,
-      CREDITS: (reference: string, trackRef: string) =>
-        `/api/releases/draft/${reference}/tracks/${trackRef}/credits`,
-      ROYALTY_SPLITS: (reference: string, trackRef: string) =>
-        `/api/releases/draft/${reference}/tracks/${trackRef}/royalty-splits`,
+    INDEX: "/api/releases",
+    RELEASE: (reference: string) => `/api/releases/${encodeURIComponent(reference)}`,
+    TAKEDOWN: (reference: string) => `/api/releases/${encodeURIComponent(reference)}/takedown`,
+    EARNINGS: (reference: string) => `/api/releases/${encodeURIComponent(reference)}/earnings`,
+    DRAFT: {
+      INDEX: "/api/releases/draft",
+      DRAFT: (reference: string) => `/api/releases/draft/${encodeURIComponent(reference)}`,
+      ARTWORK: (reference: string) =>
+        `/api/releases/draft/${encodeURIComponent(reference)}/artwork`,
+      ARTISTS: (reference: string) =>
+        `/api/releases/draft/${encodeURIComponent(reference)}/artists`,
+      TRACKS: {
+        INDEX: (reference: string) => `/api/releases/draft/${encodeURIComponent(reference)}/tracks`,
+        TRACK: (reference: string, trackRef: string) =>
+          `/api/releases/draft/${encodeURIComponent(reference)}/tracks/${encodeURIComponent(trackRef)}`,
+        LICENSE: (reference: string, trackRef: string) =>
+          `/api/releases/draft/${encodeURIComponent(reference)}/tracks/${encodeURIComponent(trackRef)}/license`,
+        CREDITS: (reference: string, trackRef: string) =>
+          `/api/releases/draft/${encodeURIComponent(reference)}/tracks/${encodeURIComponent(trackRef)}/credits`,
+        ROYALTY_SPLITS: (reference: string, trackRef: string) =>
+          `/api/releases/draft/${encodeURIComponent(reference)}/tracks/${encodeURIComponent(trackRef)}/royalty-splits`,
+      },
+      PLATFORMS: (reference: string) =>
+        `/api/releases/draft/${encodeURIComponent(reference)}/platforms`,
+      ROYALTY: (reference: string) =>
+        `/api/releases/draft/${encodeURIComponent(reference)}/royalty`,
+      SUBMIT: (reference: string) => `/api/releases/draft/${encodeURIComponent(reference)}/submit`,
+      FAST_TRACK: (reference: string) =>
+        `/api/releases/draft/${encodeURIComponent(reference)}/fast-track`,
     },
-    PLATFORMS: (reference: string) => `/api/releases/draft/${reference}/platforms`,
-    ROYALTY: (reference: string) => `/api/releases/draft/${reference}/royalty`,
-    SUBMIT: (reference: string) => `/api/releases/draft/${reference}/submit`,
-    FAST_TRACK: (reference: string) => `/api/releases/draft/${reference}/fast-track`,
   },
   LABEL: {
-    ME: "/api/label",
+    INDEX: "/api/label",
     LOGO: "/api/label/logo",
-    ARTISTS: "/api/label/artists",
-    ARTIST: (reference: string) => `/api/label/artists/${reference}`,
-    ARTIST_STATS: (reference: string) => `/api/label/artists/${reference}/stats`,
-    ARTIST_RELEASES: (reference: string, query: string = "") =>
-      `/api/label/artists/${reference}/releases${query ? `?${query}` : ""}`,
-    INVITE_ARTIST: "/api/label/artists/invite",
-    TEAM: "/api/label/team",
-    TEAM_MEMBER: (reference: string) => `/api/label/team/${reference}`,
-    TEAM_AVATAR: (reference: string) => `/api/label/team/${reference}/avatar`,
-    ROLES: "/api/label/roles",
-    ROLE: (id: number | string) => `/api/label/roles/${id}`,
-    UPDATE_ARTIST_PROFILE: (reference: string) => `/api/label/artists/${reference}/profile`,
-    PHOTO: (reference: string) => `/api/label/artists/${reference}/photo`,
+    ARTISTS: {
+      INDEX: "/api/label/artists",
+      INVITE: "/api/label/artists/invite",
+      ARTIST: (reference: string) => `/api/label/artists/${encodeURIComponent(reference)}`,
+      STATS: (reference: string) => `/api/label/artists/${encodeURIComponent(reference)}/stats`,
+      RELEASES: (reference: string, query: string = "") =>
+        `/api/label/artists/${encodeURIComponent(reference)}/releases${query ? `?${query}` : ""}`,
+      PROFILE: (reference: string) => `/api/label/artists/${encodeURIComponent(reference)}/profile`,
+      PHOTO: (reference: string) => `/api/label/artists/${encodeURIComponent(reference)}/photo`,
+    },
+    TEAM: {
+      INDEX: "/api/label/team",
+      MEMBER: (reference: string) => `/api/label/team/${encodeURIComponent(reference)}`,
+      AVATAR: (reference: string) => `/api/label/team/${encodeURIComponent(reference)}/avatar`,
+    },
+    ROLES: {
+      INDEX: "/api/label/roles",
+      ROLE: (id: number | string) => `/api/label/roles/${encodeURIComponent(id)}`,
+    },
   },
   ANALYTICS: {
     OVERVIEW: (range: string = "30d") =>
@@ -85,9 +105,10 @@ export const API_ROUTES = {
     COUNTRIES: (range: string = "30d") =>
       `/api/analytics/countries?range=${encodeURIComponent(range)}`,
   },
-  NOTFICATIONS: {
-    LIST: "/api/notifications",
+  NOTIFICATIONS: {
+    INDEX: "/api/notifications",
     READ_ALL: "/api/notifications/read-all",
+    NOTIFICATION: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}`,
     READ: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/read`,
     ACCEPT: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/accept`,
     DECLINE: (reference: string) => `/api/notifications/${encodeURIComponent(reference)}/decline`,
@@ -108,51 +129,57 @@ export const API_ROUTES = {
     APPLE_MUSIC: (q: string) => `/api/artist-lookup/apple-music?q=${encodeURIComponent(q)}`,
   },
   PLANS: {
-    LIST: "/api/plans",
+    INDEX: "/api/plans",
   },
   SUBSCRIPTION: {
-    GET: "/api/subscription",
+    INDEX: "/api/subscription",
     START: "/api/subscription/start",
-    CANCEL: "/api/subscription/cancellation",
-    MEMBER_INVITATIONS: "/api/subscription/member-invitations",
-    RESEND_INVITATION: (inviteId: number | string) =>
-      `/api/subscription/member-invitations/${encodeURIComponent(inviteId)}/resend`,
-    CANCEL_INVITATION: (inviteId: number | string) =>
-      `/api/subscription/member-invitations/${encodeURIComponent(inviteId)}`,
-    MEMBERS: (reference?: string) =>
-      reference ? `/api/subscription/members/${encodeURIComponent(reference)}` : "/api/subscription/members",
+    CANCELLATION: "/api/subscription/cancellation",
+    MEMBER_INVITATIONS: {
+      INDEX: "/api/subscription/member-invitations",
+      INVITATION: (inviteId: number | string) =>
+        `/api/subscription/member-invitations/${encodeURIComponent(inviteId)}`,
+      RESEND: (inviteId: number | string) =>
+        `/api/subscription/member-invitations/${encodeURIComponent(inviteId)}/resend`,
+    },
+    MEMBERS: {
+      INDEX: "/api/subscription/members",
+      MEMBER: (reference: string) => `/api/subscription/members/${encodeURIComponent(reference)}`,
+    },
   },
   PAYMENTS: {
     CURRENCIES: "/api/payments/currencies",
     CONVERT: (to: string, plan_id: number | string, billing_cycle: string) =>
       `/api/payments/convert?to=${encodeURIComponent(to)}&plan_id=${encodeURIComponent(plan_id)}&billing_cycle=${encodeURIComponent(billing_cycle)}`,
-    STATUS: (reference: string) => `/api/payments/${encodeURIComponent(reference)}`,
-    VERIFY: (reference: string) => `/api/payments/${encodeURIComponent(reference)}/verification`,
+    PAYMENT: (reference: string) => `/api/payments/${encodeURIComponent(reference)}`,
+    VERIFICATION: (reference: string) =>
+      `/api/payments/${encodeURIComponent(reference)}/verification`,
   },
   EARNINGS: {
-    GET: "/api/earnings",
+    INDEX: "/api/earnings",
     OVERVIEW: "/api/earnings/overview",
     TRANSACTIONS: {
-      LIST: (queryString?: string) =>
+      INDEX: (queryString?: string) =>
         `/api/earnings/transactions${queryString ? `?${queryString}` : ""}`,
-      DETAILS: (reference: string) => `/api/earnings/transactions/${encodeURIComponent(reference)}`,
+      TRANSACTION: (reference: string) =>
+        `/api/earnings/transactions/${encodeURIComponent(reference)}`,
       REPORT: (reference: string) =>
         `/api/earnings/transactions/${encodeURIComponent(reference)}/report`,
-      EXPORT: `/api/earnings/transactions/export`,
+      EXPORT: "/api/earnings/transactions/export",
     },
   },
   WITHDRAWALS: {
     ARTISTS: (queryString?: string) =>
       `/api/withdrawals/artists${queryString ? `?${queryString}` : ""}`,
     ACCOUNTS: {
-      LIST: "/api/withdrawals/accounts",
-      ADD: "/api/withdrawals/accounts",
+      INDEX: "/api/withdrawals/accounts",
       RESOLVE: "/api/withdrawals/accounts/resolve",
-      SET_DEFAULT: (id: number | string) => `/api/withdrawals/accounts/${id}`,
-      DELETE: (id: number | string) => `/api/withdrawals/accounts/${id}`,
+      ACCOUNT: (id: number | string) => `/api/withdrawals/accounts/${encodeURIComponent(id)}`,
     },
-    REQUEST: "/api/withdrawals/request",
+    REQUEST: {
+      INDEX: "/api/withdrawals/request",
+      REQUEST: (reference: string) => `/api/withdrawals/request/${encodeURIComponent(reference)}`,
+    },
     REQUEST_CONFIRM: "/api/withdrawals/request-confirm",
-    CANCEL: (reference: string) => `/api/withdrawals/request/${encodeURIComponent(reference)}`,
   },
 };

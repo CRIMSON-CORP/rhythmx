@@ -42,7 +42,7 @@ export default function ArtistReleasesSection({
 
         const res = await api
           .get<ArtistReleasesResponse>(
-            API_ROUTES.LABEL.ARTIST_RELEASES(artistId, query.toString()),
+            API_ROUTES.LABEL.ARTISTS.RELEASES(artistId, query.toString()),
           )
           .catch(() => null);
 

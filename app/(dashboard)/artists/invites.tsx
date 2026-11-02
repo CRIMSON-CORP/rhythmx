@@ -79,7 +79,7 @@ function Invites({
 
     try {
       setIsSubmitting(true);
-      const res = await api.post<InviteArtistResponse>(API_ROUTES.LABEL.INVITE_ARTIST, {
+      const res = await api.post<InviteArtistResponse>(API_ROUTES.LABEL.ARTISTS.INVITE, {
         emails: trimmed,
       });
 

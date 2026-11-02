@@ -6,7 +6,7 @@ async function ChoosePlatformPage({ params }: { params: Promise<{ release_id: st
   const { release_id } = await params;
   const [{ platforms }, { release }] = await Promise.all([
     api.get<{ platforms: Platform[] }>(API_ROUTES.META.PLATFORMS),
-    api.get<{ release: ReleaseDetail }>(`${API_ROUTES.RELEASES.MY}/${release_id}`),
+    api.get<{ release: ReleaseDetail }>(API_ROUTES.RELEASES.RELEASE(release_id)),
   ]);
   const selectedPlatformIds = release.platforms.map((platform) => platform.platform_id);
   return (

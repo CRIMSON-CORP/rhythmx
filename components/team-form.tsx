@@ -77,7 +77,7 @@ function TeamForm({
     async function loadRoles() {
       setIsLoadingRoles(true);
       try {
-        const res = await api.get<LabelRolesResponse>(API_ROUTES.LABEL.ROLES);
+        const res = await api.get<LabelRolesResponse>(API_ROUTES.LABEL.ROLES.INDEX);
         if (isMounted && res?.roles) {
           const activeRoles = res.roles.filter((r) => r.is_active !== false);
           setRoles(activeRoles);
@@ -137,7 +137,7 @@ function TeamForm({
           goeyToast.dismiss(warningToastId);
           setIsDeleting(true);
           try {
-            await api.delete(API_ROUTES.LABEL.TEAM_MEMBER(id));
+            await api.delete(API_ROUTES.LABEL.TEAM.MEMBER(id));
             goeyToast.success("Team member deleted successfully");
             onSuccess?.();
             router.refresh();
@@ -219,14 +219,14 @@ function TeamForm({
           updatePayload.password = password.trim();
         }
 
-        await api.patch(API_ROUTES.LABEL.TEAM_MEMBER(id), updatePayload);
+        await api.patch(API_ROUTES.LABEL.TEAM.MEMBER(id), updatePayload);
 
         if (avatarFile) {
           try {
             const formData = new FormData();
             formData.append("avatar", avatarFile);
             await api.postFormData({
-              url: API_ROUTES.LABEL.TEAM_AVATAR(id),
+              url: API_ROUTES.LABEL.TEAM.AVATAR(id),
               formData,
             });
           } catch {
@@ -246,7 +246,7 @@ function TeamForm({
           role_id: Number(currentRoleId),
         };
 
-        const res = await api.post<CreateTeamMemberResponse>(API_ROUTES.LABEL.TEAM, payload);
+        const res = await api.post<CreateTeamMemberResponse>(API_ROUTES.LABEL.TEAM.INDEX, payload);
         const reference = res?.reference || res?.member?.reference;
 
         if (avatarFile && reference) {
@@ -254,7 +254,7 @@ function TeamForm({
             const formData = new FormData();
             formData.append("avatar", avatarFile);
             await api.postFormData({
-              url: API_ROUTES.LABEL.TEAM_AVATAR(reference),
+              url: API_ROUTES.LABEL.TEAM.AVATAR(reference),
               formData,
             });
           } catch {

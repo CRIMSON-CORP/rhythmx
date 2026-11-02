@@ -6,7 +6,7 @@ async function ReleaseTracksPage({ params }: { params: Promise<{ release_id: str
   const { release_id } = await params;
   const [{ tracks }, { genres }, { languages }, contributorsData, publishingTypes] =
     await Promise.all([
-      api.get<{ tracks: ReleaseTrack[] }>(API_ROUTES.RELEASES.TRACKS.LIST(release_id)),
+      api.get<{ tracks: ReleaseTrack[] }>(API_ROUTES.RELEASES.DRAFT.TRACKS.INDEX(release_id)),
       api.get<GenresResponse>(API_ROUTES.META.GENRES),
       api.get<LanguagesResponse>(API_ROUTES.META.LANGUAGES),
       api.get<ContributorsResponse>(API_ROUTES.META.CONTRIBUTORS),

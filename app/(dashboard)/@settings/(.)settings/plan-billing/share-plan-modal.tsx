@@ -65,7 +65,7 @@ export default function SharePlanModal({
       setLoading(true);
       setEmailError(null);
       const res = await api.post<MemberInvitationResponse>(
-        API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS,
+        API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS.INDEX,
         {
           email: trimmed,
         }

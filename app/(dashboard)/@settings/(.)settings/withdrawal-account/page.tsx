@@ -1,14 +1,24 @@
 import WithdrawalAccountClient from "@/app/(dashboard)/@settings/(.)settings/withdrawal-account/withdrawal-account-client";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export default async function WithdrawalForm() {
   const [accountsRes, countriesRes, currenciesRes] = await Promise.all([
-    api.get<WithdrawalAccountsResponse>(API_ROUTES.WITHDRAWALS.ACCOUNTS.LIST).catch(() => null),
+    api.get<WithdrawalAccountsResponse>(API_ROUTES.WITHDRAWALS.ACCOUNTS.INDEX).catch((err) => {
+      if (isRedirectError(err)) throw err;
+      return null;
+    }),
     api
       .get<{ countries: Array<{ code: string; name: string }> }>(API_ROUTES.META.COUNTRIES)
-      .catch(() => null),
-    api.get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES).catch(() => null),
+      .catch((err) => {
+        if (isRedirectError(err)) throw err;
+        return null;
+      }),
+    api.get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES).catch((err) => {
+      if (isRedirectError(err)) throw err;
+      return null;
+    }),
   ]);
 
   const accounts = accountsRes?.accounts || [];

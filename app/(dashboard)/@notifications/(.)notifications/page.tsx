@@ -8,7 +8,7 @@ export default async function InterceptedNotificationsPage() {
 
   try {
     const data = await api.get<{ notifications: Notification[] }>(
-      `${API_ROUTES.NOTFICATIONS.LIST}?page=1&limit=20`,
+      `${API_ROUTES.NOTIFICATIONS.INDEX}?page=1&limit=20`,
     );
     if (data?.notifications && Array.isArray(data.notifications)) {
       initialNotifications = data.notifications;

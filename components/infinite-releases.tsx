@@ -44,7 +44,7 @@ export default function InfiniteReleases({
 
     try {
       const response = await api.get<{ releases: Release[] }>(
-        `${API_ROUTES.RELEASES.MY}?page=${page}&size=${pageSize}`,
+        `${API_ROUTES.RELEASES.INDEX}?page=${page}&size=${pageSize}`,
       );
       const items = Array.isArray(response?.releases) ? response.releases : [];
 

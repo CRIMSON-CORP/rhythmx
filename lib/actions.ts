@@ -6,6 +6,6 @@ export async function getMe() {
   "use cache";
   cacheLife({ revalidate: 300 });
   cacheTag("user");
-  const { user } = await api.get<{ user: User }>(API_ROUTES.USER.ME);
+  const { user } = await api.get<{ user: User }>(API_ROUTES.ME.INDEX);
   return user;
 }

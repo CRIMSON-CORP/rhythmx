@@ -20,7 +20,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   const { currency, cycle } = await searchParams;
 
   const [plansRes, currenciesRes] = await Promise.all([
-    api.get<PlansResponse>(API_ROUTES.PLANS.LIST),
+    api.get<PlansResponse>(API_ROUTES.PLANS.INDEX),
     api.get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES),
   ]);
 

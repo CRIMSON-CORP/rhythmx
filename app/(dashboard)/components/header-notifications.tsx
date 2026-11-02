@@ -15,7 +15,7 @@ export default async function HeaderNotifications() {
 
   try {
     const data = await api.get<NotificationsResponse>(
-      `${API_ROUTES.NOTFICATIONS.LIST}?page=1&limit=1`,
+      `${API_ROUTES.NOTIFICATIONS.INDEX}?page=1&limit=1`,
     );
     const unreadCount = data?.meta?.unread_count ?? 0;
     hasUnread = unreadCount > 0;

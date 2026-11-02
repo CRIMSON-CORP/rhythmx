@@ -241,7 +241,7 @@ export default function WithdrawalAccountClient({
     setDeletingId(id);
 
     try {
-      await api.delete(API_ROUTES.WITHDRAWALS.ACCOUNTS.DELETE(id));
+      await api.delete(API_ROUTES.WITHDRAWALS.ACCOUNTS.ACCOUNT(id));
       setAccounts((prev) => {
         const remaining = prev.filter((acc) => acc.id !== id);
         const hadDefault = prev.find((a) => a.id === id)?.is_default;
@@ -267,7 +267,7 @@ export default function WithdrawalAccountClient({
     setSettingDefaultId(id);
 
     try {
-      await api.patch(API_ROUTES.WITHDRAWALS.ACCOUNTS.SET_DEFAULT(id), { is_default: true });
+      await api.patch(API_ROUTES.WITHDRAWALS.ACCOUNTS.ACCOUNT(id), { is_default: true });
       setAccounts((prev) =>
         prev.map((acc) => ({
           ...acc,
@@ -321,7 +321,7 @@ export default function WithdrawalAccountClient({
       const res = await api.post<{
         account?: WithdrawalAccount;
         accounts?: WithdrawalAccount[];
-      }>(API_ROUTES.WITHDRAWALS.ACCOUNTS.ADD, payload);
+      }>(API_ROUTES.WITHDRAWALS.ACCOUNTS.INDEX, payload);
 
       if (res?.account) {
         setAccounts((prev) => [

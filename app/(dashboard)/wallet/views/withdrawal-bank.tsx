@@ -42,7 +42,7 @@ function WithdrawalBank() {
     setFetchError(null);
     try {
       const res = await api.get<WithdrawalAccountsResponse>(
-        API_ROUTES.WITHDRAWALS.ACCOUNTS.LIST,
+        API_ROUTES.WITHDRAWALS.ACCOUNTS.INDEX,
       );
       setAccounts(res?.accounts || []);
     } catch (err: unknown) {
@@ -66,7 +66,7 @@ function WithdrawalBank() {
     try {
       const amountInPounds = form.amount / 100;
       const res = await api.post<WithdrawalRequestResponse>(
-        API_ROUTES.WITHDRAWALS.REQUEST,
+        API_ROUTES.WITHDRAWALS.REQUEST.INDEX,
         {
           amount: amountInPounds,
           bank_id: account.id,

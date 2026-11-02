@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
               // not available
             }
           }
-          const endpoint = credentials.otp ? API_ROUTES.AUTH.VERIFY : API_ROUTES.AUTH.LOGIN;
+          const endpoint = credentials.otp ? API_ROUTES.AUTH.EMAIL_VERIFICATION : API_ROUTES.AUTH.LOGIN;
           const payload = credentials.otp
             ? { email: credentials.email, otp: credentials.otp, userAgent }
             : { email: credentials.email, password: credentials.password, userAgent };
@@ -240,7 +240,12 @@ export const authOptions: NextAuthOptions = {
       }
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "rhythmx_super_secret_key_change_me_in_production",
+  secret: (() => {
+    if (process.env.NODE_ENV === "production" && !process.env.NEXTAUTH_SECRET) {
+      throw new Error("NEXTAUTH_SECRET must be set in production.");
+    }
+    return process.env.NEXTAUTH_SECRET || "rhythmx_super_secret_key_change_me_in_production";
+  })(),
   pages: {
     signIn: "/auth/login",
     newUser: "/auth/get-started",

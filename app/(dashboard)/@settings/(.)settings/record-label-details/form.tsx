@@ -47,7 +47,7 @@ function Form(initialData: FormProps) {
   const submitForm = useCallback(async () => {
     try {
       setErrors({});
-      await api.patch(API_ROUTES.LABEL.ME, {
+      await api.patch(API_ROUTES.LABEL.INDEX, {
         name: labelName,
         about: labelAbout,
         license_number: licenceNumber || null,

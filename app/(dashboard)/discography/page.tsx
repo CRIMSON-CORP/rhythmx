@@ -15,7 +15,7 @@ export default async function DiscographyPage() {
   let initialHasMore = true;
 
   try {
-    const res = await api.get<ReleasesResponse>(`${API_ROUTES.RELEASES.MY}?page=1&limit=20`);
+    const res = await api.get<ReleasesResponse>(`${API_ROUTES.RELEASES.INDEX}?page=1&limit=20`);
 
     if (res?.releases) {
       initialReleases = res.releases;

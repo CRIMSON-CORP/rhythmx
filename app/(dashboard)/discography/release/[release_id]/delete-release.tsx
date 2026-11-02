@@ -40,7 +40,7 @@ function DeleteDialog({
         return;
       }
       if (isDraft) {
-        await api.delete(API_ROUTES.RELEASES.DRAFT(release_id), {
+        await api.delete(API_ROUTES.RELEASES.DRAFT.DRAFT(release_id), {
           reason,
         });
       } else {

@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 
 export default async function AccountForm() {
-  const { label: labelDetails } = await api.get<LabelDetailsResponse>(API_ROUTES.LABEL.ME);
+  const { label: labelDetails } = await api.get<LabelDetailsResponse>(API_ROUTES.LABEL.INDEX);
 
   return (
     <div className="flex flex-col">

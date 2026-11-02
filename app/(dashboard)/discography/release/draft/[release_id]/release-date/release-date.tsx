@@ -231,7 +231,7 @@ function ReleaseDate({
             currency?: string;
             gateway?: string;
           };
-        }>(API_ROUTES.RELEASES.FAST_TRACK(releaseId), {});
+        }>(API_ROUTES.RELEASES.DRAFT.FAST_TRACK(releaseId), {});
 
         if (res.data?.is_fast_track) {
           setXpressRelease(true);
@@ -261,7 +261,7 @@ function ReleaseDate({
       setIsFastTrackLoading(true);
       try {
         const res = await api.delete<{ status: boolean; message: string }>(
-          API_ROUTES.RELEASES.FAST_TRACK(releaseId),
+          API_ROUTES.RELEASES.DRAFT.FAST_TRACK(releaseId),
         );
         setXpressRelease(false);
         setCheckoutData(null);
@@ -295,7 +295,7 @@ function ReleaseDate({
       window.removeEventListener("focus", handleWindowFocus);
       try {
         const res = await api.get<{ release: ReleaseDetail }>(
-          `${API_ROUTES.RELEASES.MY}/${releaseId}`,
+          API_ROUTES.RELEASES.RELEASE(releaseId),
         );
         if (res.release?.is_fast_track) {
           setXpressRelease(true);
@@ -363,7 +363,7 @@ function ReleaseDate({
 
     setIsLoading(true);
     try {
-      await api.patch(API_ROUTES.RELEASES.DRAFT(releaseId), {
+      await api.patch(API_ROUTES.RELEASES.DRAFT.DRAFT(releaseId), {
         release_date: formatDateToYYYYMMDD(releaseDate),
         release_time: value24,
       });

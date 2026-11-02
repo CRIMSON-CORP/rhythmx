@@ -59,7 +59,7 @@ export default function NotificationList({
               meta?: { pagination?: { has_next?: boolean } };
             }
           | Notification[]
-        >(`${API_ROUTES.NOTFICATIONS.LIST}?${params.toString()}`);
+        >(`${API_ROUTES.NOTIFICATIONS.INDEX}?${params.toString()}`);
 
         const items = Array.isArray(response) ? response : (response?.notifications ?? []);
 
@@ -98,7 +98,7 @@ export default function NotificationList({
   const handleAccept = async (reference: string) => {
     try {
       setActionLoading(reference);
-      await api.post(API_ROUTES.NOTFICATIONS.ACCEPT(reference), {});
+      await api.post(API_ROUTES.NOTIFICATIONS.ACCEPT(reference), {});
       setNotifications((prev) =>
         prev.map((item) =>
           item.reference === reference ? { ...item, invite_status: "accepted" } : item,
@@ -116,7 +116,7 @@ export default function NotificationList({
   const handleDecline = async (reference: string) => {
     try {
       setActionLoading(reference);
-      await api.post(API_ROUTES.NOTFICATIONS.DECLINE(reference), {});
+      await api.post(API_ROUTES.NOTIFICATIONS.DECLINE(reference), {});
       setNotifications((prev) =>
         prev.map((item) =>
           item.reference === reference ? { ...item, invite_status: "declined" } : item,

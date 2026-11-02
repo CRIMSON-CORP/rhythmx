@@ -35,7 +35,7 @@ function ImageUpload({
       setImageUrl(URL.createObjectURL(file));
 
       try {
-        const response = await api.postFormData({ url: API_ROUTES.USER.AVATAR, formData });
+        const response = await api.postFormData({ url: API_ROUTES.ME.AVATAR, formData });
         goeyToast.success("Profile picture updated successfully");
         await update({ user: response.data });
         // updateTag("user");

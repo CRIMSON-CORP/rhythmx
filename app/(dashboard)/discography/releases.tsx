@@ -30,7 +30,7 @@ function Releases({
     setIsLoading(true);
 
     api
-      .get<{ releases: Release[] }>(`${API_ROUTES.RELEASES.MY}?status=${status}&limit=50`)
+      .get<{ releases: Release[] }>(`${API_ROUTES.RELEASES.INDEX}?status=${status}&limit=50`)
       .then((res) => {
         if (isMounted && res?.releases) {
           setReleases(res.releases);

@@ -121,7 +121,7 @@ export function ConfirmArtistModal({
             ? { spotify_url: profile.id }
             : { apple_music_url: profile.id };
 
-        await api.patch(API_ROUTES.LABEL.UPDATE_ARTIST_PROFILE(artist.reference), payload);
+        await api.patch(API_ROUTES.LABEL.ARTISTS.PROFILE(artist.reference), payload);
 
         goeyToast.success(
           `${platformType === "spotify" ? "Spotify" : "Apple Music"} profile connected`,

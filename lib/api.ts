@@ -135,7 +135,7 @@ export const api = {
     const isAuthRoute =
       originalUrl === API_ROUTES.AUTH.LOGIN ||
       originalUrl === API_ROUTES.AUTH.REGISTER ||
-      originalUrl === API_ROUTES.AUTH.VERIFY ||
+      originalUrl === API_ROUTES.AUTH.EMAIL_VERIFICATION ||
       originalUrl === API_ROUTES.AUTH.REFRESH ||
       originalUrl === API_ROUTES.AUTH.SOCIAL;
 

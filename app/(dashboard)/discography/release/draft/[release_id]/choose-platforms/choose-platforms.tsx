@@ -58,7 +58,7 @@ function ChoosePlatforms({
   const handleContinue = async () => {
     setIsLoading(true);
     try {
-      await api.put(API_ROUTES.RELEASES.PLATFORMS(release_id), {
+      await api.put(API_ROUTES.RELEASES.DRAFT.PLATFORMS(release_id), {
         platform_ids: selectedPlatformIds,
       });
       goeyToast.success("Platforms selected successfully");

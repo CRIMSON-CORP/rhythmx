@@ -5,7 +5,7 @@ import { API_ROUTES } from "@/lib/api-routes";
 async function NewDraftReleasePage({ params }: { params: Promise<{ release_id: string }> }) {
   const { release_id } = await params;
   const [{ release }, { genres }, { languages }] = await Promise.all([
-    api.get<{ release: ReleaseDetail }>(`${API_ROUTES.RELEASES.MY}/${release_id}`),
+    api.get<{ release: ReleaseDetail }>(API_ROUTES.RELEASES.RELEASE(release_id)),
     api.get<GenresResponse>(API_ROUTES.META.GENRES),
     api.get<LanguagesResponse>(API_ROUTES.META.LANGUAGES),
   ]);

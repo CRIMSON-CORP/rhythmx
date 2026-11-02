@@ -4,7 +4,7 @@ import BillingHistoryClient from "./billing-history-client";
 
 export default async function BillingPage() {
   const { history = [] } = await api.get<SubscriptionResponse>(
-    API_ROUTES.SUBSCRIPTION.GET
+    API_ROUTES.SUBSCRIPTION.INDEX
   );
 
   return (

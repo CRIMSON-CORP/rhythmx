@@ -5,7 +5,7 @@ import ReleaseDate from "./release-date";
 async function ReleaseDatePage({ params }: { params: Promise<{ release_id: string }> }) {
   const { release_id } = await params;
   const { release } = await api.get<{ release: ReleaseDetail }>(
-    `${API_ROUTES.RELEASES.MY}/${release_id}`,
+    API_ROUTES.RELEASES.RELEASE(release_id),
   );
 
   return (

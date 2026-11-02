@@ -60,11 +60,11 @@ function AllowPushNotifications({
             }
 
             // Call API delete endpoint with token
-            await api.delete(`${API_ROUTES.USER.PUSH_NOTIFICATION_TOKEN}`, {
+            await api.delete(`${API_ROUTES.ME.FCM_TOKENS}`, {
               token: encodeURIComponent(currentToken),
             });
           } else {
-            await api.delete(API_ROUTES.USER.PUSH_NOTIFICATION_TOKEN);
+            await api.delete(API_ROUTES.ME.FCM_TOKENS);
           }
 
           router.refresh();
@@ -95,7 +95,7 @@ function AllowPushNotifications({
           }
 
           if (currentToken) {
-            await api.post(API_ROUTES.USER.PUSH_NOTIFICATION_TOKEN, {
+            await api.post(API_ROUTES.ME.FCM_TOKENS, {
               token: currentToken,
             });
             router.refresh();

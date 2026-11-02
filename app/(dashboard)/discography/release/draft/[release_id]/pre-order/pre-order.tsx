@@ -112,7 +112,7 @@ function PreOrderDate({
 
     setIsLoading(true);
     try {
-      await api.patch(API_ROUTES.RELEASES.DRAFT(releaseId), {
+      await api.patch(API_ROUTES.RELEASES.DRAFT.DRAFT(releaseId), {
         preorder_date: formatDateToYYYYMMDD(preorderDate),
         preorder_time: value24,
       });

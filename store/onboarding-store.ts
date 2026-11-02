@@ -86,20 +86,20 @@ const useOnBoardingStore = create<OnBoardingStore>((set, get) => ({
       }
 
       // 2. Determine details endpoint and payload structure
-      let detailsEndpoint = API_ROUTES.ONBOARDING.ARTIST_DETAILS;
+      let detailsEndpoint = API_ROUTES.ONBOARDING.ACCOUNT_TYPE.ARTIST.INDEX;
       let detailsPayload: Record<string, unknown> = {
         artist_name: form.name,
         country: form.country,
       };
 
       if (form.selected_account === "record-label") {
-        detailsEndpoint = API_ROUTES.ONBOARDING.LABEL_DETAILS;
+        detailsEndpoint = API_ROUTES.ONBOARDING.ACCOUNT_TYPE.LABEL.INDEX;
         detailsPayload = {
           label_name: form.name,
           region: form.country,
         };
       } else if (form.selected_account === "contributor") {
-        detailsEndpoint = API_ROUTES.ONBOARDING.COLLABORATOR_DETAILS;
+        detailsEndpoint = API_ROUTES.ONBOARDING.ACCOUNT_TYPE.COLLABORATOR.INDEX;
         detailsPayload = {
           artist_name: form.name,
           country: form.country,
@@ -107,14 +107,14 @@ const useOnBoardingStore = create<OnBoardingStore>((set, get) => ({
       }
 
       // 3. Determine photo endpoint
-      let photoEndpoint = API_ROUTES.ONBOARDING.ARTIST_PHOTO;
+      let photoEndpoint = API_ROUTES.ONBOARDING.ACCOUNT_TYPE.ARTIST.PHOTO;
       if (form.selected_account === "record-label") {
-        photoEndpoint = API_ROUTES.ONBOARDING.LABEL_PHOTO;
+        photoEndpoint = API_ROUTES.ONBOARDING.ACCOUNT_TYPE.LABEL.PHOTO;
       } else if (form.selected_account === "contributor") {
-        photoEndpoint = API_ROUTES.ONBOARDING.COLLABORATOR_PHOTO;
+        photoEndpoint = API_ROUTES.ONBOARDING.ACCOUNT_TYPE.COLLABORATOR.PHOTO;
       }
 
-      await api.post(API_ROUTES.ONBOARDING.ACCOUNT_TYPE, {
+      await api.post(API_ROUTES.ONBOARDING.ACCOUNT_TYPE.INDEX, {
         account_type: accountTypeStr,
       });
 

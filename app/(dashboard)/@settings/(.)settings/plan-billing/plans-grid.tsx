@@ -75,7 +75,7 @@ export default function PlansGrid({
     reference: string,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      await api.post<PaymentVerificationResponse>(API_ROUTES.PAYMENTS.VERIFY(reference), {});
+      await api.post<PaymentVerificationResponse>(API_ROUTES.PAYMENTS.VERIFICATION(reference), {});
       return { success: true };
     } catch (err) {
       console.warn("Direct verification pending or failed, polling status:", err);
@@ -84,7 +84,7 @@ export default function PlansGrid({
         await new Promise((resolve) => setTimeout(resolve, 2500));
         try {
           const pollRes = await api.get<PaymentStatusResponse>(
-            API_ROUTES.PAYMENTS.STATUS(reference),
+            API_ROUTES.PAYMENTS.PAYMENT(reference),
           );
           if (pollRes?.payment?.status === "successful") {
             return { success: true };

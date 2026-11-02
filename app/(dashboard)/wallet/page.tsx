@@ -19,6 +19,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { TransactionDetailsModal } from "./transaction-details-modal";
 import { StatusBadge } from "./status-badge";
 import { WalletPagination } from "./wallet-pagination";
@@ -63,12 +64,18 @@ export default async function WalletPage({ searchParams }: WalletPageProps) {
   const limit = Math.max(1, Math.min(100, parseInt(resolvedParams?.limit || "20", 10) || 20));
 
   const [balanceRes, transactionsRes] = await Promise.all([
-    api.get<EarningsBalanceResponse>(API_ROUTES.EARNINGS.GET).catch(() => null),
+    api.get<EarningsBalanceResponse>(API_ROUTES.EARNINGS.INDEX).catch((err) => {
+      if (isRedirectError(err)) throw err;
+      return null;
+    }),
     api
       .get<WalletTransactionsResponse>(
-        API_ROUTES.EARNINGS.TRANSACTIONS.LIST(`page=${page}&limit=${limit}`),
+        API_ROUTES.EARNINGS.TRANSACTIONS.INDEX(`page=${page}&limit=${limit}`),
       )
-      .catch(() => null),
+      .catch((err) => {
+        if (isRedirectError(err)) throw err;
+        return null;
+      }),
   ]);
 
   const formattedBalance = formatCurrency(balanceRes?.balance ?? 0, balanceRes?.currency ?? "GBP");

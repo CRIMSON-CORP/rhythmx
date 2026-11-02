@@ -61,7 +61,7 @@ function CreateAccountForm() {
 
     try {
       const promises: Promise<unknown>[] = [
-        api.patch(API_ROUTES.ONBOARDING.PROFILE, validation.data),
+        api.patch(API_ROUTES.ONBOARDING.PROFILE.INDEX, validation.data),
       ];
 
       // Avatar upload request (if selected)
@@ -71,7 +71,7 @@ function CreateAccountForm() {
 
         promises.push(
           api.postFormData({
-            url: API_ROUTES.ONBOARDING.UPLOAD_AVATAR,
+            url: API_ROUTES.ONBOARDING.PROFILE.AVATAR,
             formData: avatarFormData,
           }),
         );

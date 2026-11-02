@@ -24,7 +24,7 @@ export function RemoveArtistDialog({ reference }: { reference: string }) {
   const handleRemove = async () => {
     try {
       setIsDeleting(true);
-      await api.delete(API_ROUTES.LABEL.ARTIST(reference));
+      await api.delete(API_ROUTES.LABEL.ARTISTS.ARTIST(reference));
       goeyToast.success("Artist removed successfully");
       setOpen(false);
       router.push("/artists");

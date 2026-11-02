@@ -294,7 +294,7 @@ const useCreateArtistStore = create<CreateArtistStore>((set, get) => ({
 
       const res = await api.post<{
         artist: CreatedArtistData;
-      }>(API_ROUTES.LABEL.ARTISTS, payload);
+      }>(API_ROUTES.LABEL.ARTISTS.INDEX, payload);
 
       const artist = (res as any)?.artist || (res as any)?.data?.artist;
 
@@ -310,7 +310,7 @@ const useCreateArtistStore = create<CreateArtistStore>((set, get) => ({
           const photoRes = await api.post<{
             avatar_url?: string;
             portrait_url?: string;
-          }>(API_ROUTES.LABEL.PHOTO(artist.reference), photoData);
+          }>(API_ROUTES.LABEL.ARTISTS.PHOTO(artist.reference), photoData);
 
           const photoUrl =
             photoRes?.avatar_url || (photoRes as any)?.data?.avatar_url || (photoRes as any)?.url;

@@ -42,14 +42,14 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
 
   try {
     const [artistRes, statsRes, releasesRes] = await Promise.all([
-      api.get<LabelArtistDetailResponse>(API_ROUTES.LABEL.ARTIST(artist_id)),
-      api.get<ArtistStatsResponse>(API_ROUTES.LABEL.ARTIST_STATS(artist_id)).catch((err) => {
+      api.get<LabelArtistDetailResponse>(API_ROUTES.LABEL.ARTISTS.ARTIST(artist_id)),
+      api.get<ArtistStatsResponse>(API_ROUTES.LABEL.ARTISTS.STATS(artist_id)).catch((err) => {
         console.error("Failed to fetch artist stats:", err);
         return null;
       }),
       api
         .get<ArtistReleasesResponse>(
-          API_ROUTES.LABEL.ARTIST_RELEASES(artist_id, "page=1&limit=20"),
+          API_ROUTES.LABEL.ARTISTS.RELEASES(artist_id, "page=1&limit=20"),
         )
         .catch((err) => {
           console.error("Failed to fetch artist releases:", err);

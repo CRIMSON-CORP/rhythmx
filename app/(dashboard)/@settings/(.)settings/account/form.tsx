@@ -57,7 +57,7 @@ function Form(props: FormErrors) {
     const timer = setTimeout(async () => {
       try {
         setErrors({ dob: "", email: "", first_name: "", gender: "", last_name: "", phone: "" });
-        await api.patch(API_ROUTES.USER.ME, {
+        await api.patch(API_ROUTES.ME.INDEX, {
           first_name: firstName,
           last_name: lastName,
           phone: phone || null,

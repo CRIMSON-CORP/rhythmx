@@ -61,7 +61,7 @@ export default function AllTeamSection({
       });
 
       const res = await api
-        .get<LabelTeamResponse>(`${API_ROUTES.LABEL.TEAM}?${query.toString()}`)
+        .get<LabelTeamResponse>(`${API_ROUTES.LABEL.TEAM.INDEX}?${query.toString()}`)
         .catch(() => null);
 
       const items = res?.team || [];

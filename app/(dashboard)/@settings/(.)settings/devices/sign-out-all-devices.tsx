@@ -13,7 +13,7 @@ function SignOutAllDevices() {
     <Button
       onClick={() =>
         startTransition(async () => {
-          await api.post(API_ROUTES.USER.DEVICE_SIGN_OUTS, {});
+          await api.post(API_ROUTES.ME.DEVICE_SIGN_OUTS, {});
           router.refresh();
         })
       }

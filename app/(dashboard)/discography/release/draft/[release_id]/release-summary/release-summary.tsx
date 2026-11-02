@@ -200,7 +200,7 @@ function ReleaseSummary({
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
     try {
-      await api.post(API_ROUTES.RELEASES.SUBMIT(releaseId), {});
+      await api.post(API_ROUTES.RELEASES.DRAFT.SUBMIT(releaseId), {});
 
       goeyToast.success("Release Submitted", {
         description: "Your release has been successfully submitted for review!",

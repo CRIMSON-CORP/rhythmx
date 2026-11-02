@@ -110,7 +110,7 @@ function SplitRoyalty({
 
     setIsTogglingRoyalty(true);
     try {
-      await api.patch(API_ROUTES.RELEASES.ROYALTY(releaseId), {
+      await api.patch(API_ROUTES.RELEASES.DRAFT.ROYALTY(releaseId), {
         owns_full_royalty: checked,
       });
 
@@ -195,7 +195,7 @@ function SplitRoyalty({
 
     setIsUpdatingSplit(true);
     try {
-      await api.put(API_ROUTES.RELEASES.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
+      await api.put(API_ROUTES.RELEASES.DRAFT.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
         splits: [...existingSplits, newSplit],
       });
 
@@ -220,7 +220,7 @@ function SplitRoyalty({
 
     setIsUpdatingSplit(true);
     try {
-      await api.put(API_ROUTES.RELEASES.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
+      await api.put(API_ROUTES.RELEASES.DRAFT.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
         splits: updatedSplits,
       });
 
@@ -258,7 +258,7 @@ function SplitRoyalty({
     };
 
     try {
-      await api.put(API_ROUTES.RELEASES.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
+      await api.put(API_ROUTES.RELEASES.DRAFT.TRACKS.ROYALTY_SPLITS(releaseId, selectedTrack.reference), {
         splits: [...existingSplits, newSplit],
       });
 

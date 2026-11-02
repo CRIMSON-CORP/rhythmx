@@ -65,7 +65,7 @@ export function TransactionDetailsModal({
       try {
         const cleanRef = reference.replace(/^#/, "");
         const res = await api.get<TransactionDetailsResponse>(
-          API_ROUTES.EARNINGS.TRANSACTIONS.DETAILS(cleanRef)
+          API_ROUTES.EARNINGS.TRANSACTIONS.TRANSACTION(cleanRef)
         );
         if (res?.transaction) {
           setTransaction(res.transaction);

@@ -9,7 +9,7 @@ export async function toggleNotificationPreference(
   newValue: boolean,
 ): Promise<void> {
   try {
-    await api.patch(API_ROUTES.USER.NOTIFICATION_PREFERENCES, {
+    await api.patch(API_ROUTES.ME.NOTIFICATION_PREFERENCES, {
       preferences: {
         [category]: newValue,
       },

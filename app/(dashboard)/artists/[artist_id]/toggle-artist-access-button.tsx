@@ -30,7 +30,7 @@ export function ToggleArtistAccessButton({
     setLoading(true);
     try {
       const res = await api.patch<UpdateArtistAccessResponse>(
-        API_ROUTES.LABEL.ARTIST(reference),
+        API_ROUTES.LABEL.ARTISTS.ARTIST(reference),
         { access_status: nextAccessStatus },
       );
 

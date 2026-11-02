@@ -3,11 +3,15 @@ import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import BillingErrorToast from "./billing-error-toast";
 import PlanBillingTabs from "./plan-billing-tabs";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export default async function PlanBillingLayout({ children }: { children: React.ReactNode }) {
   const subRes = await api
-    .get<SubscriptionResponse>(API_ROUTES.SUBSCRIPTION.GET)
-    .catch(() => null);
+    .get<SubscriptionResponse>(API_ROUTES.SUBSCRIPTION.INDEX)
+    .catch((err) => {
+      if (isRedirectError(err)) throw err;
+      return null;
+    });
 
   const canShare = subRes?.subscription?.plan?.slug === "rhythm-elite";
 

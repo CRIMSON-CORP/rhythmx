@@ -194,7 +194,9 @@ const useNewReleaseStore = create<NewReleaseStoreProps>((set, get) => ({
         id: upload_Relase_toast_id,
       });
       const data = await api[release_id ? "patch" : "post"]<{ reference: string }>(
-        API_ROUTES.RELEASES.CREATE_DRAFT + (release_id ? `/${release_id}` : ""),
+        release_id
+          ? API_ROUTES.RELEASES.DRAFT.DRAFT(release_id)
+          : API_ROUTES.RELEASES.DRAFT.INDEX,
         get().getReleaseDataFromState(),
       );
       goeyToast.dismiss(upload_Relase_toast_id);
@@ -208,7 +210,7 @@ const useNewReleaseStore = create<NewReleaseStoreProps>((set, get) => ({
           const formData = new FormData();
           formData.set("artwork", artwork);
           await api.postFormData({
-            url: API_ROUTES.RELEASES.UPLOAD_ARTWORK(_release_id),
+            url: API_ROUTES.RELEASES.DRAFT.ARTWORK(_release_id),
             formData,
           });
           goeyToast.dismiss(upload_artwork_toast_id);

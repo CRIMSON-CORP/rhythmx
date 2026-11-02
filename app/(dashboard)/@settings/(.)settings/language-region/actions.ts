@@ -6,7 +6,7 @@ import { revalidatePath, updateTag } from "next/cache";
 
 export async function updateTimezone(timezone: string): Promise<void> {
   try {
-    await api.patch(API_ROUTES.USER.LOCALE, { timezone });
+    await api.patch(API_ROUTES.ME.LOCALE, { timezone });
     updateTag("user");
     revalidatePath("/settings/language-region");
   } catch (error: unknown) {

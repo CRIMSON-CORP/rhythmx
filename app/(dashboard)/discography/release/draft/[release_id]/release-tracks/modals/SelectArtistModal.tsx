@@ -68,7 +68,7 @@ export function SelectArtistModal({
               has_prev: boolean;
             };
           };
-        }>(`${API_ROUTES.LABEL.ARTISTS}?${query.toString()}`)
+        }>(`${API_ROUTES.LABEL.ARTISTS.INDEX}?${query.toString()}`)
         .catch(() => null);
 
       const rawArtists = res?.artists || [];

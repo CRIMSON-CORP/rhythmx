@@ -34,6 +34,6 @@ async function MyRelease() {
 export default MyRelease;
 
 async function Releases() {
-  const { releases } = await api.get<{ releases: Release[] }>(API_ROUTES.RELEASES.MY);
+  const { releases } = await api.get<{ releases: Release[] }>(API_ROUTES.RELEASES.INDEX);
   return <InfiniteReleases initialReleases={releases} scrollable />;
 }

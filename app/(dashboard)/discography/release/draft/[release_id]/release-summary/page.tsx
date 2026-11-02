@@ -14,9 +14,9 @@ async function ReleaseSummaryPage({ params }: { params: Promise<{ release_id: st
   const { release_id } = await params;
 
   const [releaseRes, tracksRes, { platforms }, { genres }, { languages }] = await Promise.all([
-    api.get<{ release: ReleaseDetail }>(`${API_ROUTES.RELEASES.MY}/${release_id}`),
+    api.get<{ release: ReleaseDetail }>(API_ROUTES.RELEASES.RELEASE(release_id)),
     api.get<{ tracks: ReleaseTrack[]; owns_full_royalty: boolean }>(
-      API_ROUTES.RELEASES.TRACKS.LIST(release_id),
+      API_ROUTES.RELEASES.DRAFT.TRACKS.INDEX(release_id),
     ),
     api.get<{ platforms: Platform[] }>(API_ROUTES.META.PLATFORMS),
     api.get<GenresResponse>(API_ROUTES.META.GENRES),

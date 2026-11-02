@@ -120,7 +120,7 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
 
     try {
       const response = await api.postFormData({
-        url: API_ROUTES.RELEASES.TRACKS.ADD(releaseReference),
+        url: API_ROUTES.RELEASES.DRAFT.TRACKS.INDEX(releaseReference),
         formData,
         onUploadProgress: (percent) => {
           setUploadingQueue((prev) =>
@@ -217,7 +217,7 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
       const creditsPayload = updatedTrack.people || EMPTY_PEOPLE;
 
       await Promise.all([
-        api.patch(API_ROUTES.RELEASES.TRACKS.UPDATE(releaseReference, updatedTrack.reference), {
+        api.patch(API_ROUTES.RELEASES.DRAFT.TRACKS.TRACK(releaseReference, updatedTrack.reference), {
           title: updatedTrack.title,
           primary_genre: updatedTrack.primary_genre,
           secondary_genre: updatedTrack.secondary_genre,
@@ -232,7 +232,7 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
           has_license: updatedTrack.has_license,
         }),
         api.put(
-          API_ROUTES.RELEASES.TRACKS.CREDITS(releaseReference, updatedTrack.reference),
+          API_ROUTES.RELEASES.DRAFT.TRACKS.CREDITS(releaseReference, updatedTrack.reference),
           creditsPayload,
         ),
       ]);
@@ -274,7 +274,7 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
           setDeletingTrackRefs((prev) => new Set(prev).add(track.reference));
 
           try {
-            await api.delete(API_ROUTES.RELEASES.TRACKS.DELETE(releaseReference, track.reference));
+            await api.delete(API_ROUTES.RELEASES.DRAFT.TRACKS.TRACK(releaseReference, track.reference));
             setTracks((prev) => prev.filter((t) => t.reference !== track.reference));
             if (editingTrackRef === track.reference) {
               setEditingTrackRef(null);
@@ -794,7 +794,7 @@ function TrackEditPanel({
     const assignedRole = artistData.role || (isMain ? "primary-artist" : "featuring-artist");
 
     const newPerson: TrackCreditItem = {
-      artist_reference: artistData.reference,
+      artist_reference: artistData.reference || null,
       stage_name: artistData.stage_name || artistData.name,
       official_name: artistData.name,
       avatar_url: artistData.avatar_url || null,
@@ -1359,7 +1359,7 @@ function TrackEditPanel({
                     // Delete on server in background
                     api
                       .delete(
-                        API_ROUTES.RELEASES.TRACKS.REMOVE_LICENSE(
+                        API_ROUTES.RELEASES.DRAFT.TRACKS.LICENSE(
                           releaseReference,
                           localForm.reference,
                         ),

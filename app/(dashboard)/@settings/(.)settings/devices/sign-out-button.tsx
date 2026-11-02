@@ -15,7 +15,7 @@ function SignOutButton({ device_id }: { device_id: Device["id"] }) {
       size="xs"
       onClick={() =>
         startTransition(async () => {
-          await api.delete(API_ROUTES.USER.DEVICE_SIGN_OUT + `/${device_id}`);
+          await api.delete(API_ROUTES.ME.DEVICES.DEVICE(device_id));
           router.refresh();
         })
       }

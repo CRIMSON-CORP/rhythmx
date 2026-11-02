@@ -98,7 +98,9 @@ async function submitDraftRelease(previousState: State, formData: FormData): Pro
 
   try {
     const data = await api[release_id ? "patch" : "post"]<{ reference: string }>(
-      API_ROUTES.RELEASES.CREATE_DRAFT + (release_id ? `/${release_id}` : ""),
+      release_id
+        ? API_ROUTES.RELEASES.DRAFT.DRAFT(release_id.toString())
+        : API_ROUTES.RELEASES.DRAFT.INDEX,
       payload,
     );
     reference = data.reference;
@@ -118,7 +120,7 @@ async function submitDraftRelease(previousState: State, formData: FormData): Pro
       const artworkFormData = new FormData();
       artworkFormData.append("artwork", artwork);
       await api.postFormData({
-        url: API_ROUTES.RELEASES.UPLOAD_ARTWORK(reference),
+        url: API_ROUTES.RELEASES.DRAFT.ARTWORK(reference),
         formData: artworkFormData,
       });
     }

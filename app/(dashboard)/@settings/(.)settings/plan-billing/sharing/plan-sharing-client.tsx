@@ -72,7 +72,7 @@ export default function PlanSharingClient({
     try {
       setActionLoading({ inviteId: invite.invite_id, action: "resend" });
       const res = await api.post<MemberInvitationResponse | null>(
-        API_ROUTES.SUBSCRIPTION.RESEND_INVITATION(invite.invite_id),
+        API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS.RESEND(invite.invite_id),
         {},
       );
       goeyToast.success(`Invitation resent to ${invite.email}`);
@@ -95,7 +95,7 @@ export default function PlanSharingClient({
     const displayName = invite.name || invite.email;
     try {
       setActionLoading({ inviteId: invite.invite_id, action: "cancel" });
-      await api.delete(API_ROUTES.SUBSCRIPTION.CANCEL_INVITATION(invite.invite_id));
+      await api.delete(API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS.INVITATION(invite.invite_id));
       setInvites((prev) => prev.filter((item) => item.invite_id !== invite.invite_id));
       goeyToast.success(`Invitation for ${displayName} cancelled`);
     } catch (err: unknown) {

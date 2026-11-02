@@ -25,9 +25,9 @@ export default async function ArtistsPage() {
   try {
     const [artistsRes, invitesRes] = await Promise.all([
       api.get<LabelArtistsResponse>(
-        `${API_ROUTES.LABEL.ARTISTS}?page=1&limit=20`
+        `${API_ROUTES.LABEL.ARTISTS.INDEX}?page=1&limit=20`
       ),
-      api.get<ArtistInvitesResponse>(API_ROUTES.LABEL.INVITE_ARTIST).catch((err) => {
+      api.get<ArtistInvitesResponse>(API_ROUTES.LABEL.ARTISTS.INVITE).catch((err) => {
         console.error("Failed to fetch artist invites on server:", err);
         return undefined;
       }),

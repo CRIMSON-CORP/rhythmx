@@ -61,7 +61,7 @@ export default function AllReleasesSection({
         });
 
         const res = await api
-          .get<ReleasesResponse>(`${API_ROUTES.RELEASES.MY}?${query.toString()}`)
+          .get<ReleasesResponse>(`${API_ROUTES.RELEASES.INDEX}?${query.toString()}`)
           .catch(() => null);
 
         const items = res?.releases || [];

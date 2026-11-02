@@ -144,7 +144,7 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
         label: "Yes, Delete it",
         successLabel: "Account deleted successfully",
         onClick: async () => {
-          await api.post(API_ROUTES.USER.ACCOUNT_DELETION, {});
+          await api.post(API_ROUTES.ME.ACCOUNT_DELETION, {});
           signOut({
             callbackUrl: "/auth/get-started",
           });

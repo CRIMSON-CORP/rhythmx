@@ -61,7 +61,7 @@ export default function AllArtistsSection({
       });
 
       const res = await api
-        .get<LabelArtistsResponse>(`${API_ROUTES.LABEL.ARTISTS}?${query.toString()}`)
+        .get<LabelArtistsResponse>(`${API_ROUTES.LABEL.ARTISTS.INDEX}?${query.toString()}`)
         .catch(() => null);
 
       const items = res?.artists || [];

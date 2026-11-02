@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/date-formatter";
 import SignOutButton from "./sign-out-button";
 
 export default async function DevicesSettingsPage() {
-  const { devices } = await api.get<{ devices: Array<Device> }>(API_ROUTES.USER.DEVICES);
+  const { devices } = await api.get<{ devices: Array<Device> }>(API_ROUTES.ME.DEVICES.INDEX);
 
   return (
     <div className="flex flex-col gap-6 h-full overflow-auto">

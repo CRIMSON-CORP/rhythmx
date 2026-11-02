@@ -9,10 +9,17 @@ import { API_ROUTES } from "@/lib/api-routes";
 import DeleteRelease from "./delete-release";
 import PlayTrack from "./play-track";
 
+function formatDuration(durationInSeconds: number | null | undefined): string {
+  if (!durationInSeconds || isNaN(durationInSeconds)) return "0:00";
+  const minutes = Math.floor(durationInSeconds / 60);
+  const seconds = Math.floor(durationInSeconds % 60);
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 async function Release({ params }: { params: Promise<{ release_id: string }> }) {
   const { release_id } = await params;
   const [{ release }, earnings] = await Promise.all([
-    api.get<{ release: ReleaseDetail }>(`${API_ROUTES.RELEASES.MY}/${release_id}`),
+    api.get<{ release: ReleaseDetail }>(API_ROUTES.RELEASES.RELEASE(release_id)),
     api.get<EarningsResponse>(`${API_ROUTES.RELEASES.EARNINGS(release_id)}`),
   ]);
 
@@ -101,32 +108,50 @@ async function Release({ params }: { params: Promise<{ release_id: string }> }) 
           <h2 className="font-medium text-border-default-secondary">Tracks</h2>
           <div className="grow relative overflow-auto pr-2">
             <ul className="flex flex-col gap-4 overflow-auto absolute inset-0">
-              {release.tracks.map((track) => (
-                <li
-                  key={track.reference}
-                  className="flex max-lg:flex-wrap items-center justify-between gap-4 px-5 py-3 hover:rounded-20 border-default-tertiary border-b hover:bg-page-background transition-colors group"
-                >
-                  <span className="size-10 font-medium text-border-default-secondary text-center bg-page-background rounded-full flex items-center justify-center flex-none">
-                    {track.order}
-                  </span>
-                  <div className="size-10.5 bg-brand-purple/12 rounded-full flex items-center justify-center flex-none">
-                    <Icon name="music" size={26.25} className="text-brand-purple" />
-                  </div>
-                  <div className="flex flex-col grow break-all">
-                    <span className="font-medium break-after-all">{track.title}</span>
-                    <span className="text-[11px] text-border-default-secondary">
-                      {track.is_uploaded ? "Uploaded" : "Not Uploaded"}
-                    </span>
-                  </div>
-                  <Link
-                    href="/"
-                    className="px-5 py-3 border border-black hover:bg-white rounded-full transition-colors whitespace-nowrap"
+              {release.tracks.map((track) => {
+                const primaryArtist =
+                  track.contributors?.find((c) => c.role === "primary-artist")?.name ||
+                  track.people?.main?.[0]?.stage_name ||
+                  track.people?.main?.[0]?.official_name ||
+                  release.artists?.[0]?.name;
+                const durationText = track.duration ? formatDuration(track.duration) : null;
+
+                return (
+                  <li
+                    key={track.reference}
+                    className="flex max-lg:flex-wrap items-center justify-between gap-4 px-5 py-3 hover:rounded-20 border-default-tertiary border-b hover:bg-page-background transition-colors group"
                   >
-                    Edit Track
-                  </Link>
-                  <PlayTrack source={track.audio_url} />
-                </li>
-              ))}
+                    <span className="size-10 font-medium text-border-default-secondary text-center bg-page-background rounded-full flex items-center justify-center flex-none">
+                      {track.order}
+                    </span>
+                    <div className="size-10.5 bg-brand-purple/12 rounded-full flex items-center justify-center flex-none">
+                      <Icon name="music" size={26.25} className="text-brand-purple" />
+                    </div>
+                    <div className="flex flex-col grow break-all min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium break-after-all">{track.title}</span>
+                        {track.is_explicit && (
+                          <span className="bg-black/5 text-black px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex-none">
+                            Explicit
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-border-default-secondary">
+                        {primaryArtist && <span className="truncate">{primaryArtist}</span>}
+                        {primaryArtist && durationText && <span>•</span>}
+                        {durationText && <span>{durationText}</span>}
+                      </div>
+                    </div>
+                    <Link
+                      href={`/discography/release/draft/${release.reference}/release-tracks`}
+                      className="px-5 py-3 border border-black hover:bg-white rounded-full transition-colors whitespace-nowrap text-sm font-medium"
+                    >
+                      Edit Track
+                    </Link>
+                    <PlayTrack source={track.audio_url} />
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>

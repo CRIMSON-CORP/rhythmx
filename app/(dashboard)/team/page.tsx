@@ -9,7 +9,7 @@ export default async function TeamPage() {
   let initialMeta: PaginationMeta | undefined;
 
   try {
-    const res = await api.get<LabelTeamResponse>(`${API_ROUTES.LABEL.TEAM}?page=1&limit=20`);
+    const res = await api.get<LabelTeamResponse>(`${API_ROUTES.LABEL.TEAM.INDEX}?page=1&limit=20`);
     if (res?.team) {
       initialTeam = res.team;
       initialMeta = res.meta?.pagination;

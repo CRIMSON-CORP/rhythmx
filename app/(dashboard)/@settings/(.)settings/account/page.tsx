@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 
 export default async function AccountForm() {
-  const { user } = await api.get<{ user: User }>(API_ROUTES.USER.ME);
+  const { user } = await api.get<{ user: User }>(API_ROUTES.ME.INDEX);
   return (
     <div className="flex flex-col">
       {/* Profile Details Header */}

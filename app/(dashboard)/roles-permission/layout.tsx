@@ -15,7 +15,7 @@ export default async function Layout({
   let initialCatalogue: RoleCatalogueGroup[] = [];
 
   try {
-    const res = await api.get<LabelRolesResponse>(API_ROUTES.LABEL.ROLES);
+    const res = await api.get<LabelRolesResponse>(API_ROUTES.LABEL.ROLES.INDEX);
     if (res?.roles) {
       initialRoles = res.roles;
     }

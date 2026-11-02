@@ -22,7 +22,7 @@ function Layout({
       startTransition(async () => {
         try {
           setError("");
-          await api.patch(API_ROUTES.ONBOARDING.TERMS_AGREEMENT, {
+          await api.patch(API_ROUTES.ONBOARDING.ACCEPT_TERMS, {
             accepted,
           });
           router.push(accepted ? "/billing" : "/");

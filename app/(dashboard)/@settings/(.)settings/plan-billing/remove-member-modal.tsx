@@ -47,7 +47,7 @@ export default function RemoveMemberModal({
     const memberRef = member.reference || member.id;
     try {
       setLoading(true);
-      await api.delete(API_ROUTES.SUBSCRIPTION.MEMBERS(memberRef));
+      await api.delete(API_ROUTES.SUBSCRIPTION.MEMBERS.MEMBER(memberRef));
       goeyToast.success(`${member.name} has been removed from your plan.`);
       setOpen(false);
       onRemove?.(memberRef);

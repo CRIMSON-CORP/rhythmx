@@ -16,7 +16,7 @@ export default function NotificationsPanel({ children }: { children: React.React
     window.dispatchEvent(new CustomEvent("notifications:read-all"));
 
     // Call backend endpoint to mark all as read
-    api.post(API_ROUTES.NOTFICATIONS.READ_ALL, {}).catch((err) => {
+    api.post(API_ROUTES.NOTIFICATIONS.READ_ALL, {}).catch((err) => {
       console.error("Failed to mark all notifications as read:", err);
     });
   }, []);

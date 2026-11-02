@@ -8,7 +8,7 @@ export default async function NotificationSettingsPage() {
   const { preferences, push_enabled } = await api.get<{
     preferences: NotificationPreferences;
     push_enabled: boolean;
-  }>(API_ROUTES.USER.NOTIFICATION_PREFERENCES);
+  }>(API_ROUTES.ME.NOTIFICATION_PREFERENCES);
 
   return (
     <div className="flex flex-col">

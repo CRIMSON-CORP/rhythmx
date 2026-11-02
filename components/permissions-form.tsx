@@ -126,11 +126,11 @@ export default function PermissionsForm({ roleId }: PermissionsFormProps) {
     setIsSubmitting(true);
     try {
       if (isEditMode && roleId) {
-        await api.patch(API_ROUTES.LABEL.ROLE(roleId), payload);
+        await api.patch(API_ROUTES.LABEL.ROLES.ROLE(roleId), payload);
         goeyToast.success("Permissions updated successfully.");
         router.refresh();
       } else {
-        await api.post(API_ROUTES.LABEL.ROLES, payload);
+        await api.post(API_ROUTES.LABEL.ROLES.INDEX, payload);
         goeyToast.success("Role created successfully.");
         router.push("/roles-permission");
         router.refresh();
@@ -162,7 +162,7 @@ export default function PermissionsForm({ roleId }: PermissionsFormProps) {
           goeyToast.dismiss(warningToastId);
           setIsDeleting(true);
           try {
-            await api.delete(API_ROUTES.LABEL.ROLE(roleId));
+            await api.delete(API_ROUTES.LABEL.ROLES.ROLE(roleId));
             goeyToast.success("Role deleted successfully.");
             router.push("/roles-permission");
             router.refresh();

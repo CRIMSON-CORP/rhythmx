@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 import { updateTimezone } from "./actions";
 
 export default async function LanguageSettingsPage() {
-  const { user } = await api.get<{ user: User }>(API_ROUTES.USER.ME);
+  const { user } = await api.get<{ user: User }>(API_ROUTES.ME.INDEX);
   const { timezones } = await api.get<{ timezones: TimeZone[] }>(API_ROUTES.META.TIMEZONES);
 
   const userTimezone = timezones.find((t) => t.slug === user.timezone);

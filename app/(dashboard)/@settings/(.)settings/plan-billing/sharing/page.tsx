@@ -8,13 +8,13 @@ export default async function PlanSharingPage() {
   let sharingError: string | null = null;
 
   const [subRes, userRes, sharingRes] = await Promise.all([
-    api.get<SubscriptionResponse>(API_ROUTES.SUBSCRIPTION.GET).catch((err) => {
+    api.get<SubscriptionResponse>(API_ROUTES.SUBSCRIPTION.INDEX).catch((err) => {
       console.error("Failed to fetch subscription on sharing page:", err);
       return { subscription: null };
     }),
-    api.get<{ user: User }>(API_ROUTES.USER.ME).catch(() => null),
+    api.get<{ user: User }>(API_ROUTES.ME.INDEX).catch(() => null),
     api
-      .get<SubscriptionSharingResponse>(API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS)
+      .get<SubscriptionSharingResponse>(API_ROUTES.SUBSCRIPTION.MEMBER_INVITATIONS.INDEX)
       .catch((err: unknown) => {
         if (isRedirectError(err)) throw err;
         const msg =

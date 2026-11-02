@@ -5,6 +5,7 @@ import { formatCurrency } from "@/lib/utils";
 import PlansGrid from "./plans-grid";
 import { Button } from "@/components/ui/button";
 import SharePlanModal from "./share-plan-modal";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 function formatExpiryDate(dateStr?: string | null): string {
   if (!dateStr) return "";
@@ -27,9 +28,12 @@ function isSubscriptionExpired(sub?: UserSubscription | null): boolean {
 
 export default async function ManagePlanPage() {
   const [{ plans = [] }, { subscription = null }, userRes] = await Promise.all([
-    api.get<PlansResponse>(API_ROUTES.PLANS.LIST),
-    api.get<SubscriptionResponse>(API_ROUTES.SUBSCRIPTION.GET),
-    api.get<{ user: User }>(API_ROUTES.USER.ME).catch(() => null),
+    api.get<PlansResponse>(API_ROUTES.PLANS.INDEX),
+    api.get<SubscriptionResponse>(API_ROUTES.SUBSCRIPTION.INDEX),
+    api.get<{ user: User }>(API_ROUTES.ME.INDEX).catch((err) => {
+      if (isRedirectError(err)) throw err;
+      return null;
+    }),
   ]);
 
   const isExpired = isSubscriptionExpired(subscription);
