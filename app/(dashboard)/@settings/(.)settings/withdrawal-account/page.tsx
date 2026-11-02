@@ -4,15 +4,11 @@ import { API_ROUTES } from "@/lib/api-routes";
 
 export default async function WithdrawalForm() {
   const [accountsRes, countriesRes, currenciesRes] = await Promise.all([
-    api
-      .get<WithdrawalAccountsResponse>(API_ROUTES.WITHDRAWALS.ACCOUNTS.LIST)
-      .catch(() => null),
+    api.get<WithdrawalAccountsResponse>(API_ROUTES.WITHDRAWALS.ACCOUNTS.LIST).catch(() => null),
     api
       .get<{ countries: Array<{ code: string; name: string }> }>(API_ROUTES.META.COUNTRIES)
       .catch(() => null),
-    api
-      .get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES)
-      .catch(() => null),
+    api.get<PaymentCurrenciesResponse>(API_ROUTES.PAYMENTS.CURRENCIES).catch(() => null),
   ]);
 
   const accounts = accountsRes?.accounts || [];

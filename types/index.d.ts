@@ -297,6 +297,7 @@ interface Bank {
   name: string;
   slug: string;
   type: string;
+  logo_url: string;
   currency: string;
 }
 

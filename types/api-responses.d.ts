@@ -609,6 +609,10 @@ interface WithdrawalAccount {
   created_at: string;
 }
 
+interface ResolveAccountResponse {
+  account_name: string;
+}
+
 interface WithdrawalAccountsResponse {
   accounts: WithdrawalAccount[];
 }

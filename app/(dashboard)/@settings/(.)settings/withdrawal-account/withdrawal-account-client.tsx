@@ -101,7 +101,7 @@ function BankList({
         >
           <div className="flex items-center gap-3.5 min-w-0">
             <Image
-              src={(bank as { image?: string }).image || "/images/avatar.png"}
+              src={bank.logo_url}
               alt={bank.name}
               width={40}
               height={40}
@@ -155,6 +155,8 @@ export default function WithdrawalAccountClient({
   const [routingNumber, setRoutingNumber] = React.useState("");
   const [bankCountry, setBankCountry] = React.useState("");
   const [currency, setCurrency] = React.useState("");
+  const [isResolving, setIsResolving] = React.useState(false);
+  const [resolveError, setResolveError] = React.useState<string | null>(null);
 
   const handleOpenModal = () => {
     setModalStep("select-bank");
@@ -165,6 +167,8 @@ export default function WithdrawalAccountClient({
     setRoutingNumber("");
     setBankCountry("");
     setCurrency("");
+    setResolveError(null);
+    setIsResolving(false);
     setIsSubmitting(false);
     setIsModalOpen(true);
   };
@@ -173,8 +177,64 @@ export default function WithdrawalAccountClient({
     setSelectedBank(bank);
     setBankCountry("");
     setCurrency("");
+    setAccountName("");
+    setAccountNumber("");
+    setResolveError(null);
+    setIsResolving(false);
     setModalStep("bank-details");
   };
+  React.useEffect(() => {
+    const cleaned = accountNumber.trim();
+    if (!selectedBank?.code || cleaned.length < 10) {
+      setAccountName("");
+      setResolveError(null);
+      setIsResolving(false);
+      return;
+    }
+
+    let isMounted = true;
+    setIsResolving(true);
+    setResolveError(null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await api.post<ResolveAccountResponse>(
+          API_ROUTES.WITHDRAWALS.ACCOUNTS.RESOLVE,
+          {
+            bank_code: selectedBank.code,
+            account_number: cleaned,
+          },
+        );
+
+        if (!isMounted) return;
+
+        if (res?.account_name) {
+          setAccountName(res.account_name);
+          setResolveError(null);
+        } else {
+          setAccountName("");
+          setResolveError("Could not resolve account name. Please verify the account number.");
+        }
+      } catch (err: unknown) {
+        if (!isMounted) return;
+        setAccountName("");
+        const msg =
+          (err as { message?: string })?.message ||
+          "Could not resolve account name. Please check your details.";
+        setResolveError(msg);
+      } finally {
+        if (isMounted) {
+          setIsResolving(false);
+        }
+      }
+    }, 500);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [accountNumber, selectedBank?.code]);
+
 
   const handleDelete = async (id: number) => {
     if (deletingId) return;
@@ -305,9 +365,11 @@ export default function WithdrawalAccountClient({
   const isFormValid =
     selectedBank !== null &&
     accountName.trim().length > 0 &&
-    accountNumber.trim().length >= 6 &&
+    accountNumber.trim().length >= 10 &&
     bankCountry.trim().length > 0 &&
-    currency.trim().length > 0;
+    currency.trim().length > 0 &&
+    !isResolving &&
+    !resolveError;
 
   return (
     <>
@@ -489,7 +551,7 @@ export default function WithdrawalAccountClient({
                   <div className="flex items-center justify-between p-3.5 bg-light-blue rounded-xl">
                     <div className="flex items-center gap-3.5 min-w-0">
                       <Image
-                        src={(selectedBank as { image?: string })?.image || "/images/avatar.png"}
+                        src={selectedBank.logo_url || "/images/avatar.png"}
                         alt={selectedBank.name}
                         width={40}
                         height={40}
@@ -559,22 +621,36 @@ export default function WithdrawalAccountClient({
                 <Input
                   name="account-number"
                   label="Account Number"
-                  placeholder="e.g. 55554444"
+                  placeholder="e.g. 0123456789"
                   required
-                  maxLength={25}
+                  maxLength={20}
                   value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
+                  error={resolveError || undefined}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    setAccountNumber(val);
+                    if (accountName) setAccountName("");
+                    if (resolveError) setResolveError(null);
+                  }}
                 />
 
                 {/* Account Name */}
-                <Input
-                  name="account-name"
-                  label="Account Name"
-                  required
-                  disabled
-                  readOnly
-                  value={accountName}
-                />
+                <div className="relative">
+                  <Input
+                    name="account-name"
+                    label="Account Name"
+                    placeholder={isResolving ? "Resolving account name..." : "Account name will appear here"}
+                    required
+                    disabled
+                    readOnly
+                    value={accountName}
+                  />
+                  {isResolving && (
+                    <div className="absolute right-4 bottom-4.5 text-default-tertiary pointer-events-none">
+                      <Loader2 size={16} className="animate-spin text-brand-orange" />
+                    </div>
+                  )}
+                </div>
 
                 {/* Routing Number (Optional) */}
                 <Input

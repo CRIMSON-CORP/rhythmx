@@ -144,6 +144,7 @@ export const API_ROUTES = {
     ACCOUNTS: {
       LIST: "/api/withdrawals/accounts",
       ADD: "/api/withdrawals/accounts",
+      RESOLVE: "/api/withdrawals/accounts/resolve",
       SET_DEFAULT: (id: number | string) => `/api/withdrawals/accounts/${id}`,
       DELETE: (id: number | string) => `/api/withdrawals/accounts/${id}`,
     },
