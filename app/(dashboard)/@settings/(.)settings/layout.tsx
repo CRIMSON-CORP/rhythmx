@@ -183,7 +183,7 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
           >
             <div className="flex flex-col gap-6">
               {/* Search input */}
-              <div className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-white/50 border border-default/5">
+              <div className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-white/20">
                 <Search size={16} className="text-default-tertiary shrink-0" />
                 <input
                   type="text"
@@ -211,6 +211,7 @@ export default function SettingsDialogLayout({ children }: SettingsDialogLayoutP
                           <Link
                             key={item.id}
                             href={item.href}
+                            replace
                             onClick={() => setIsSidebarOpen(false)}
                             className={`flex items-center gap-3.5 px-4 py-3 rounded-md transition-all duration-200 font-medium ${
                               isActive

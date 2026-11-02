@@ -14,6 +14,7 @@ function TabLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
+      replace
       className={`px-4 py-2 rounded-full transition-all ${
         isActive
           ? "outline outline-default bg-white text-default font-medium"

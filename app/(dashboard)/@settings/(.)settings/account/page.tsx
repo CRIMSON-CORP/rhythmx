@@ -29,6 +29,7 @@ export default async function AccountForm() {
       <footer className="px-4 py-4 md:px-6 mt-2 bg-page-background">
         <Link
           href="/settings/security-privacy"
+          replace
           className="w-full bg-white text-default hover:bg-default hover:text-white transition-colors duration-300 flex gap-3 p-3 rounded-20 text-left"
         >
           <Lock size={20} />

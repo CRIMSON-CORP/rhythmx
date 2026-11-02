@@ -87,7 +87,7 @@ export default async function ManagePlanPage() {
               </span>
             </div>
             <Button asChild variant="purple">
-              <Link href="/settings/plan-billing/sharing">Renew</Link>
+              <Link href="/settings/plan-billing/sharing" replace>Renew</Link>
             </Button>
             {subscription.plan?.slug === "rhythm-elite" && (
               <SharePlanModal

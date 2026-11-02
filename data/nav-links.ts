@@ -97,7 +97,7 @@ export const profileOptions = [
     command: "⇧I",
   },
   {
-    href: "/settings",
+    href: "/settings/account",
     title: "Settings",
     icon: Settings,
     command: "⇧S",

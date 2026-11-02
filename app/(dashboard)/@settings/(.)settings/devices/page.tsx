@@ -61,7 +61,11 @@ export default async function DevicesSettingsPage() {
                     <td className="py-4.5 px-6 text-grey">{formatDate(device.last_login_at)}</td>
                     <td className="py-4.5 px-6 text-grey">{device.location}</td>
                     <td className="py-4.5 px-6 text-right">
-                      <SignOutButton device_id={device.id} />
+                      {device.is_current ? (
+                        "Current Device"
+                      ) : (
+                        <SignOutButton device_id={device.id} />
+                      )}
                     </td>
                   </tr>
                 ))}
