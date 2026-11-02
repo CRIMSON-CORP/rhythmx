@@ -69,7 +69,7 @@ function TeamForm({
     role && roles.length > 0
       ? roles.find((r) => r.name.toLowerCase() === role.toLowerCase())?.id?.toString()
       : undefined;
-  const currentRoleId = roleId ?? matchedRoleId ?? "";
+  const currentRoleId = roleId || matchedRoleId || "";
 
   // Fetch roles from GET /api/label/roles on mount
   useEffect(() => {
@@ -266,6 +266,7 @@ function TeamForm({
         onSuccess?.();
         router.refresh();
       }
+      resetState();
     } catch (err: any) {
       const firstFieldError = getFirstFieldError(err);
       if (firstFieldError) {
@@ -280,6 +281,22 @@ function TeamForm({
       setIsSubmitting(false);
     }
   };
+
+  function resetState() {
+    setFirstName(undefined);
+    setLastName(undefined);
+    setEmail(undefined);
+    setRoleId(undefined);
+    setPassword("");
+    setAvatarFile(null);
+    setAvatarPreview(null);
+  }
+
+  useEffect(() => {
+    return () => {
+      resetState();
+    };
+  }, []);
 
   return (
     <DialogContent showCloseButton={false} className="gap-0 max-w-138">
