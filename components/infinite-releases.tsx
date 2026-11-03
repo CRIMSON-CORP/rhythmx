@@ -24,7 +24,9 @@ export default function InfiniteReleases({
 }: InfiniteReleasesProps) {
   const [releases, setReleases] = useState<Release[]>(initialReleases);
   const [page, setPage] = useState<number>(initialReleases.length > 0 ? 2 : 1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [hasMore, setHasMore] = useState<boolean>(
+    initialReleases.length > 0 ? initialReleases.length >= pageSize : true,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
 
@@ -44,7 +46,7 @@ export default function InfiniteReleases({
 
     try {
       const response = await api.get<{ releases: Release[] }>(
-        `${API_ROUTES.RELEASES.INDEX}?page=${page}&size=${pageSize}`,
+        `${API_ROUTES.RELEASES.INDEX}?page=${page}&limit=${pageSize}`,
       );
       const items = Array.isArray(response?.releases) ? response.releases : [];
 
@@ -53,7 +55,11 @@ export default function InfiniteReleases({
       }
 
       if (items.length > 0) {
-        setReleases((prev) => [...prev, ...items]);
+        setReleases((prev) => {
+          const existing = new Set(prev.map((r) => r.reference));
+          const fresh = items.filter((r) => !existing.has(r.reference));
+          return [...prev, ...fresh];
+        });
         setPage((prevPage) => prevPage + 1);
       }
 
@@ -83,7 +89,10 @@ export default function InfiniteReleases({
   }, [page, pageSize, hasMore, maxRetries]);
 
   const fetchNextPageRef = useRef(fetchNextPage);
-  fetchNextPageRef.current = fetchNextPage;
+
+  useEffect(() => {
+    fetchNextPageRef.current = fetchNextPage;
+  }, [fetchNextPage]);
 
   // Clean up any pending retry timeout on unmount
   useEffect(() => {
@@ -124,7 +133,7 @@ export default function InfiniteReleases({
     return () => {
       observer.disconnect();
     };
-  }, [hasMore, hasError, maxRetries, page]);
+  }, [hasMore, hasError, maxRetries]);
 
   useEffect(() => {
     if (
