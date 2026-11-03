@@ -270,6 +270,15 @@ interface ArtistStatsResponse {
 
 type ArtistReleasesResponse = ReleasesResponse;
 
+interface ReleaseTracksResponse {
+  tracks: ReleaseTrack[];
+  owns_full_royalty?: boolean;
+}
+
+interface TrackDetailResponse {
+  track: ReleaseTrack;
+}
+
 interface InviteArtistSentItem {
   invite_id: number;
   email: string;

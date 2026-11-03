@@ -62,6 +62,7 @@ interface Team {
 
 interface Track {
   id: string;
+  reference?: string;
   track_title: string;
   track_duration: string;
   track_file: File | null;
@@ -113,26 +114,26 @@ interface ReleaseTrackPerson {
 
 interface TrackCreditItem {
   reference?: string;
-  artist_reference?: string | null;
   is_main_artist?: boolean;
-  stage_name?: string | null;
-  official_name?: string | null;
-  name?: string;
-  role?: string;
-  genre?: string;
-  language?: string;
+  artist_reference?: string | null;
   spotify_url?: string | null;
   apple_music_url?: string | null;
+  image_url?: string | null;
+  publishing?: string | null;
+  official_name?: string;
+  stage_name?: string;
+  role?: string;
+  name?: string;
+  display_name?: string;
+  avatar_url?: string | null;
   spotify_id?: string;
   apple_music_id?: string;
-  publishing?: string | null;
   publishing_type?: string | null;
-  avatar_url?: string | null;
-  image_url?: string | null;
-  display_name?: string;
+  genre?: string;
+  language?: string;
 }
 
-type TrackPeopleCredits = {
+type TrackPeopleCredits = Record<string, TrackCreditItem[]> & {
   main: TrackCreditItem[];
   key_artist: TrackCreditItem[];
   engineer: TrackCreditItem[];
@@ -142,20 +143,21 @@ type TrackPeopleCredits = {
 interface TrackRoyaltySplit {
   reference: string;
   name: string;
-  email?: string | null;
+  email: string | null;
   percent: number;
+  status: "accepted" | "pending" | "declined" | string;
+  type: "artist" | "collaborator" | "external" | string;
+  avatar_url: string | null;
   role?: string;
   recipient_type?: "artist" | "external" | string;
   is_owner?: boolean;
-  status?: "accepted" | "pending" | "declined" | string;
   artist_reference?: string | null;
-  avatar_url?: string | null;
 }
 
 interface TrackRoyalty {
-  mode: "unset" | "split" | "full" | string;
   owner_percent: number;
   splits: TrackRoyaltySplit[];
+  mode?: "unset" | "split" | "full" | string;
 }
 
 interface ReleaseTrack {
@@ -180,11 +182,39 @@ interface ReleaseTrack {
   duration: number | null;
   audio_url: string;
   uploaded_at: string;
-  people?: TrackPeopleCredits;
+  people: TrackPeopleCredits;
   people_count: number;
   credits_count: number;
   credits_revision: number;
   royalty?: TrackRoyalty;
+  is_uploaded?: boolean;
+}
+
+interface TrackContributor {
+  name: string;
+  role: string;
+}
+
+interface ReleaseDetailTrack {
+  reference: string;
+  order: number;
+  title: string;
+  duration: number | null;
+  isrc: string | null;
+  version: string | null;
+  is_explicit: boolean;
+  audio_url: string;
+  language: string | null;
+  lyrics: string | null;
+  label: string | null;
+  has_advisory: boolean;
+  uploaded_at: string;
+  contributors?: TrackContributor[];
+  royalty?: TrackRoyalty;
+  people?: TrackPeopleCredits;
+  people_count?: number;
+  credits_count?: number;
+  is_uploaded?: boolean;
 }
 
 interface Permission {
@@ -438,7 +468,7 @@ interface ReleaseDetail {
   updated_at: string;
   all_platform_plays: number;
   artists: Artist[];
-  tracks: Track[];
+  tracks: ReleaseDetailTrack[];
   platforms: ReleasePlatform[];
   links: [];
   status_log: [];
@@ -452,18 +482,6 @@ interface RoyaltySplit {
   amount: number;
   email: string | null;
   recipient_name: string | null;
-}
-
-interface Track {
-  reference: string;
-  order: number;
-  title: string;
-  duration: number | null;
-  isrc: string | null;
-  version: string | null;
-  is_explicit: boolean;
-  audio_url: string;
-  royalty_splits: RoyaltySplit[];
 }
 
 interface Earning {
