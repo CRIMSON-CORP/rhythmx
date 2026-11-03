@@ -134,14 +134,6 @@ export const authOptions: NextAuthOptions = {
             user.next_step = responseData.next_step;
           }
 
-          if (responseData?.next_step === "profile_setup") {
-            return "/settings/account";
-          }
-
-          if (responseData?.next_step === "choose_plan" || responseData?.next_step === "renew") {
-            return "/billing";
-          }
-
           return true;
         } catch (error) {
           console.error("[NextAuth Google Sign-In] Network error sending token to backend:", error);
