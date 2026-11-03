@@ -81,7 +81,8 @@ function CreateArtistFlow({ open, onOpenChange, trigger, onArtistCreated }: Crea
   const age = useMemo(() => {
     if (!form.dob) return "";
     const today = new Date();
-    const birthDate = new Date(form.dob);
+    const [y, m, d] = form.dob.split("-").map(Number);
+    const birthDate = new Date(y, m - 1, d);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {

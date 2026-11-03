@@ -4,12 +4,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-} from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { RemoveArtistDialog } from "./remove-artist-dialog";
@@ -20,9 +15,10 @@ import ArtistReleasesSection from "./artist-releases-section";
 function formatDob(dobStr: string | null | undefined): string {
   if (!dobStr) return "—";
   try {
-    const d = new Date(dobStr);
-    if (isNaN(d.getTime())) return dobStr;
-    return d.toLocaleDateString("en-GB", {
+    const [y, m, d] = dobStr.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    if (isNaN(date.getTime())) return dobStr;
+    return date.toLocaleDateString("en-GB", {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -64,8 +60,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
     }
     if (releasesRes?.releases) {
       initialReleases = releasesRes.releases;
-      initialHasMore =
-        releasesRes.meta?.pagination?.has_next ?? initialReleases.length >= 20;
+      initialHasMore = releasesRes.meta?.pagination?.has_next ?? initialReleases.length >= 20;
     }
   } catch (error) {
     console.error("Failed to fetch artist profile:", error);
@@ -90,8 +85,8 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
   const comparisonText = isUp
     ? "Increase compared to last month"
     : isDown
-    ? "Decrease compared to last month"
-    : "Compared to last month";
+      ? "Decrease compared to last month"
+      : "Compared to last month";
 
   const currency = earningsData?.currency || "GBP";
   const totalEarnings = earningsData?.total ?? 0;
@@ -115,10 +110,7 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <ToggleArtistAccessButton
-            reference={artist.reference}
-            initialStatus={artist.status}
-          />
+          <ToggleArtistAccessButton reference={artist.reference} initialStatus={artist.status} />
           <RemoveArtistDialog reference={artist.reference} />
         </div>
       </header>
@@ -211,7 +203,9 @@ async function ArtistPage({ params }: { params: Promise<{ artist_id: string }> }
               </div>
               <footer className="p-5 flex items-center justify-center gap-2.5 border-t border-t-default-default mt-auto">
                 <p className="text-border-default-secondary text-sm">Total Earnings</p>
-                <p className="font-medium text-default">{formatCurrency(totalEarnings, currency)}</p>
+                <p className="font-medium text-default">
+                  {formatCurrency(totalEarnings, currency)}
+                </p>
               </footer>
             </div>
           </div>
