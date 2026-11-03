@@ -49,7 +49,7 @@ export const mainOptions = [
     command: "⇧W",
   },
   {
-    href: "/subscription",
+    href: "/settings/plan-billing",
     title: "Subscription",
     icon: Zap,
     command: "⇧S",

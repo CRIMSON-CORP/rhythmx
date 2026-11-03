@@ -49,7 +49,7 @@ export default async function ManagePlanPage() {
         <div className="flex flex-col gap-4 px-3 md:px-8 pb-4">
           <h3 className="font-medium">Active Plan</h3>
           <div className="bg-white p-4 rounded-2xl flex items-center gap-6">
-            <div className="flex items-center gap-3 grow">
+            <div className="flex flex-wrap items-center gap-3 grow">
               <div
                 data-is-expired={isExpired}
                 className="w-10.5 h-10.5 rounded-full data-[is-expired=true]:bg-black/50 data-[is-expired=false]:bg-brand-purple-2 flex items-center justify-center text-white shrink-0"
@@ -91,7 +91,9 @@ export default async function ManagePlanPage() {
               </span>
             </div>
             <Button asChild variant="purple">
-              <Link href="/settings/plan-billing/sharing" replace>Renew</Link>
+              <Link href="/settings/plan-billing/sharing" replace>
+                Renew
+              </Link>
             </Button>
             {subscription.plan?.slug === "rhythm-elite" && (
               <SharePlanModal
