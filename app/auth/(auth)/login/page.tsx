@@ -8,16 +8,17 @@ import { loginSchema } from "@/models/login-schema";
 import { getSession, signIn, signOut } from "next-auth/react";
 
 function Page() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     signOut({ redirect: false });
     if (new URLSearchParams(window.location.search).get("expired")) {
       setErrors({ form: "Your session has expired. Please log in again." });
     }
   }, []);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
