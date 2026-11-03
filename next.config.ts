@@ -29,6 +29,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.revelator.com",
       },
+      {
+        protocol: "https",
+        hostname: "rhythmxdistro.cc",
+      },
+      {
+        protocol: "https",
+        hostname: "**.rhythmxdistro.cc",
+      },
+      {
+        protocol: "https",
+        hostname: "storage.rhythmx.com",
+      },
     ],
   },
   allowedDevOrigins: ["10.13.131.78"],
