@@ -55,6 +55,15 @@ export const proxy = withAuth(
       return NextResponse.redirect(new URL("/billing", req.url));
     }
 
+    // Restrict artists from accessing /artists (roster management) routes
+    if (
+      token &&
+      token.account_type === "artist" &&
+      (pathname === "/artists" || pathname.startsWith("/artists/"))
+    ) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
     return NextResponse.next();
   },
   {

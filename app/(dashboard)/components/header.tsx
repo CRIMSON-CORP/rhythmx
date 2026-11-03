@@ -36,6 +36,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 async function Header() {
   const session = await getServerSession(authOptions);
+  const filteredMainOptions = mainOptions.filter((option) => {
+    if (session?.user.account_type === "artist" && option.href === "/artists") return false;
+    return true;
+  });
   return (
     <div className="@container container w-full mx-auto px-4 pt-4 md:pt-10">
       <header className="bg-white px-4 md:px-8 py-3 md:py-6 rounded-full flex items-center justify-between">
@@ -52,7 +56,7 @@ async function Header() {
             >
               <div className="flex flex-col font-medium p-0">
                 <div className="flex flex-col">
-                  {mainOptions.map((option) => (
+                  {filteredMainOptions.map((option) => (
                     <PopoverClose asChild key={option.href}>
                       <Link
                         href={option.href.trim()}
