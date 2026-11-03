@@ -135,7 +135,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           if (responseData?.next_step === "profile_setup") {
-            return "/auth/create-account";
+            return "/settings/account";
           }
 
           if (responseData?.next_step === "choose_plan" || responseData?.next_step === "renew") {

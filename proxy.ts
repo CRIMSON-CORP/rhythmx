@@ -28,7 +28,7 @@ export const proxy = withAuth(
     // Redirect signed-in users away from pre-login auth pages (get-started, login, verify)
     if (token && pathname.startsWith("/auth") && !pathname.startsWith("/auth/create-account")) {
       if (token.next_step === "profile_setup") {
-        return NextResponse.redirect(new URL("/auth/create-account", req.url));
+        return NextResponse.redirect(new URL("/settings/account", req.url));
       }
       if (token.next_step === "choose_plan" || token.next_step === "renew") {
         return NextResponse.redirect(new URL("/billing", req.url));
@@ -44,15 +44,6 @@ export const proxy = withAuth(
     // Redirect unauthenticated users trying to access /auth/create-account to /auth/get-started
     if (!token && pathname.startsWith("/auth/create-account")) {
       return NextResponse.redirect(new URL("/auth/get-started", req.url));
-    }
-
-    // Redirect signed-in users needing profile setup to /auth/create-account
-    if (
-      token &&
-      token.next_step === "profile_setup" &&
-      !pathname.startsWith("/auth/create-account")
-    ) {
-      return NextResponse.redirect(new URL("/auth/create-account", req.url));
     }
 
     // Redirect signed-in users needing to choose or renew plan to /billing

@@ -53,7 +53,7 @@ function Page() {
         const nextStep = session?.next_step ?? session?.user?.next_step;
 
         if (nextStep === "profile_setup") {
-          window.location.href = "/auth/create-account";
+          window.location.href = "/settings/account";
           return;
         }
 
