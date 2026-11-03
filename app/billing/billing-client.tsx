@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { ChevronDown, Check } from "lucide-react";
 import Icon from "@/components/icon";
 import { api } from "@/lib/api";
@@ -50,9 +51,11 @@ export default function BillingClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { update: updateSession } = useSession();
 
   const currencyCodes = extractCurrencyCodes(currencies);
   const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
+  const [isVerifyingRedirect, setIsVerifyingRedirect] = useState(false);
 
   // Preload Flutterwave inline checkout script
   useEffect(() => {
@@ -101,6 +104,44 @@ export default function BillingClient({
     }
   };
 
+  // Handle Flutterwave full-page redirect return (?status=successful&tx_ref=...)
+  useEffect(() => {
+    const status = searchParams.get("status");
+    const txRef = searchParams.get("tx_ref");
+
+    if (status && txRef && (status === "successful" || status === "completed")) {
+      let isMounted = true;
+      setIsVerifyingRedirect(true);
+      goeyToast.success("Payment received! Verifying your transaction...");
+
+      (async () => {
+        const verifyRes = await verifyPayment(txRef);
+        if (!isMounted) return;
+
+        if (verifyRes.success) {
+          goeyToast.success("Payment verified! Your subscription is now active.");
+          try {
+            await updateSession?.({ next_step: null });
+          } catch (e) {
+            console.warn("Failed to update session next_step:", e);
+          }
+          window.location.href = "/";
+        } else {
+          goeyToast.error(
+            verifyRes.error || "Payment verification failed. Please check your dashboard.",
+          );
+          setIsVerifyingRedirect(false);
+        }
+      })();
+
+      return () => {
+        isMounted = false;
+      };
+    } else if (status === "cancelled") {
+      goeyToast.error("Payment was cancelled.");
+    }
+  }, [searchParams, updateSession]);
+
   const handleSelectPlan = async (plan: PlanItem) => {
     if (plan.is_custom) {
       // User requested custom plan CTA does nothing for now
@@ -140,8 +181,13 @@ export default function BillingClient({
             const verifyRes = await verifyPayment(res.reference || res.checkout!.tx_ref);
             if (verifyRes.success) {
               goeyToast.success("Payment verified! Your subscription is now active.");
-              router.push("/");
-              router.refresh();
+              try {
+                await updateSession?.({ next_step: null });
+              } catch (e) {
+                console.warn("Failed to update session next_step:", e);
+              }
+              window.location.href = "/";
+              return;
             } else {
               goeyToast.error(
                 verifyRes.error || "Payment verification failed. Please check your dashboard.",
@@ -177,6 +223,19 @@ export default function BillingClient({
 
   return (
     <div className="relative min-h-screen w-full bg-white text-[#141414] overflow-x-hidden flex flex-col items-center">
+      {isVerifyingRedirect && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-30 p-8 flex flex-col items-center gap-4 shadow-2xl max-w-sm text-center">
+            <div className="w-10 h-10 border-3 border-brand-orange border-t-transparent rounded-full animate-spin" />
+            <div className="space-y-1">
+              <h3 className="font-semibold text-lg text-[#141414]">Verifying Payment</h3>
+              <p className="text-sm text-neutral-500">
+                Please wait while we activate your subscription...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Ambient Gradient Glow from Figma */}
       <div
         aria-hidden="true"

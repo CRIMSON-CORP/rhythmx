@@ -186,6 +186,12 @@ export const authOptions: NextAuthOptions = {
         if (session.refresh_token) {
           token.refresh_token = session.refresh_token;
         }
+        if (session.next_step !== undefined) {
+          token.next_step = session.next_step;
+        }
+        if (session.user?.next_step !== undefined) {
+          token.next_step = session.user.next_step;
+        }
       }
       return token;
     },
