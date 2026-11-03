@@ -149,10 +149,6 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      if (user?.next_step === "choose_plan" || user?.next_step === "renew") {
-        return "/billing";
-      }
-
       return true;
     },
     async jwt({ token, user, account, trigger, session }) {

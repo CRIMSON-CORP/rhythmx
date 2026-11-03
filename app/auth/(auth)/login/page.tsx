@@ -52,6 +52,11 @@ function Page() {
         const session = await getSession();
         const nextStep = session?.next_step ?? session?.user?.next_step;
 
+        if (nextStep === "profile_setup") {
+          window.location.href = "/auth/create-account";
+          return;
+        }
+
         if (nextStep === "choose_plan" || nextStep === "renew") {
           window.location.href = "/billing";
           return;
