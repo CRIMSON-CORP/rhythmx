@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { useRouter } from "next/navigation";
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { goeyToast } from "goey-toast";
@@ -48,10 +48,6 @@ import UserSharing from "@/components/icons/user-sharing";
 interface UploadingTrack {
   id: string;
   file: File;
-  name: string;
-  progress: number;
-  status: "uploading" | "error";
-  errorMessage?: string;
 }
 
 interface ReleaseTracksProps {
@@ -102,65 +98,16 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
     }
   };
 
-  const uploadSingleFile = async (file: File) => {
-    const uploadId = nanoid();
-
-    const newUploadItem: UploadingTrack = {
-      id: uploadId,
-      file,
-      name: file.name,
-      progress: 0,
-      status: "uploading",
-    };
-
-    setUploadingQueue((prev) => [...prev, newUploadItem]);
-
-    const formData = new FormData();
-    formData.append("audio", file);
-
-    try {
-      const response = await api.postFormData({
-        url: API_ROUTES.RELEASES.DRAFT.TRACKS.INDEX(releaseReference),
-        formData,
-        onUploadProgress: (percent) => {
-          setUploadingQueue((prev) =>
-            prev.map((item) =>
-              item.id === uploadId
-                ? { ...item, progress: Math.min(Math.round(percent), 99) }
-                : item,
-            ),
-          );
-        },
+  const handleUploadSuccess = useCallback(
+    (uploadId: string, fileName: string, uploadedTrack: ReleaseTrack) => {
+      setTracks((prev) => [...prev, uploadedTrack]);
+      setUploadingQueue((prev) => prev.filter((item) => item.id !== uploadId));
+      goeyToast.success("Upload Completed", {
+        description: `"${uploadedTrack.title || fileName}" was uploaded successfully.`,
       });
-
-      const uploadedTrack = (response.data?.track || response.data) as ReleaseTrack;
-      if (uploadedTrack && uploadedTrack.reference) {
-        setTracks((prev) => [...prev, uploadedTrack]);
-        setUploadingQueue((prev) => prev.filter((item) => item.id !== uploadId));
-        goeyToast.success("Upload Completed", {
-          description: `"${uploadedTrack.title || file.name}" was uploaded successfully.`,
-        });
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (err: unknown) {
-      const errorMsg =
-        err instanceof Error
-          ? err.message
-          : typeof err === "object" && err !== null && "message" in err
-            ? String((err as { message: unknown }).message)
-            : "Network error or upload failed";
-
-      setUploadingQueue((prev) =>
-        prev.map((item) =>
-          item.id === uploadId ? { ...item, status: "error", errorMessage: errorMsg } : item,
-        ),
-      );
-      goeyToast.error("Upload Failed", {
-        description: `Failed to upload "${file.name}": ${errorMsg}`,
-      });
-    }
-  };
+    },
+    [],
+  );
 
   const handleAudioFiles = (files: FileList) => {
     const validFiles: File[] = [];
@@ -194,19 +141,16 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
 
     if (validFiles.length === 0) return;
 
-    validFiles.forEach((file) => {
-      uploadSingleFile(file);
-    });
+    const newQueueItems: UploadingTrack[] = validFiles.map((file) => ({
+      id: nanoid(),
+      file,
+    }));
+    setUploadingQueue((prev) => [...prev, ...newQueueItems]);
   };
 
-  const handleCancelUpload = (uploadId: string) => {
+  const handleCancelUpload = useCallback((uploadId: string) => {
     setUploadingQueue((prev) => prev.filter((item) => item.id !== uploadId));
-  };
-
-  const handleRetryUpload = (item: UploadingTrack) => {
-    setUploadingQueue((prev) => prev.filter((q) => q.id !== item.id));
-    uploadSingleFile(item.file);
-  };
+  }, []);
 
   const handleStartEdit = (track: ReleaseTrack) => {
     setEditingTrackRef(track.reference);
@@ -374,8 +318,11 @@ function ReleaseTracks({ releaseReference, tracks: initialTracks, meta }: Releas
                   key={item.id}
                   item={item}
                   index={tracks.length + queueIdx}
+                  releaseReference={releaseReference}
+                  onSuccess={(uploadedTrack) =>
+                    handleUploadSuccess(item.id, item.file.name, uploadedTrack)
+                  }
                   onCancel={() => handleCancelUpload(item.id)}
-                  onRetry={() => handleRetryUpload(item)}
                 />
               ))}
             </ul>
@@ -519,15 +466,83 @@ function TrackItem({
 function UploadingTrackItem({
   item,
   index,
+  releaseReference,
+  onSuccess,
   onCancel,
-  onRetry,
 }: {
   item: UploadingTrack;
   index: number;
+  releaseReference: string;
+  onSuccess: (uploadedTrack: ReleaseTrack) => void;
   onCancel: () => void;
-  onRetry?: () => void;
 }) {
-  const isError = item.status === "error";
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState<"uploading" | "error">("uploading");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const startUpload = useCallback(async () => {
+    setStatus("uploading");
+    setErrorMessage(null);
+    setProgress(0);
+
+    const formData = new FormData();
+    formData.append("audio", item.file);
+
+    try {
+      const response = await api.postFormData({
+        url: API_ROUTES.RELEASES.DRAFT.TRACKS.INDEX(releaseReference),
+        formData,
+        onUploadProgress: (percent) => {
+          if (isMountedRef.current) {
+            setProgress(Math.min(Math.round(percent), 99));
+          }
+        },
+      });
+
+      const uploadedTrack = (response.data?.track || response.data) as ReleaseTrack;
+      if (uploadedTrack && uploadedTrack.reference) {
+        if (isMountedRef.current) {
+          setProgress(100);
+          onSuccess(uploadedTrack);
+        }
+      } else {
+        throw new Error("Invalid response from server");
+      }
+    } catch (err: unknown) {
+      if (!isMountedRef.current) return;
+
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Network error or upload failed";
+
+      setStatus("error");
+      setErrorMessage(errorMsg);
+      goeyToast.error("Upload Failed", {
+        description: `Failed to upload "${item.file.name}": ${errorMsg}`,
+      });
+    }
+  }, [item.file, releaseReference, onSuccess]);
+
+  const hasStartedRef = useRef(false);
+  useEffect(() => {
+    if (!hasStartedRef.current) {
+      hasStartedRef.current = true;
+      startUpload();
+    }
+  }, [startUpload]);
+
+  const isError = status === "error";
 
   return (
     <li className="relative flex items-center gap-4 px-6 py-4.5 bg-white overflow-hidden transition-colors">
@@ -535,7 +550,7 @@ function UploadingTrackItem({
       {!isError && (
         <div
           style={{
-            width: `${item.progress}%`,
+            width: `${progress}%`,
             transition: "width 0.25s ease-out",
           }}
           className="absolute top-0 left-0 h-full bg-[#D4F7D9] pointer-events-none"
@@ -566,30 +581,30 @@ function UploadingTrackItem({
 
         {/* Title and progress status */}
         <div className="flex flex-col grow break-all min-w-0">
-          <span className="font-medium text-sm text-default truncate">{item.name}</span>
+          <span className="font-medium text-sm text-default truncate">{item.file.name}</span>
           <span
             className={cn(
               "text-[11px] font-medium leading-none mt-1",
               isError ? "text-danger-default" : "text-positive-default",
             )}
           >
-            {isError
-              ? item.errorMessage || "Upload failed"
-              : `uploading... ${Math.round(item.progress)}%`}
+            {isError ? errorMessage || "Upload failed" : `uploading... ${Math.round(progress)}%`}
           </span>
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-3 flex-none">
-          {isError && onRetry && (
+          {isError && (
             <button
-              onClick={onRetry}
-              className="text-xs text-brand-orange hover:underline font-medium"
+              type="button"
+              onClick={startUpload}
+              className="text-xs text-brand-orange hover:underline font-medium cursor-pointer"
             >
               Retry
             </button>
           )}
           <button
+            type="button"
             onClick={onCancel}
             className="p-1 rounded-full group/btn cursor-pointer hover:bg-page-background transition-colors"
             title={isError ? "Remove from list" : "Cancel upload"}
