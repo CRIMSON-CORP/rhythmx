@@ -17,7 +17,7 @@ export default function Earnings({ data, rangeLabel = "30 Days" }: EarningsProps
   const [dollars, cents] = formatted.split(".");
 
   return (
-    <div className="@container col-span-2 min-w-80 bg-white rounded-30 grow-2 flex flex-col gap-6">
+    <div className="@container md:col-span-2 min-w-80 bg-white rounded-30 grow-2 flex flex-col gap-6">
       <header className="flex items-center justify-between gap-1 text-default-tertiary px-4 py-5">
         <h2 className="font-medium leading-tight">Earnings</h2>
         <ListFilter size={24} />

@@ -748,4 +748,3 @@ interface ReleasesResponse {
     counts?: ReleaseStatusCounts;
   };
 }
-
