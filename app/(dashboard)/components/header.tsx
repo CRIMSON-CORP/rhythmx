@@ -43,7 +43,7 @@ async function Header() {
   return (
     <div className="@container container w-full mx-auto px-4 pt-4 md:pt-10">
       <header className="bg-white px-4 md:px-8 py-3 md:py-6 rounded-full flex items-center justify-between">
-        <div className="flex items-center @max-md:gap-2 gap-4 lg:gap-8">
+        <div className="flex items-center @max-md:gap-2 gap-4 lg:gap-8 overflow-hidden">
           <Icon name="logo" width={25} height={38} className="text-brand-orange" />
           <Popover>
             <PopoverTrigger className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-page-background">
@@ -112,7 +112,7 @@ async function Header() {
           </Popover>
           <PageTitle />
         </div>
-        <div className="flex items-center gap-4 lg:gap-8 text-default font-medium">
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-8 text-default font-medium">
           <Dialog>
             <DialogTrigger className="@max-4xl:hidden">
               <SearchIcon size={24} />
@@ -229,7 +229,7 @@ async function Header() {
             </PopoverContent>
           </Popover>
           <Popover>
-            <PopoverTrigger className="p-2 bg-brand-orange rounded-full @max-xl:hidden">
+            <PopoverTrigger className="p-2 bg-brand-orange rounded-full">
               <Plus size={20} className="text-white" />
             </PopoverTrigger>
             <PopoverContent

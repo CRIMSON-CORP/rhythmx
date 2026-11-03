@@ -42,7 +42,7 @@ export default function PageTitle() {
           </Link>
         )}
       </div>
-      <span className="text-sm font-medium">{currentPath.title}</span>
+      <span className="text-sm font-medium truncate ">{currentPath.title}</span>
     </>
   );
 }
