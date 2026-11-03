@@ -8,6 +8,7 @@ export const API_ROUTES = {
     REFRESH: "/api/auth/refresh",
   },
   ONBOARDING: {
+    INDEX: "/api/onboarding",
     PROFILE: {
       INDEX: "/api/onboarding/profile",
       AVATAR: "/api/onboarding/profile/avatar",

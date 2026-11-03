@@ -24,6 +24,23 @@ interface VerifyResponse {
   next_step: string;
 }
 
+interface OnboardingStateResponse {
+  user: User;
+  wizard?: {
+    current_step: number;
+    email_verified: boolean;
+    profile_completed: boolean;
+    account_type_selected: boolean;
+    account_profile_done: boolean;
+    terms_accepted: boolean;
+    plan_selected: boolean;
+    wizard_completed: boolean;
+    completed_at: string | null;
+  };
+  marketing_opt_in?: boolean | null;
+  next_step: string | null;
+}
+
 interface MeResponse {
   user: User;
   subscription: null;
@@ -540,6 +557,8 @@ interface PaymentVerificationResponse {
   };
   subscription?: UserSubscription;
   wizard?: Record<string, unknown>;
+  next_step?: string | null;
+  payment_status?: string;
 }
 
 interface PaymentStatusResponse {
@@ -552,6 +571,7 @@ interface PaymentStatusResponse {
   };
   subscription?: UserSubscription;
   wizard?: Record<string, unknown>;
+  next_step?: string | null;
 }
 
 interface EarningsBalanceResponse {

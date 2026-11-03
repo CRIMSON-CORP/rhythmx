@@ -72,60 +72,116 @@ export default function BillingClient({
     router.replace(`/billing?${buildQuery("currency", code)}`, { scroll: false });
   };
 
-  const verifyPayment = async (
+  const verifyPaymentAndPollNextStep = async (
     reference: string,
-  ): Promise<{ success: boolean; error?: string }> => {
-    try {
-      await api.post<PaymentVerificationResponse>(API_ROUTES.PAYMENTS.VERIFICATION(reference), {});
-      return { success: true };
-    } catch (err) {
-      console.warn("Direct verification pending or failed, polling status:", err);
-      // Poll up to 5 times (total 12.5 seconds)
-      for (let attempt = 1; attempt <= 5; attempt++) {
-        await new Promise((resolve) => setTimeout(resolve, 2500));
-        try {
-          const pollRes = await api.get<PaymentStatusResponse>(
-            API_ROUTES.PAYMENTS.PAYMENT(reference),
-          );
-          if (pollRes?.payment?.status === "successful") {
-            return { success: true };
-          }
-          if (pollRes?.payment?.status === "failed") {
-            return { success: false, error: "Payment was marked as failed by provider." };
-          }
-        } catch (pollErr) {
-          console.warn(`[Poll attempt ${attempt}] error:`, pollErr);
+  ): Promise<{ success: boolean; next_step: string | null; error?: string }> => {
+    // Poll up to 10 attempts (every 3 seconds up to ~30s) per Bruno docs
+    const maxAttempts = 10;
+    const delay = 3000;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      // 1. Check verification endpoint directly with Flutterwave
+      try {
+        const res = await api.post<PaymentVerificationResponse>(
+          API_ROUTES.PAYMENTS.VERIFICATION(reference),
+          {},
+        );
+
+        if (res?.subscription?.status === "active" || res?.payment?.status === "successful") {
+          return {
+            success: true,
+            next_step: res.next_step !== undefined ? res.next_step : null,
+          };
+        }
+
+        if (res?.payment_status === "pending" || res?.payment?.status === "pending") {
+          console.log(`[Verification attempt ${attempt}]: payment is still processing...`);
+        }
+      } catch (err: unknown) {
+        const errorMsg = getErrorMessage(err);
+        console.warn(`[Verification attempt ${attempt}] error:`, errorMsg);
+
+        if (errorMsg.includes("not successful") || errorMsg.includes("failed")) {
+          return { success: false, next_step: null, error: errorMsg };
         }
       }
-      return {
-        success: false,
-        error: "Verification is taking longer than usual. Please check your dashboard in a moment.",
-      };
+
+      // 2. Cross-check status poll endpoint
+      try {
+        const pollRes = await api.get<PaymentStatusResponse>(
+          API_ROUTES.PAYMENTS.PAYMENT(reference),
+        );
+        if (pollRes?.payment?.status === "successful") {
+          return {
+            success: true,
+            next_step: pollRes.next_step !== undefined ? pollRes.next_step : null,
+          };
+        }
+        if (pollRes?.payment?.status === "failed") {
+          return { success: false, next_step: null, error: "Payment was marked as failed." };
+        }
+      } catch {
+        // continue
+      }
+
+      // 3. Check onboarding endpoint for next_step single source of truth
+      try {
+        const onboardingRes = await api.get<OnboardingStateResponse>(
+          API_ROUTES.ONBOARDING.INDEX,
+        );
+        if (onboardingRes?.wizard?.plan_selected || onboardingRes?.next_step === null) {
+          return {
+            success: true,
+            next_step: onboardingRes.next_step,
+          };
+        }
+      } catch {
+        // continue
+      }
+
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
     }
+
+    return {
+      success: false,
+      next_step: null,
+      error: "We are still confirming your payment with Flutterwave. Please check your dashboard in a moment.",
+    };
   };
 
-  // Handle Flutterwave full-page redirect return (?status=successful&tx_ref=...)
+  // Handle Flutterwave return via redirect or reload (?status=successful&tx_ref=...)
   useEffect(() => {
     const status = searchParams.get("status");
-    const txRef = searchParams.get("tx_ref");
+    const txRef =
+      searchParams.get("tx_ref") ||
+      (typeof window !== "undefined" ? sessionStorage.getItem("pending_payment_ref") : null);
 
-    if (status && txRef && (status === "successful" || status === "completed")) {
+    if (txRef && (status === "successful" || status === "completed" || searchParams.has("tx_ref"))) {
       let isMounted = true;
       setIsVerifyingRedirect(true);
       goeyToast.success("Payment received! Verifying your transaction...");
 
       (async () => {
-        const verifyRes = await verifyPayment(txRef);
+        const verifyRes = await verifyPaymentAndPollNextStep(txRef);
         if (!isMounted) return;
 
         if (verifyRes.success) {
+          if (typeof window !== "undefined") {
+            sessionStorage.removeItem("pending_payment_ref");
+          }
           goeyToast.success("Payment verified! Your subscription is now active.");
           try {
-            await updateSession?.({ next_step: null });
+            await updateSession?.({ next_step: verifyRes.next_step });
           } catch (e) {
             console.warn("Failed to update session next_step:", e);
           }
-          window.location.href = "/";
+          if (verifyRes.next_step === "profile_setup") {
+            window.location.href = "/settings/account";
+          } else {
+            window.location.href = "/";
+          }
         } else {
           goeyToast.error(
             verifyRes.error || "Payment verification failed. Please check your dashboard.",
@@ -138,6 +194,9 @@ export default function BillingClient({
         isMounted = false;
       };
     } else if (status === "cancelled") {
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("pending_payment_ref");
+      }
       goeyToast.error("Payment was cancelled.");
     }
   }, [searchParams, updateSession]);
@@ -163,6 +222,10 @@ export default function BillingClient({
         throw new Error("Invalid response from server: checkout details missing");
       }
 
+      if (typeof window !== "undefined" && res.reference) {
+        sessionStorage.setItem("pending_payment_ref", res.reference);
+      }
+
       const checkoutResult = await openFlutterwaveCheckout({
         public_key: res.checkout.public_key,
         tx_ref: res.checkout.tx_ref,
@@ -178,15 +241,23 @@ export default function BillingClient({
           console.log("[Flutterwave Payment Callback]:", paymentData);
           if (paymentData.status === "successful" || paymentData.status === "completed") {
             goeyToast.success("Payment received! Activating your subscription...");
-            const verifyRes = await verifyPayment(res.reference || res.checkout!.tx_ref);
+            const ref = res.reference || res.checkout!.tx_ref;
+            const verifyRes = await verifyPaymentAndPollNextStep(ref);
             if (verifyRes.success) {
+              if (typeof window !== "undefined") {
+                sessionStorage.removeItem("pending_payment_ref");
+              }
               goeyToast.success("Payment verified! Your subscription is now active.");
               try {
-                await updateSession?.({ next_step: null });
+                await updateSession?.({ next_step: verifyRes.next_step });
               } catch (e) {
                 console.warn("Failed to update session next_step:", e);
               }
-              window.location.href = "/";
+              if (verifyRes.next_step === "profile_setup") {
+                window.location.href = "/settings/account";
+              } else {
+                window.location.href = "/";
+              }
               return;
             } else {
               goeyToast.error(
