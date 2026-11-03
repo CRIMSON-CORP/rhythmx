@@ -1,9 +1,3 @@
-import ChoosePlatform from "@/app/(dashboard)/discography/single/new/steps/choose-platform";
-import ReleaseDate from "@/app/(dashboard)/discography/single/new/steps/release-date";
-import ReleaseDetalsPage from "@/app/(dashboard)/discography/single/new/steps/release-detals";
-import ReleaseSummary from "@/app/(dashboard)/discography/single/new/steps/release-summary";
-import ReleaseTracks from "@/app/(dashboard)/discography/single/new/steps/release-tracks";
-import SplitRoyalty from "@/app/(dashboard)/discography/single/new/steps/split-royalty";
 import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { goeyToast } from "goey-toast";
@@ -61,23 +55,13 @@ export const newReleaseStoreTitles = [
     tab_title: "Release Details",
     icon: Info,
     path: "",
-    Component: ReleaseDetalsPage,
   },
-  // {
-  //   title: "Add Artist",
-  //   subtitle: "Assigned and manage the release artist",
-  //   tab_title: "Artist",
-  //   icon: Star,
-  //   path: "add-artists",
-  //   Component: AddArtistPage,
-  // },
   {
     title: "Release Tracks",
     subtitle: "Add release tracks and track meta data",
     tab_title: "Tracks",
     icon: Disc,
     path: "release-tracks",
-    Component: ReleaseTracks,
   },
   {
     title: "Choose platforms",
@@ -85,7 +69,6 @@ export const newReleaseStoreTitles = [
     tab_title: "Platforms",
     icon: Layers,
     path: "choose-platforms",
-    Component: ChoosePlatform,
   },
   {
     title: "Split Royalty",
@@ -93,7 +76,6 @@ export const newReleaseStoreTitles = [
     tab_title: "Split Royalty",
     icon: DollarSign,
     path: "split-royalty",
-    Component: SplitRoyalty,
   },
   {
     title: "Preorder Date",
@@ -101,7 +83,6 @@ export const newReleaseStoreTitles = [
     tab_title: "Pre-order",
     icon: ShoppingBag,
     path: "pre-order",
-    Component: SplitRoyalty,
   },
   {
     title: "Release Date",
@@ -109,7 +90,6 @@ export const newReleaseStoreTitles = [
     tab_title: "Release Date",
     icon: Calendar,
     path: "release-date",
-    Component: ReleaseDate,
   },
   {
     title: "Review",
@@ -118,7 +98,6 @@ export const newReleaseStoreTitles = [
     tab_title: "Review & Submit",
     icon: AlignLeft,
     path: "release-summary",
-    Component: ReleaseSummary,
   },
 ];
 
@@ -194,9 +173,7 @@ const useNewReleaseStore = create<NewReleaseStoreProps>((set, get) => ({
         id: upload_Relase_toast_id,
       });
       const data = await api[release_id ? "patch" : "post"]<{ reference: string }>(
-        release_id
-          ? API_ROUTES.RELEASES.DRAFT.DRAFT(release_id)
-          : API_ROUTES.RELEASES.DRAFT.INDEX,
+        release_id ? API_ROUTES.RELEASES.DRAFT.DRAFT(release_id) : API_ROUTES.RELEASES.DRAFT.INDEX,
         get().getReleaseDataFromState(),
       );
       goeyToast.dismiss(upload_Relase_toast_id);
