@@ -8,7 +8,7 @@ import { api } from "@/lib/api";
 import { API_ROUTES } from "@/lib/api-routes";
 import { goeyToast } from "goey-toast";
 import ContinueButton from "../../ContinueButton";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 
 function ChoosePlatforms({

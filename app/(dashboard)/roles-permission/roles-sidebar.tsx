@@ -4,7 +4,7 @@ import { Command, Search, Users, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { useRoles } from "./roles-provider";
 
 interface RolesSidebarProps {
